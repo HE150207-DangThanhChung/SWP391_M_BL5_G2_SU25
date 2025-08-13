@@ -12,6 +12,29 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        <h1>List Employee</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Employee Code</th>
+                    <th>BOD</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Hoang</td>
+                    <td>EMP123123</td>
+                    <td>22-12-2000</td>
+                    <td>
+                        <button>View</button>
+                        <button>Ban</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
     </body>
 </html>
