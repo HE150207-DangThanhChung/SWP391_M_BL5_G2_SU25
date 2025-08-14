@@ -9,7 +9,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Danh sách Cửa hàng</title>
 
         <!--        <link
                     rel="stylesheet"
@@ -283,32 +283,32 @@
                 <h2>Cửa hàng</h2>
 
                 <!-- Filter 1 -->
-                <section class="filter-box" >
-                    <header>
-                        <span>Trạng thái cửa hàng</span>
-                        <i class="fa fa-chevron-down"></i>
-                    </header>
-
-                </section>
-
-                <!-- Filter 2 -->
-                <section class="filter-box">
-                    <header>
-                        <span>Chi nhánh làm việc</span>
-                        <div style="display:flex; align-items:center; gap:8px;">
-                            <i class="fa fa-plus" ></i>
-                            <i class="fa fa-chevron-down" ></i>
-                        </div>
-                    </header>
-                </section>
-
-                <!-- Filter 3 -->
-                <section class="filter-box">
-                    <header>
-                        <span>Chức danh</span>
-                        <i class="fa fa-chevron-down" ></i>
-                    </header>
-                </section>
+                <!--                <section class="filter-box" >
+                                    <header>
+                                        <span>Trạng thái cửa hàng</span>
+                                        <i class="fa fa-chevron-down"></i>
+                                    </header>
+                
+                                </section>
+                
+                                 Filter 2 
+                                <section class="filter-box">
+                                    <header>
+                                        <span>Chi nhánh làm việc</span>
+                                        <div style="display:flex; align-items:center; gap:8px;">
+                                            <i class="fa fa-plus" ></i>
+                                            <i class="fa fa-chevron-down" ></i>
+                                        </div>
+                                    </header>
+                                </section>
+                
+                                 Filter 3 
+                                <section class="filter-box">
+                                    <header>
+                                        <span>Chức danh</span>
+                                        <i class="fa fa-chevron-down" ></i>
+                                    </header>
+                                </section>-->
             </div>
 
             <!-- Right Content -->
@@ -320,10 +320,11 @@
                         <input type="search" placeholder="Theo tên cửa hàng"/>
                     </div>
                     <div class="feature">
-                        <button>✚ Thêm cửa hàng</button>
-                        <button>✚ Nhập file </button>
-                        <button>✚ Xuất file </button>
+                        <button>➕ Thêm cửa hàng</button>
+                        <button>📤 Nhập file</button>
+                        <button>📥 Xuất file</button>
                     </div>
+
                 </div>
 
                 <!-- Table container -->
@@ -332,12 +333,12 @@
                         <thead>
                             <tr>
                                 <th><input type="checkbox"/></th>
-                                <th></th>
+                                <th>Ảnh của hàng</th>
                                 <th>Mã cửa hàng</th>
                                 <th>Tên cửa hàng</th>
                                 <th>Số điện thoại</th>
-                                <th>Số CCCD</th>
-                                <th>Ghi chú</th>
+
+                                <th>Địa chỉ</th>
                                 <th>Thông tin chi tiết</th>
 
                             </tr>
@@ -350,9 +351,11 @@
                                 <td>1</td>
                                 <td>Iphone</td>
                                 <td>0123456789</td>
-                                <td>123456789012</td>
-                                <td>Nhân viên bán hàng</td>
-                                <td><button>Chi tiết</button></td>
+
+                                <td>Thạch Hòa</td>
+                                <td><button>Chi tiết</button> 
+
+                                </td>
 
                             </tr>
 

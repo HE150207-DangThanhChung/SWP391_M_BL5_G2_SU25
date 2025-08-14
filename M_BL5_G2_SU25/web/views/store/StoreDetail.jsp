@@ -9,7 +9,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Chi tiết của hàng</title>
         <style>
 
             body {
@@ -74,7 +74,7 @@
             }
 
             .right button{
-                background-color: #ff2a2a;
+                background-color: #28a745;
                 color: #fff;
                 border-radius: 15px;
                 padding: 8px 24px;
@@ -176,17 +176,14 @@
                         <td>Số điện thoại cửa hàng </td> 
                         <td> <input type="text"/> </td> 
                     </tr>
-                    <tr> 
+<!--                    <tr> 
                         <td>Ngày đăng kí cửa hàng </td> 
                         <td></i> <input type="date"/> </td> 
-                    </tr>
-                    <tr> 
-                        <td> Gia hạn  </td> 
-                        <td><input type="text" name="name" value="12 tháng"> </td> 
-                    </tr>
+                    </tr>-->
+                    
                 </table>
                 <div class="btn">
-                    <button>Lưu</button>
+                    <button>Lưu</button> <button>Hủy bỏ</button>
                 </div>
             </div>
         </div>

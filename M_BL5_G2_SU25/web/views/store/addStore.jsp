@@ -9,7 +9,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Thêm mới cửa hàng</title>
         
         <style>
 
@@ -179,13 +179,13 @@
                         <td>Số điện thoại của hàng</td>
                         <td><input type="text"/></td>
                     </tr>
-                    <tr>
+<!--                    <tr>
                         <td>Ngày đăng kí cửa hàng</td>
                         <td><input type="date"/></td>
-                    </tr>
+                    </tr>-->
                 </table>
                 <div class="btn">
-                    <button>Thêm mới</button>
+                    <button>Thêm mới</button> <button>Hủy bỏ</button>
                 </div>
             </div>
         </div>  
