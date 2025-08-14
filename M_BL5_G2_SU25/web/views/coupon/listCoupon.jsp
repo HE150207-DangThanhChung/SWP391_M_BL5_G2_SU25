@@ -12,6 +12,18 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Mã coupon</th>
+                    <th>Giảm (%)</th>
+                    <th>Giảm tối đa</th>
+                    <th>Áp dụng từ</th>
+                    <th>Đến ngày</th>
+                    <th>Trạng thái</th>
+                    <th class="action-column">Chi tiết</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
     </body>
 </html>

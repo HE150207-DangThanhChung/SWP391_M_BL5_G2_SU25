@@ -9,15 +9,16 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Login</title>
     </head>
     <body>
         <h1>Login</h1>
-        <form>
+        <form action="" method="">
             <label for="username">Username</label>
-            <input id="username" type="text" />
-            <label for="username">Password</label>
-            <input id="username" type="password" />
+            <input id="username" type="text" name="username" />
+            <label for="password">Password</label>
+            <input id="password" type="password" name="password"/>
+            <input type="submit" value="Login">
         </form>
         <label>This is a line for testing GIT</label>        
     </body>

@@ -12,6 +12,19 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th class="name-column">Họ và tên</th>
+                    <th class="phone-column">Số điện thoại</th>
+                    <th class="email-column">Email</th>
+                    <th class="gender-column">Giới tính</th>
+                    <th class="tax-column">Mã số thuế (nếu có)</th>
+                    <th class="status-column">Trạng thái</th>
+                    <th class="address-column">Địa chỉ</th>
+                    <th class="action-column">Chi tiết</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
     </body>
 </html>
