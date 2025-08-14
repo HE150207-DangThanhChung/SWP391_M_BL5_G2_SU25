@@ -19,5 +19,6 @@
             <label for="username">Password</label>
             <input id="username" type="password" />
         </form>
+        <label>This is a line for testing GIT</label>
     </body>
 </html>
