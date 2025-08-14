@@ -19,7 +19,12 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
 Chỉnh sửa lại annotation @WebServlet theo phần cá nhân làm riêng
 */
-@WebServlet(name = "CategoryController", urlPatterns = {"/CategoryController"})
+@WebServlet(name = "CategoryController", urlPatterns = {
+    "/management/category",
+    "/management/category/add",
+    "/management/category/edit",
+    "/management/category/detail"
+})
 public class CategoryController extends HttpServlet {
 
     /**
