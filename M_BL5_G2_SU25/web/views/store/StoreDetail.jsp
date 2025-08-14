@@ -1,7 +1,7 @@
 <%-- 
-    Document   : editDetailStore
-    Created on : Aug 13, 2025, 8:49:45 AM
-    Author     : tayho
+    Document   : StoreDetail.jsp
+    Created on : 14 thg 8, 2025, 08:57:18
+    Author     : truon
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -151,6 +151,46 @@
         </style>
     </head>
     <body>
-        
+        <div class="content">
+            <div class="left">
+                <img height="150" width="150" src="image/logo2.jpg" />
+                <h2>
+                </h2>
+            </div>
+            <div class="right ">
+                <h2> Hồ sơ của </h2>
+                <table>
+                    <tr> 
+                        <td> ID cửa hàng</td> 
+                        <td> <input type="text"/> </td> 
+                    </tr>
+                    <tr> 
+                        <td> Tên cửa hàng</td> 
+                        <td> <input type="text"/> </td> 
+                    </tr>
+                    <tr> 
+                        <td> Địa chỉ cửa hàng </td> 
+                        <td> <input type="text"/> </td> 
+                    </tr>
+                    <tr> 
+                        <td>Số điện thoại cửa hàng </td> 
+                        <td> <input type="text"/> </td> 
+                    </tr>
+                    <tr> 
+                        <td>Ngày đăng kí cửa hàng </td> 
+                        <td></i> <input type="date"/> </td> 
+                    </tr>
+                    <tr> 
+                        <td> Gia hạn  </td> 
+                        <td><input type="text" name="name" value="12 tháng"> </td> 
+                    </tr>
+                </table>
+                <div class="btn">
+                    <button>Lưu</button>
+                </div>
+            </div>
+        </div>
+
+
     </body>
 </html>
