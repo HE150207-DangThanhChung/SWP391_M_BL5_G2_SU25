@@ -9,9 +9,23 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Add Supplier</title>
     </head>
     <body>
-        <h1>Hello World!</h1>
-    </body>
+        <h2>Add New Supplier</h2>
+        <form action="AddSupplierServlet" method="post">
+            Supplier Name: <input type="text" name="supplierName" required><br><br>
+            Address: <textarea name="address" required></textarea><br><br>
+            Phone: <input type="text" name="phone" required><br><br>
+            Email: <input type="email" name="email" required><br><br>
+            Status:
+            <select name="status">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select><br><br>
+            Notes: <textarea name="notes"></textarea><br><br>
+
+            <input type="submit" value="Add Supplier">
+            <input type="reset" value="Reset">
+        </form>
 </html>
