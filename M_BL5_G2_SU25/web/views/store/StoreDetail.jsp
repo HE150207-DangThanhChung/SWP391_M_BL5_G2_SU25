@@ -176,15 +176,17 @@
                         <td>Số điện thoại cửa hàng </td> 
                         <td> <input type="text"/> </td> 
                     </tr>
-<!--                    <tr> 
-                        <td>Ngày đăng kí cửa hàng </td> 
-                        <td></i> <input type="date"/> </td> 
-                    </tr>-->
-                    
+                    <!--                    <tr> 
+                                            <td>Ngày đăng kí cửa hàng </td> 
+                                            <td></i> <input type="date"/> </td> 
+                                        </tr>-->
+
                 </table>
                 <div class="btn">
-                    <button>Lưu</button> <button>Hủy bỏ</button>
+                    <button onclick="window.location.href = 'editDetailStore.jsp'">Chỉnh sửa</button>
+                    <button onclick="window.location.href = 'listStore.jsp'">Hủy bỏ</button>
                 </div>
+
             </div>
         </div>
 

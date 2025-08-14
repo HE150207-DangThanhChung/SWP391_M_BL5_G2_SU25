@@ -185,7 +185,8 @@
                     </tr>-->
                 </table>
                 <div class="btn">
-                    <button>Thêm mới</button> <button>Hủy bỏ</button>
+                    <button>Thêm mới</button> 
+                    <button onclick="window.location.href = 'listStore.jsp'">Hủy bỏ</button>
                 </div>
             </div>
         </div>  

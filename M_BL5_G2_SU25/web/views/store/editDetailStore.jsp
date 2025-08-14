@@ -74,7 +74,7 @@
             }
 
             .right button{
-                background-color: #ff2a2a;
+                background-color: #28a745;
                 color: #fff;
                 border-radius: 15px;
                 padding: 8px 24px;
@@ -151,6 +151,45 @@
         </style>
     </head>
     <body>
-        
+        <div class="content">
+            <div class="left">
+                <img height="150" width="150" src="image/logo2.jpg" />
+                <h2>
+                    <input type="file" name="name">
+                </h2>
+            </div>
+            <div class="right ">
+                <h2> Chỉnh sửa hồ sơ cửa hàng </h2>
+                <table>
+                    <tr> 
+                        <td> ID cửa hàng</td> 
+                        <td> <input type="text"/> </td> 
+                    </tr>
+                    <tr> 
+                        <td> Tên cửa hàng</td> 
+                        <td> <input type="text"/> </td> 
+                    </tr>
+                    <tr> 
+                        <td> Địa chỉ cửa hàng </td> 
+                        <td> <input type="text"/> </td> 
+                    </tr>
+                    <tr> 
+                        <td>Số điện thoại cửa hàng </td> 
+                        <td> <input type="text"/> </td> 
+                    </tr>
+                    <!--                    <tr> 
+                                            <td>Ngày đăng kí cửa hàng </td> 
+                                            <td></i> <input type="date"/> </td> 
+                                        </tr>-->
+
+                </table>
+                <div class="btn">
+                    <button>Lưu</button>
+                    <button onclick="window.location.href = 'StoreDetail.jsp'">Hủy bỏ</button>
+                </div>
+
+
+            </div>
+        </div>
     </body>
 </html>

@@ -320,10 +320,11 @@
                         <input type="search" placeholder="Theo tên cửa hàng"/>
                     </div>
                     <div class="feature">
-                        <button>➕ Thêm cửa hàng</button>
+                        <button onclick="window.location.href = 'addStore.jsp'">➕ Thêm cửa hàng</button>
                         <button>📤 Nhập file</button>
                         <button>📥 Xuất file</button>
                     </div>
+
 
                 </div>
 
@@ -353,9 +354,8 @@
                                 <td>0123456789</td>
 
                                 <td>Thạch Hòa</td>
-                                <td><button>Chi tiết</button> 
+                                <td><button onclick="window.location.href = 'StoreDetail.jsp'">Chi tiết</button></td>
 
-                                </td>
 
                             </tr>
 
