@@ -16,15 +16,17 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+
 /**
  *
  * @author tayho
  */
 /**
-Chỉnh sửa lại annotation @WebServlet theo phần cá nhân làm riêng
-*/
-@WebServlet("/admin/products/")
+ * Chỉnh sửa lại annotation @WebServlet theo phần cá nhân làm riêng
+ */
+@WebServlet("/admin/products/*")
 public class ProductController extends HttpServlet {
+
     private ProductDAO productDAO;
 
     @Override
@@ -36,7 +38,7 @@ public class ProductController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
-        if (pathInfo == null || "/".equals(pathInfo)) {
+        if (pathInfo == null || pathInfo.equals("") || "/".equals(pathInfo)) {
             // Show product list
             List<Product> products = productDAO.getAllProducts();
             request.setAttribute("products", products);

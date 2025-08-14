@@ -41,7 +41,11 @@
             <c:forEach var="product" items="${products}">
                 <tr>
                     <td>${product.productId}</td>
-                    <td>${product.productName}</td>
+                    <td>
+                        <a href="${pageContext.request.contextPath}/admin/products/detail?productId=${product.productId}">
+                            ${product.productName}
+                        </a>
+                    </td>
                     <td>${product.brandName}</td>
                     <td>${product.categoryName}</td>
                     <td>${product.price}</td>
@@ -66,7 +70,7 @@
             <ul class="pagination pagination-sm mb-0">
                 <li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
                 <li class="page-item"><a class="page-link" href="#">&lt;</a></li>
-                <c:forEach begin="1" end="${totalPages}" var="page">
+                    <c:forEach begin="1" end="${totalPages}" var="page">
                     <li class="page-item ${page == currentPage ? 'active' : ''}">
                         <a class="page-link" href="?page=${page}">${page}</a>
                     </li>

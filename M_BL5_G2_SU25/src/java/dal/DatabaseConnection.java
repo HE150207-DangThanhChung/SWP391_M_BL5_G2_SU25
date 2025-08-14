@@ -13,8 +13,8 @@ import java.sql.SQLException;
  */
 public class DatabaseConnection {
     private static final String URL = "jdbc:sqlserver://localhost:1433;databaseName=DACSPV2_Shop_1;encrypt=false";
-    private static final String USER = "Mavinhloc";
-    private static final String PASSWORD = "123";
+    private static final String USER = "";
+    private static final String PASSWORD = "";
 
     public static Connection getConnection() throws SQLException {
         try {
