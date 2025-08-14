@@ -4,6 +4,10 @@
  */
 package controller;
 
+import dal.ProductDAO;
+import model.Product;
+import model.Brand;
+import model.Category;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -11,7 +15,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
+import java.util.List;
 /**
  *
  * @author tayho
@@ -19,62 +23,56 @@ import jakarta.servlet.http.HttpServletResponse;
 /**
 Chỉnh sửa lại annotation @WebServlet theo phần cá nhân làm riêng
 */
-@WebServlet(name = "ProductController", urlPatterns = {"/ProductController"})
+@WebServlet("/admin/products/")
 public class ProductController extends HttpServlet {
+    private ProductDAO productDAO;
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet ProductController</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet ProductController at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
+    @Override
+    public void init() throws ServletException {
+        productDAO = new ProductDAO();
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        String pathInfo = request.getPathInfo();
+        if (pathInfo == null || "/".equals(pathInfo)) {
+            // Show product list
+            List<Product> products = productDAO.getAllProducts();
+            request.setAttribute("products", products);
+            request.getRequestDispatcher("/views/admin/productList.jsp").forward(request, response);
+        } else if (pathInfo.startsWith("/detail")) {
+            // Show product details
+            String productIdStr = request.getParameter("productId");
+            if (productIdStr != null) {
+                int productId = Integer.parseInt(productIdStr);
+                Product product = productDAO.getProductById(productId);
+                if (product != null) {
+                    request.setAttribute("product", product);
+                    request.getRequestDispatcher("/views/admin/productDetail.jsp").forward(request, response);
+                } else {
+                    response.sendRedirect("products");
+                }
+            } else {
+                response.sendRedirect("products");
+            }
+        }
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        String productName = request.getParameter("productName");
+        int brandId = Integer.parseInt(request.getParameter("brandId"));
+        int categoryId = Integer.parseInt(request.getParameter("categoryId"));
+        String productCode = request.getParameter("productCode");
+        double price = Double.parseDouble(request.getParameter("price"));
+        int quantity = Integer.parseInt(request.getParameter("quantity"));
+        String status = request.getParameter("status");
+
+        Product product = new Product(productName, brandId, categoryId, productCode, price, quantity, status);
+        productDAO.addProduct(product);
+        response.sendRedirect("products");
     }
 
     /**
