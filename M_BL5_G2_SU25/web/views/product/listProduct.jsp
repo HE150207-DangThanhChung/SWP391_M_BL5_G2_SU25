@@ -1,9 +1,3 @@
-<%-- 
-    Document   : listProduct
-    Created on : Aug 13, 2025, 8:48:42 AM
-    Author     : tayho
---%>
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -24,15 +18,21 @@
     .table td a:hover {
         text-decoration: underline;
     }
+    .product-img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
 </style>
 
 <div class="container mt-4">
-
     <!-- Page Title -->
     <h2 class="mb-4">Danh sách sản phẩm</h2>
 
     <!-- Search & Filters -->
     <div class="d-flex flex-wrap mb-3 align-items-center gap-2">
+        <a href="${pageContext.request.contextPath}/product/add" class="btn btn-success">Thêm sản phẩm</a>
         <input type="text" class="form-control search-bar" placeholder="Tìm kiếm theo tên, thương hiệu, danh mục..." />
         <button class="btn btn-primary"><i class="bi bi-search"></i> Tìm kiếm</button>
         <button class="btn btn-info">Filter 1</button>
@@ -50,11 +50,14 @@
             <thead class="table-primary">
                 <tr>
                     <th>ID</th>
+                    <th>Hình ảnh</th>
                     <th>Tên sản phẩm</th>
                     <th>Thương hiệu</th>
                     <th>Danh mục</th>
+                    <th>Nhà cung cấp</th>
+                    <th>Mã sản phẩm</th>
                     <th>Giá</th>
-                    <th>Số lượng</th>
+                    <th>Bảo hành (Tháng)</th>
                     <th>Trạng thái</th>
                     <th>Hành động</th>
                 </tr>
@@ -64,16 +67,28 @@
                     <tr>
                         <td>${product.productId}</td>
                         <td>
+                            <c:choose>
+                                <c:when test="${not empty product.imageUrl}">
+                                    <img src="${pageContext.request.contextPath}/${product.imageUrl}" alt="${product.productName}" class="product-img">
+                                </c:when>
+                                <c:otherwise>
+                                    <span class="text-muted">No image</span>
+                                </c:otherwise>
+                            </c:choose>
+                        </td>
+                        <td>
                             <a href="${pageContext.request.contextPath}/product/detail?productId=${product.productId}">
                                 ${product.productName}
                             </a>
                         </td>
                         <td>${product.brandName}</td>
                         <td>${product.categoryName}</td>
+                        <td>${product.supplierName}</td>
+                        <td>${product.productCode}</td>
                         <td>${product.price}</td>
-                        <td>${product.quantity}</td>
+                        <td>${product.warrantyDurationMonth}</td>
                         <td>
-                            <span class="badge ${product.status == 'Available' ? 'bg-success' : 'bg-danger'}">
+                            <span class="badge ${product.status == 'Active' ? 'bg-success' : 'bg-danger'}">
                                 ${product.status}
                             </span>
                         </td>
@@ -107,5 +122,4 @@
             </ul>
         </nav>
     </div>
-
 </div>

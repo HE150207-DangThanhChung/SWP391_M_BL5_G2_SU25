@@ -8,63 +8,67 @@ package model;
  *
  * @author tayho
  */
+
 public class Product {
     private int productId;
     private String productName;
-    private int brandId;
-    private String brandName;
+    private String status;
     private int categoryId;
     private String categoryName;
+    private int brandId;
+    private String brandName;
+    private int supplierId;
+    private String supplierName;
     private String productCode;
     private double price;
-    private int quantity;
-    private String status;
+    private int warrantyDurationMonth;
+    private String imageUrl; // From ProductImage
 
-    // Constructor for listing (includes brand and category names)
-    public Product(int productId, String productName, int brandId, String brandName, int categoryId, String categoryName,
-                   String productCode, double price, int quantity, String status) {
+    // Constructors
+    public Product() {}
+    public Product(int productId, String productName, String status, int categoryId, String categoryName, 
+                   int brandId, String brandName, int supplierId, String supplierName, String productCode, 
+                   double price, int warrantyDurationMonth, String imageUrl) {
         this.productId = productId;
         this.productName = productName;
-        this.brandId = brandId;
-        this.brandName = brandName;
+        this.status = status;
         this.categoryId = categoryId;
         this.categoryName = categoryName;
-        this.productCode = productCode;
-        this.price = price;
-        this.quantity = quantity;
-        this.status = status;
-    }
-
-    // Constructor for adding (minimal fields)
-    public Product(String productName, int brandId, int categoryId, String productCode, double price, int quantity, String status) {
-        this.productName = productName;
         this.brandId = brandId;
-        this.categoryId = categoryId;
+        this.brandName = brandName;
+        this.supplierId = supplierId;
+        this.supplierName = supplierName;
         this.productCode = productCode;
         this.price = price;
-        this.quantity = quantity;
-        this.status = status;
+        this.warrantyDurationMonth = warrantyDurationMonth;
+        this.imageUrl = imageUrl;
     }
 
-    // Getters and setters
+    // Getters and Setters
     public int getProductId() { return productId; }
     public void setProductId(int productId) { this.productId = productId; }
     public String getProductName() { return productName; }
     public void setProductName(String productName) { this.productName = productName; }
-    public int getBrandId() { return brandId; }
-    public void setBrandId(int brandId) { this.brandId = brandId; }
-    public String getBrandName() { return brandName; }
-    public void setBrandName(String brandName) { this.brandName = brandName; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
     public int getCategoryId() { return categoryId; }
     public void setCategoryId(int categoryId) { this.categoryId = categoryId; }
     public String getCategoryName() { return categoryName; }
     public void setCategoryName(String categoryName) { this.categoryName = categoryName; }
+    public int getBrandId() { return brandId; }
+    public void setBrandId(int brandId) { this.brandId = brandId; }
+    public String getBrandName() { return brandName; }
+    public void setBrandName(String brandName) { this.brandName = brandName; }
+    public int getSupplierId() { return supplierId; }
+    public void setSupplierId(int supplierId) { this.supplierId = supplierId; }
+    public String getSupplierName() { return supplierName; }
+    public void setSupplierName(String supplierName) { this.supplierName = supplierName; }
     public String getProductCode() { return productCode; }
     public void setProductCode(String productCode) { this.productCode = productCode; }
     public double getPrice() { return price; }
     public void setPrice(double price) { this.price = price; }
-    public int getQuantity() { return quantity; }
-    public void setQuantity(int quantity) { this.quantity = quantity; }
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public int getWarrantyDurationMonth() { return warrantyDurationMonth; }
+    public void setWarrantyDurationMonth(int warrantyDurationMonth) { this.warrantyDurationMonth = warrantyDurationMonth; }
+    public String getImageUrl() { return imageUrl; }
+    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 }
