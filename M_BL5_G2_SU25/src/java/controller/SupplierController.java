@@ -11,6 +11,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.List;
 
 @WebServlet(name = "SupplierController", urlPatterns = {
@@ -29,10 +30,12 @@ public class SupplierController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String path = request.getServletPath();
-        
-        switch(path){
-            case BASE_PATH -> doGetList(request, response);
-            case BASE_PATH + "/add" -> doGetAdd(request, response);
+
+        switch (path) {
+            case BASE_PATH ->
+                doGetList(request, response);
+            case BASE_PATH + "/add" ->
+                doGetAdd(request, response);
         }
     }
 
@@ -40,21 +43,70 @@ public class SupplierController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String path = request.getServletPath();
-        
-        switch(path){
-            case BASE_PATH + "/add" -> doPostAdd(request, response);
+
+        switch (path) {
+            case BASE_PATH + "/add" ->
+                doPostAdd(request, response);
         }
     }
-    
-    private void doPostAdd(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
-        
+
+    private void doPostAdd(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        SupplierDAO dao = new SupplierDAO();
+        HashMap<String, Object> jsonMap = new HashMap<>();
+
+        try {
+            String email = request.getParameter("email");
+            String name = request.getParameter("name");
+            String phone = request.getParameter("phone");
+            String status = request.getParameter("status");
+            String taxCode = request.getParameter("taxCode");
+
+            if (dao.isEmailExisted(email)) {
+                jsonMap.put("ok", false);
+                jsonMap.put("message", "Email is already existed!");
+                sendJson(response, jsonMap);
+                return;
+            }
+            if (dao.isNameExisted(name)) {
+                jsonMap.put("ok", false);
+                jsonMap.put("message", "Name is already existed!");
+                sendJson(response, jsonMap);
+                return;
+            }
+            if (dao.isPhoneExisted(phone)) {
+                jsonMap.put("ok", false);
+                jsonMap.put("message", "Phone is already existed!");
+                sendJson(response, jsonMap);
+                return;
+            }
+            if (dao.isTaxCodeExisted(taxCode)) {
+                jsonMap.put("ok", false);
+                jsonMap.put("message", "Tax Code is already existed!");
+                sendJson(response, jsonMap);
+                return;
+            }
+
+            boolean success = dao.addSupplier(name, phone, email, taxCode, status);
+            if (success) {
+                jsonMap.put("ok", true);
+                jsonMap.put("message", "Supplier added successfully!");
+            } else {
+                jsonMap.put("ok", false);
+                jsonMap.put("message", "Failed to add supplier. Please try again.");
+            }
+            sendJson(response, jsonMap);
+        } catch (IOException e) {
+            jsonMap.put("ok", false);
+            jsonMap.put("message", "Something wrong, please try again later!");
+            sendJson(response, jsonMap);
+        }
     }
-    
-    private void doGetAdd(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+
+    private void doGetAdd(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.getRequestDispatcher("/views/supplier/addSupplier.jsp").forward(request, response);
     }
-    
-    private void doGetList(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+
+    private void doGetList(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String searchKey = request.getParameter("search");
         String status = request.getParameter("status");
         String pageStr = request.getParameter("page");
@@ -63,8 +115,11 @@ public class SupplierController extends HttpServlet {
         if (pageStr != null && !pageStr.isEmpty()) {
             try {
                 page = Integer.parseInt(pageStr);
-                if (page < 1) page = 1;
-            } catch (NumberFormatException ignored) {}
+                if (page < 1) {
+                    page = 1;
+                }
+            } catch (NumberFormatException ignored) {
+            }
         }
 
         int offset = (page - 1) * ITEMS_PER_PAGE;
@@ -76,7 +131,7 @@ public class SupplierController extends HttpServlet {
         int totalSuppliers = dao.countSuppliersWithFilter(searchKey, status);
         int totalPages = (int) Math.ceil((double) totalSuppliers / ITEMS_PER_PAGE);
         int endItem = (offset + 1) == totalSuppliers ? offset + 1 : offset + ITEMS_PER_PAGE;
-        
+
         request.setAttribute("startItem", offset + 1);
         request.setAttribute("endItem", endItem);
         request.setAttribute("totalItems", totalSuppliers);
@@ -88,16 +143,11 @@ public class SupplierController extends HttpServlet {
 
         request.getRequestDispatcher("/views/supplier/listSupplier.jsp").forward(request, response);
     }
-    
+
     public static void sendJson(HttpServletResponse response, Object data) throws IOException {
-        // Set content type and encoding
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-
-        // Convert object to JSON string
         String json = gson.toJson(data);
-
-        // Write JSON to response
         response.getWriter().write(json);
         response.getWriter().flush();
     }

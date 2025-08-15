@@ -378,22 +378,23 @@
                                                     btnText.textContent = 'Adding...';
                                                     form.classList.add('loading');
 
-                                                    const supplierData = {
-                                                        name: document.getElementById('supplierName').value.trim(),
-                                                        phone: document.getElementById('supplierPhone').value.trim(),
-                                                        email: document.getElementById('supplierEmail').value.trim(),
-                                                        taxCode: document.getElementById('supplierTaxCode').value.trim(),
-                                                        status: document.getElementById('supplierStatus').value
-                                                    };
-
                                                     $.ajax({
-                                                        url: '${pageContext.request.contextPath}/management/suppliers/add', 
+                                                        url: '${pageContext.request.contextPath}/management/suppliers/add',
                                                         method: 'POST',
-                                                        data: JSON.stringify(supplierData),
-                                                        contentType: 'application/json',
+                                                        data: {
+                                                            name: document.getElementById('supplierName').value.trim(),
+                                                            phone: document.getElementById('supplierPhone').value.trim(),
+                                                            email: document.getElementById('supplierEmail').value.trim(),
+                                                            taxCode: document.getElementById('supplierTaxCode').value.trim(),
+                                                            status: document.getElementById('supplierStatus').value
+                                                        },
                                                         success: function (response) {
-                                                            showToast('Supplier added successfully!', 'success');
-                                                            clearForm();
+                                                            if (response.ok === true) {
+                                                                showToast(response.message);
+                                                                clearForm();
+                                                            } else {
+                                                                showToast(response.message, 'error');
+                                                            }
                                                         },
                                                         error: function (xhr, status, error) {
                                                             console.error('Error:', error);

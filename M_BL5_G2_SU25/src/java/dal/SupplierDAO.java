@@ -30,7 +30,7 @@ public class SupplierDAO {
     public boolean addSupplier(String name, String phone, String email, String taxCode, String status) {
         String sql = """
                  INSERT INTO Supplier (SupplierName, Phone, Email, TaxCode, Status)
-                 VALUES (?, ?, ?, ?)
+                 VALUES (?, ?, ?, ?, ?)
                  """;
 
         try {
@@ -48,6 +48,7 @@ public class SupplierDAO {
 
         } catch (SQLException e) {
             e.printStackTrace();
+            System.out.println(e);
         } finally {
             if (ps != null) try {
                 ps.close();
