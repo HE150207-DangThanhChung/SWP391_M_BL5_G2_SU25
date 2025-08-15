@@ -17,7 +17,7 @@
             <div class="main-panel flex flex-col min-h-screen w-full">
                 <jsp:include page="/views/common/header.jsp"/>
                 <main class="content flex-1 p-6 bg-gray-50">
-                    <div class="mb-8">
+                    <div class="mb-8 pt-2 pl-2">
                         <div class="flex items-center justify-between">
                             <div>
                                 <h1 class="text-3xl font-bold text-gray-900">Chỉnh sửa danh mục</h1>

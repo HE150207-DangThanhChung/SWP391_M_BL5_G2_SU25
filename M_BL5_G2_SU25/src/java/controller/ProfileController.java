@@ -7,6 +7,8 @@ package controller;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import dal.EmployeeDAO;
+import dal.RoleDAO;
+import dal.StoreDAO;
 import dal.SupplierDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
@@ -17,6 +19,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.HashMap;
 import model.Employee;
+import model.Role;
+import model.Store;
 import model.Supplier;
 
 /**
@@ -31,16 +35,16 @@ import model.Supplier;
     "/profile/edit"
 })
 public class ProfileController extends HttpServlet {
-    
+
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final int ITEMS_PER_PAGE = 2;
     private final String BASE_PATH = "/profile";
-    
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String path = request.getServletPath();
-        
+
         switch (path) {
             case BASE_PATH ->
                 doGetDetail(request, response);
@@ -48,53 +52,59 @@ public class ProfileController extends HttpServlet {
                 doGetEdit(request, response);
         }
     }
-    
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String path = request.getServletPath();
-        
+
         switch (path) {
             case BASE_PATH + "/edit" ->
                 doPostEdit(request, response);
         }
     }
-    
+
     private void doGetDetail(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         HttpSession session = request.getSession(false);
         String username = (String) session.getAttribute("tendangnhap");
         EmployeeDAO eDao = new EmployeeDAO();
-        
+        StoreDAO sDao = new StoreDAO();
+        RoleDAO rDao = new RoleDAO();
+
         if (username == null || username.isEmpty()) {
             response.sendError(404);
         }
-        
+
         Employee e = eDao.getEmployeeByUsername(username);
-        
+        Store s = sDao.getStoreById(e.getStoreId());
+        Role r = rDao.getRoleById(e.getRoleId());
+
+        request.setAttribute("r", r);
+        request.setAttribute("s", s);
         request.setAttribute("e", e);
         request.getRequestDispatcher("/views/profile/viewProfile.jsp").forward(request, response);
     }
-    
+
     private void doGetEdit(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String idStr = request.getParameter("id");
         SupplierDAO dao = new SupplierDAO();
-        
+
         if (idStr == null || idStr.isEmpty()) {
             response.sendError(404);
         }
-        
+
         int id = Integer.parseInt(idStr);
-        
+
         Supplier s = dao.getSupplierById(id);
-        
+
         request.setAttribute("s", s);
         request.getRequestDispatcher("/views/profile/editProfile.jsp").forward(request, response);
     }
-    
+
     private void doPostEdit(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         SupplierDAO dao = new SupplierDAO();
         HashMap<String, Object> jsonMap = new HashMap<>();
-        
+
         try {
             String idStr = request.getParameter("id");
             String email = request.getParameter("email");
@@ -102,11 +112,11 @@ public class ProfileController extends HttpServlet {
             String phone = request.getParameter("phone");
             String status = request.getParameter("status");
             String taxCode = request.getParameter("taxCode");
-            
+
             int id = Integer.parseInt(idStr);
-            
+
             Supplier s = dao.getSupplierById(id);
-            
+
             if (!s.getEmail().equals(email)) {
                 if (dao.isEmailExisted(email)) {
                     jsonMap.put("ok", false);
@@ -139,7 +149,7 @@ public class ProfileController extends HttpServlet {
                     return;
                 }
             }
-            
+
             boolean success = dao.editSupplier(id, name, phone, email, taxCode, status);
             if (success) {
                 jsonMap.put("ok", true);
@@ -155,7 +165,7 @@ public class ProfileController extends HttpServlet {
             sendJson(response, jsonMap);
         }
     }
-    
+
     public static void sendJson(HttpServletResponse response, Object data) throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
@@ -163,5 +173,5 @@ public class ProfileController extends HttpServlet {
         response.getWriter().write(json);
         response.getWriter().flush();
     }
-    
+
 }

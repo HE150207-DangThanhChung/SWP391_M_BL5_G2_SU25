@@ -60,7 +60,7 @@
 
                 <main class="content flex-1 p-6 bg-gray-50">
                     <!-- Tiêu đề -->
-                    <div class="mb-8">
+                    <div class="mb-8 pt-2 pl-2">
                         <div class="flex items-center justify-between">
                             <div>
                                 <h1 class="text-3xl font-bold text-gray-900">Chi tiết danh mục</h1>

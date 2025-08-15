@@ -89,10 +89,10 @@
 
                 <main class="content flex-1 p-6 bg-gray-50">
                     <!-- Tiêu đề -->
-                    <div class="mb-8">
+                    <div class="mb-8 pt-2 pl-2">
                         <div class="flex items-center justify-between">
                             <div>
-                                <h1 class="text-3xl font-bold text-gray-900">Hồ sơ cá nhận</h1>
+                                <h1 class="text-3xl font-bold text-gray-900">Hồ sơ cá nhân</h1>
                                 <p class="text-gray-600 mt-1">Thông tin cá nhân và công việc</p>
                             </div>
                             <button onclick="history.back()"
@@ -162,12 +162,12 @@
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Vai trò</label>
-                                    <p class="px-4 py-3 border border-gray-300 rounded-lg bg-gray-50">${e.roleId}</p>
+                                    <p class="px-4 py-3 border border-gray-300 rounded-lg bg-gray-50">${r.name}</p>
                                 </div>
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Cửa hàng</label>
-                                    <p class="px-4 py-3 border border-gray-300 rounded-lg bg-gray-50">${e.storeId}</p>
+                                    <p class="px-4 py-3 border border-gray-300 rounded-lg bg-gray-50">${s.storeName}</p>
                                 </div>
 
                                 <div class="lg:col-span-2">
