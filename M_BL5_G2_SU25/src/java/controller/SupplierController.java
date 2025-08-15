@@ -38,6 +38,8 @@ public class SupplierController extends HttpServlet {
                 doGetAdd(request, response);
             case BASE_PATH + "/edit" ->
                 doGetEdit(request, response);
+            case BASE_PATH + "/detail" ->
+                doGetDetail(request, response);
         }
     }
 
@@ -52,6 +54,22 @@ public class SupplierController extends HttpServlet {
             case BASE_PATH + "/edit" ->
                 doPostEdit(request, response);
         }
+    }
+
+    private void doGetDetail(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String idStr = request.getParameter("id");
+        SupplierDAO dao = new SupplierDAO();
+
+        if (idStr == null || idStr.isEmpty()) {
+            response.sendError(404);
+        }
+
+        int id = Integer.parseInt(idStr);
+
+        Supplier s = dao.getSupplierById(id);
+
+        request.setAttribute("s", s);
+        request.getRequestDispatcher("/views/supplier/viewSupplier.jsp").forward(request, response);
     }
 
     private void doGetEdit(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
