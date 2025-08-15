@@ -24,9 +24,56 @@ public class SupplierDAO {
 
     public static void main(String[] args) {
         SupplierDAO supDao = new SupplierDAO();
-        System.out.println(supDao.GetAllSupplierWithPagingAndFilter("", null, 0, 10));
+//        System.out.println(supDao.GetAllSupplierWithPagingAndFilter("", null, 0, 10));
+        System.out.println(supDao.getSupplierById(1));
     }
 
+    public Supplier getSupplierById(int id){
+        Supplier s = new Supplier();
+
+        StringBuilder sql = new StringBuilder("""
+        SELECT [SupplierId],
+               [SupplierName],
+               [Phone],
+               [Email],
+               [TaxCode],
+               [Status]
+        FROM [SWP391_M_BL5_G2_SU25].[dbo].[Supplier]
+        WHERE SupplierId = ?
+    """);
+
+        Connection con = null;
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+
+        try {
+            con = DBContext.getConnection();
+            ps = con.prepareStatement(sql.toString());
+
+            ps.setInt(1, id);
+
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                s.setSupplierId(rs.getInt("SupplierId"));
+                s.setSupplierName(rs.getString("SupplierName"));
+                s.setEmail(rs.getString("Email"));
+                s.setPhone(rs.getString("Phone"));
+                s.setTaxCode(rs.getString("TaxCode"));
+                s.setStatus(rs.getString("Status"));
+            }
+
+        } catch (SQLException e) {
+            System.out.println(e);
+        } finally {
+            DBContext.closeConnection(rs);
+            DBContext.closeConnection(ps);
+            DBContext.closeConnection(con);
+        }
+
+        return s;
+    }
+    
     public boolean addSupplier(String name, String phone, String email, String taxCode, String status) {
         String sql = """
                  INSERT INTO Supplier (SupplierName, Phone, Email, TaxCode, Status)
@@ -114,10 +161,10 @@ public class SupplierDAO {
                 Supplier s = new Supplier();
                 s.setSupplierId(rs.getInt("SupplierId"));
                 s.setSupplierName(rs.getString("SupplierName"));
-                s.setSupplierEmail(rs.getString("Email"));
-                s.setSupplierPhone(rs.getString("Phone"));
-                s.setSupplierTaxCode(rs.getString("TaxCode"));
-                s.setSupplierStatus(rs.getString("Status"));
+                s.setEmail(rs.getString("Email"));
+                s.setPhone(rs.getString("Phone"));
+                s.setTaxCode(rs.getString("TaxCode"));
+                s.setStatus(rs.getString("Status"));
                 supList.add(s);
             }
 

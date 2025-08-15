@@ -49,11 +49,90 @@ public class SupplierController extends HttpServlet {
         switch (path) {
             case BASE_PATH + "/add" ->
                 doPostAdd(request, response);
+            case BASE_PATH + "/edit" ->
+                doPostEdit(request, response);
         }
     }
 
     private void doGetEdit(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String idStr = request.getParameter("id");
+        SupplierDAO dao = new SupplierDAO();
+
+        if (idStr == null || idStr.isEmpty()) {
+            response.sendError(404);
+        }
+
+        int id = Integer.parseInt(idStr);
+
+        Supplier s = dao.getSupplierById(id);
+
+        request.setAttribute("s", s);
         request.getRequestDispatcher("/views/supplier/editSupplier.jsp").forward(request, response);
+    }
+
+    private void doPostEdit(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        SupplierDAO dao = new SupplierDAO();
+        HashMap<String, Object> jsonMap = new HashMap<>();
+
+        try {
+            String idStr = request.getParameter("id");
+            String email = request.getParameter("email");
+            String name = request.getParameter("name");
+            String phone = request.getParameter("phone");
+            String status = request.getParameter("status");
+            String taxCode = request.getParameter("taxCode");
+
+            int id = Integer.parseInt(idStr);
+
+            Supplier s = dao.getSupplierById(id);
+
+            if (!s.getEmail().equals(email)) {
+                if (dao.isEmailExisted(email)) {
+                    jsonMap.put("ok", false);
+                    jsonMap.put("message", "Email is already existed!");
+                    sendJson(response, jsonMap);
+                    return;
+                }
+            }
+            if (s.getSupplierName().equals(name)) {
+                if (dao.isNameExisted(name)) {
+                    jsonMap.put("ok", false);
+                    jsonMap.put("message", "Name is already existed!");
+                    sendJson(response, jsonMap);
+                    return;
+                }
+            }
+            if (s.getPhone().equals(phone)) {
+                if (dao.isPhoneExisted(phone)) {
+                    jsonMap.put("ok", false);
+                    jsonMap.put("message", "Phone is already existed!");
+                    sendJson(response, jsonMap);
+                    return;
+                }
+            }
+            if (s.getTaxCode().equals(taxCode)) {
+                if (dao.isTaxCodeExisted(taxCode)) {
+                    jsonMap.put("ok", false);
+                    jsonMap.put("message", "Tax Code is already existed!");
+                    sendJson(response, jsonMap);
+                    return;
+                }
+            }
+
+            boolean success = dao.addSupplier(name, phone, email, taxCode, status);
+            if (success) {
+                jsonMap.put("ok", true);
+                jsonMap.put("message", "Supplier added successfully!");
+            } else {
+                jsonMap.put("ok", false);
+                jsonMap.put("message", "Failed to add supplier. Please try again.");
+            }
+            sendJson(response, jsonMap);
+        } catch (IOException e) {
+            jsonMap.put("ok", false);
+            jsonMap.put("message", "Something wrong, please try again later!");
+            sendJson(response, jsonMap);
+        }
     }
 
     private void doPostAdd(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

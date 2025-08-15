@@ -168,8 +168,8 @@
                                         <select id="supplierStatus" 
                                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white">
                                             <option value="">-- Select Status --</option>
-                                            <option value="active">Active</option>
-                                            <option value="inactive">Inactive</option>
+                                            <option value="Active">Active</option>
+                                            <option value="Deactive">Inactive</option>
                                         </select>
                                         <span id="supplierStatusError" class="error-text" style="display: none;"></span>
                                     </div>
