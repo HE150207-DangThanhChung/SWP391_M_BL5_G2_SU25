@@ -22,7 +22,7 @@ import java.util.List;
 public class CategoryController extends HttpServlet {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private final int ITEMS_PER_PAGE = 2;
+    private final int ITEMS_PER_PAGE = 5;
     private final String BASE_PATH = "/management/category";
 
     @Override
@@ -31,10 +31,14 @@ public class CategoryController extends HttpServlet {
         String path = request.getServletPath();
 
         switch (path) {
-            case BASE_PATH -> doGetList(request, response);
-            case BASE_PATH + "/add" -> doGetAdd(request, response);
-            case BASE_PATH + "/edit" -> doGetEdit(request, response);
-            case BASE_PATH + "/detail" -> doGetDetail(request, response);
+            case BASE_PATH ->
+                doGetList(request, response);
+            case BASE_PATH + "/add" ->
+                doGetAdd(request, response);
+            case BASE_PATH + "/edit" ->
+                doGetEdit(request, response);
+            case BASE_PATH + "/detail" ->
+                doGetDetail(request, response);
         }
     }
 
@@ -44,8 +48,10 @@ public class CategoryController extends HttpServlet {
         String path = request.getServletPath();
 
         switch (path) {
-            case BASE_PATH + "/add" -> doPostAdd(request, response);
-            case BASE_PATH + "/edit" -> doPostEdit(request, response);
+            case BASE_PATH + "/add" ->
+                doPostAdd(request, response);
+            case BASE_PATH + "/edit" ->
+                doPostEdit(request, response);
         }
     }
 
@@ -58,8 +64,20 @@ public class CategoryController extends HttpServlet {
             return;
         }
 
-        int id = Integer.parseInt(idStr);
+        int id = 0;
+
+        try {
+            id = Integer.parseInt(idStr);
+        } catch (NumberFormatException ex) {
+            response.sendError(404);
+            return;
+        }
         Category c = dao.getCategoryById(id);
+
+        if (c.getCategoryName() == null || c.getCategoryName().isEmpty()) {
+            response.sendError(404);
+            return;
+        }
 
         request.setAttribute("c", c);
         request.getRequestDispatcher("/views/category/viewCategory.jsp").forward(request, response);
@@ -167,10 +185,11 @@ public class CategoryController extends HttpServlet {
                 if (page < 1) {
                     page = 1;
                 }
-            } catch (NumberFormatException ignored) {}
+            } catch (NumberFormatException ignored) {
+            }
         }
 
-        int offset = (page - 1) * ITEMS_PER_PAGE;
+        int offset = (page - 1) * ITEMS_PER_PAGE; //page = 2 -> (page - 1) = 1 * ITEMS_PER_PAGE = 5
         CategoryDAO dao = new CategoryDAO();
 
         List<Category> catList = dao.GetAllCategoryWithPagingAndFilter(searchKey, status, offset, ITEMS_PER_PAGE);
