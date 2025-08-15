@@ -1,9 +1,3 @@
-<%-- 
-    Document   : productDetail
-    Created on : Aug 15, 2025, 10:34:14 AM
-    Author     : ADMIN
---%>
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -18,13 +12,24 @@
                 <p><strong>Tên sản phẩm:</strong> ${product.productName}</p>
                 <p><strong>Thương hiệu:</strong> ${product.brandName}</p>
                 <p><strong>Danh mục:</strong> ${product.categoryName}</p>
+                <p><strong>Nhà cung cấp:</strong> ${product.supplierName}</p>
                 <p><strong>Mã sản phẩm:</strong> ${product.productCode}</p>
                 <p><strong>Giá:</strong> ${product.price}</p>
-                <p><strong>Số lượng:</strong> ${product.quantity}</p>
+                <p><strong>Bảo hành:</strong> ${product.warrantyDurationMonth} tháng</p>
                 <p><strong>Trạng thái:</strong> 
-                    <span class="badge ${product.status == 'Available' ? 'bg-success' : 'bg-danger'}">
+                    <span class="badge ${product.status == 'Active' ? 'bg-success' : 'bg-danger'}">
                         ${product.status}
                     </span>
+                </p>
+                <p><strong>Hình ảnh:</strong>
+                    <c:choose>
+                        <c:when test="${not empty product.imageUrl}">
+                            <img src="${pageContext.request.contextPath}/${product.imageUrl}" alt="${product.productName}" class="product-img" style="width: 150px; height: 150px;">
+                        </c:when>
+                        <c:otherwise>
+                            <span class="text-muted">No image</span>
+                        </c:otherwise>
+                    </c:choose>
                 </p>
             </div>
         </div>
@@ -36,4 +41,3 @@
         <a href="${pageContext.request.contextPath}/product" class="btn btn-secondary">⬅ Quay lại danh sách</a>
     </c:if>
 </div>
-

@@ -11,65 +11,33 @@ package model;
 public class Supplier {
     private int supplierId;
     private String supplierName;
-    private String supplierPhone;
-    private String supplierEmail;
-    private String supplierTaxCode;
-    private String supplierStatus;
+    private String phone;
+    private String email;
+    private String taxCode;
+    private String status;
 
-    public Supplier() {
-        
-    }
-    
-    public int getSupplierId() {
-        return supplierId;
-    }
-
-    public void setSupplierId(int supplierId) {
+    // Constructors
+    public Supplier() {}
+    public Supplier(int supplierId, String supplierName, String phone, String email, String taxCode, String status) {
         this.supplierId = supplierId;
-    }
-
-    public String getSupplierName() {
-        return supplierName;
-    }
-
-    public void setSupplierName(String supplierName) {
         this.supplierName = supplierName;
+        this.phone = phone;
+        this.email = email;
+        this.taxCode = taxCode;
+        this.status = status;
     }
 
-    public String getSupplierPhone() {
-        return supplierPhone;
-    }
-
-    public void setSupplierPhone(String supplierPhone) {
-        this.supplierPhone = supplierPhone;
-    }
-
-    public String getSupplierEmail() {
-        return supplierEmail;
-    }
-
-    public void setSupplierEmail(String supplierEmail) {
-        this.supplierEmail = supplierEmail;
-    }
-
-    public String getSupplierTaxCode() {
-        return supplierTaxCode;
-    }
-
-    public void setSupplierTaxCode(String supplierTaxCode) {
-        this.supplierTaxCode = supplierTaxCode;
-    }
-
-    public String getSupplierStatus() {
-        return supplierStatus;
-    }
-
-    public void setSupplierStatus(String supplierStatus) {
-        this.supplierStatus = supplierStatus;
-    }
-
-    @Override
-    public String toString() {
-        return "Supplier{" + "supplierId=" + supplierId + ", supplierName=" + supplierName + ", supplierPhone=" + supplierPhone + ", supplierEmail=" + supplierEmail + ", supplierTaxCode=" + supplierTaxCode + ", supplierStatus=" + supplierStatus + '}';
-    }
+    // Getters and Setters
+    public int getSupplierId() { return supplierId; }
+    public void setSupplierId(int supplierId) { this.supplierId = supplierId; }
+    public String getSupplierName() { return supplierName; }
+    public void setSupplierName(String supplierName) { this.supplierName = supplierName; }
+    public String getPhone() { return phone; }
+    public void setPhone(String phone) { this.phone = phone; }
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+    public String getTaxCode() { return taxCode; }
+    public void setTaxCode(String taxCode) { this.taxCode = taxCode; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 }
