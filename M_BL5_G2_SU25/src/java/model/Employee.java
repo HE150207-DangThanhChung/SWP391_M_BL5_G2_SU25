@@ -11,6 +11,7 @@ import java.util.Date;
  * @author tayho
  */
 public class Employee {
+
     private int employeeId;
     private String userName;
     private String password;
@@ -199,6 +200,10 @@ public class Employee {
     public void setStoreName(String storeName) {
         this.storeName = storeName;
     }
-    
-    
+
+    @Override
+    public String toString() {
+        return "Employee{" + "employeeId=" + employeeId + ", userName=" + userName + ", password=" + password + ", firstName=" + firstName + ", lastName=" + lastName + ", phone=" + phone + ", email=" + email + ", cccd=" + cccd + ", status=" + status + ", avatar=" + avatar + ", dob=" + dob + ", address=" + address + ", startAt=" + startAt + ", gender=" + gender + ", roleId=" + roleId + ", storeId=" + storeId + ", roleName=" + roleName + ", storeName=" + storeName + '}';
+    }
+
 }

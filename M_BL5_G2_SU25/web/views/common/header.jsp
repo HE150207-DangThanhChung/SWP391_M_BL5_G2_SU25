@@ -308,7 +308,7 @@
                 <div class="dropdown">
                     <button class="dropbtn">Hồ Sơ</button>
                     <div class="dropdown-content">
-                        <a href="#">Cá Nhân</a>
+                        <a href="${pageContext.request.contextPath}/profile">Cá Nhân</a>
                         <a href="#">Cài Đặt</a>
                         <c:url var="logoutUrl" value="/logout"/>
                         <a href="${logoutUrl}">Đăng Xuất</a>
