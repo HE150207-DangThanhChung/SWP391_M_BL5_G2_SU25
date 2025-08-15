@@ -28,7 +28,48 @@ public class SupplierDAO {
         System.out.println(supDao.getSupplierById(1));
     }
 
-    public Supplier getSupplierById(int id){
+    public boolean editSupplier(int supplierId, String name, String phone, String email, String taxCode, String status) {
+        String sql = """
+            UPDATE Supplier
+            SET SupplierName = ?, 
+                Phone = ?, 
+                Email = ?, 
+                TaxCode = ?, 
+                Status = ?
+            WHERE SupplierID = ?
+            """;
+
+        try {
+            con = DBContext.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, name);
+            ps.setString(2, phone);
+            ps.setString(3, email);
+            ps.setString(4, taxCode);
+            ps.setString(5, status);
+            ps.setInt(6, supplierId);
+
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            System.out.println(e);
+        } finally {
+            if (ps != null) {
+                try {
+                    ps.close();
+                } catch (SQLException ignored) {
+                }
+            }
+            DBContext.closeConnection(con);
+        }
+
+        return false;
+    }
+
+    public Supplier getSupplierById(int id) {
         Supplier s = new Supplier();
 
         StringBuilder sql = new StringBuilder("""
@@ -73,7 +114,7 @@ public class SupplierDAO {
 
         return s;
     }
-    
+
     public boolean addSupplier(String name, String phone, String email, String taxCode, String status) {
         String sql = """
                  INSERT INTO Supplier (SupplierName, Phone, Email, TaxCode, Status)
