@@ -82,10 +82,10 @@
                     <form method="get" action="${pageContext.request.contextPath}/management/suppliers" class="flex items-center gap-3 mb-4">
                         <input type="text" name="search" value="${param.search}" placeholder="Search..."
                                class="border border-gray-300 rounded-md px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-                        <select name="statusId" class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <select name="status" class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="">All Status</option>
-                            <option value="1" ${param.statusId == '1' ? 'selected' : ''}>Active</option>
-                            <option value="0" ${param.statusId == '0' ? 'selected' : ''}>Inactive</option>
+                            <option value="Active" ${param.status == 'Active' ? 'selected' : ''}>Active</option>
+                            <option value="Deactive" ${param.status == 'Deactive' ? 'selected' : ''}>Deactive</option>
                         </select>
                         <button type="submit" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md">Filter</button>
                         <a href="${pageContext.request.contextPath}/management/suppliers"><button type="button" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md">Clear Filter</button></a>
@@ -117,8 +117,8 @@
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.supplierTaxCode}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                                                          ${s.supplierStatus == '1' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                                                        ${s.supplierStatus == '1' ? 'Active' : 'Inactive'}
+                                                          ${s.supplierStatus == 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                                        ${s.supplierStatus}
                                                     </span>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">

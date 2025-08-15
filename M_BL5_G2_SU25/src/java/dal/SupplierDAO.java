@@ -27,7 +27,7 @@ public class SupplierDAO {
         System.out.println(supDao.GetAllSupplierWithPagingAndFilter("", null, 0, 10));
     }
 
-    public List<Supplier> GetAllSupplierWithPagingAndFilter(String searchKey, Integer statusId, int offset, int limit) {
+    public List<Supplier> GetAllSupplierWithPagingAndFilter(String searchKey, String status, int offset, int limit) {
         List<Supplier> supList = new ArrayList<>();
 
         StringBuilder sql = new StringBuilder("""
@@ -44,7 +44,7 @@ public class SupplierDAO {
         if (searchKey != null && !searchKey.trim().isEmpty()) {
             sql.append(" AND (SupplierName LIKE ? OR Phone LIKE ? OR Email LIKE ? OR TaxCode LIKE ?) ");
         }
-        if (statusId != null) {
+        if (status != null && !status.trim().isEmpty()) {
             sql.append(" AND Status = ? ");
         }
 
@@ -68,8 +68,8 @@ public class SupplierDAO {
                 ps.setString(paramIndex++, searchPattern);
             }
 
-            if (statusId != null) {
-                ps.setInt(paramIndex++, statusId);
+            if (status != null && !status.trim().isEmpty()) {
+                ps.setString(paramIndex++, status);
             }
 
             ps.setInt(paramIndex++, offset);
@@ -99,7 +99,7 @@ public class SupplierDAO {
         return supList;
     }
 
-    public int countSuppliersWithFilter(String searchKey, Integer statusId) {
+    public int countSuppliersWithFilter(String searchKey, String status) {
         StringBuilder sql = new StringBuilder("""
         SELECT COUNT(*) AS total
         FROM [SWP391_M_BL5_G2_SU25].[dbo].[Supplier]
@@ -109,7 +109,7 @@ public class SupplierDAO {
         if (searchKey != null && !searchKey.trim().isEmpty()) {
             sql.append(" AND (SupplierName LIKE ? OR Phone LIKE ? OR Email LIKE ? OR TaxCode LIKE ?) ");
         }
-        if (statusId != null) {
+        if (status != null && !status.trim().isEmpty()) {
             sql.append(" AND Status = ? ");
         }
 
@@ -130,8 +130,8 @@ public class SupplierDAO {
                 ps.setString(paramIndex++, pattern);
                 ps.setString(paramIndex++, pattern);
             }
-            if (statusId != null) {
-                ps.setInt(paramIndex++, statusId);
+            if (status != null && !status.trim().isEmpty()) {
+                ps.setString(paramIndex++, status);
             }
 
             rs = ps.executeQuery();

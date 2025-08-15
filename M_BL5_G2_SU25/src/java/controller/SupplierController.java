@@ -26,13 +26,8 @@ public class SupplierController extends HttpServlet {
             throws ServletException, IOException {
 
         String searchKey = request.getParameter("search");
-        String statusIdStr = request.getParameter("statusId");
+        String status = request.getParameter("status");
         String pageStr = request.getParameter("page");
-
-        Integer statusId = null;
-        if (statusIdStr != null && !statusIdStr.isEmpty()) {
-            statusId = Integer.parseInt(statusIdStr);
-        }
 
         int page = 1;
         if (pageStr != null && !pageStr.isEmpty()) {
@@ -46,16 +41,20 @@ public class SupplierController extends HttpServlet {
 
         SupplierDAO dao = new SupplierDAO();
 
-        List<Supplier> supList = dao.GetAllSupplierWithPagingAndFilter(searchKey, statusId, offset, ITEMS_PER_PAGE);
+        List<Supplier> supList = dao.GetAllSupplierWithPagingAndFilter(searchKey, status, offset, ITEMS_PER_PAGE);
 
-        int totalSuppliers = dao.countSuppliersWithFilter(searchKey, statusId);
+        int totalSuppliers = dao.countSuppliersWithFilter(searchKey, status);
         int totalPages = (int) Math.ceil((double) totalSuppliers / ITEMS_PER_PAGE);
-
+        int endItem = (offset + 1) == totalSuppliers ? offset + 1 : offset + ITEMS_PER_PAGE;
+        
+        request.setAttribute("startItem", offset + 1);
+        request.setAttribute("endItem", endItem);
+        request.setAttribute("totalItems", totalSuppliers);
         request.setAttribute("suppliers", supList);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("searchKey", searchKey);
-        request.setAttribute("statusId", statusId);
+        request.setAttribute("status", status);
 
         request.getRequestDispatcher("/views/supplier/listSupplier.jsp").forward(request, response);
     }
