@@ -102,50 +102,48 @@
             </div>
             <nav class="sidebar-nav">
                 <c:set var="currentPath" value="${pageContext.request.servletPath}" />
+                // Mỗi người làm phần nào sẽ vào đây và điền link cho phần đó nhé
+                <!--<a href="${pageContext.request.contextPath} sau đó điền link vào đây">-->
 
-                <a href="${pageContext.request.contextPath}/shopowner/store">
+                <a href="">    
                     <i class="fas fa-warehouse"></i>
                     Quản lý cửa hàng
                 </a>
-                <a href="${pageContext.request.contextPath}/shopowner/employee">
-                    <i class="fas fa-user-friends"></i> Quản lí nhân viên
+                <a href="">
+                    <i class="fas fa-user-friends"></i> 
+                    Quản lí nhân viên
                 </a>
-                <a href="${pageContext.request.contextPath}/customer">
+                <a href="">
                     <i class="fas fa-tags"></i> 
                     Quản lí khách hàng
                 </a>
-                <a href="${pageContext.request.contextPath}/shopowner/restockrequest">
+                <a href="">
                     <i class="fas fa-tags"></i> 
                     Quản lí nhập kho
                 </a>
-                <a href="${pageContext.request.contextPath}/shopowner/transferrequest">
-                    <i class="fas fa-tags"></i> 
-                    Quản lí chuyển hàng
-                </a>
-                <a href="${pageContext.request.contextPath}/shopowner/supplier">
-                    <i class="fas fa-tags"></i> 
-                    Quản lí nhà cung cấp
-                </a>
-                <a href="${pageContext.request.contextPath}/shopowner/brand">
-                    <i class="fas fa-tags"></i> 
-                    Quản lí thương hiệu
-                </a>
-                <a href="${pageContext.request.contextPath}/shopowner/category">
+                <a href="">
                     <i class="fas fa-tags"></i> 
                     Quản lí danh mục
                 </a>
-                <a href="${pageContext.request.contextPath}/shopowner/coupon">
+                <a href="">
                     <i class="fas fa-tags"></i> 
-                    Quản lí khuyến mãi
+                    Quản lí nhà cung cấp
                 </a>
-                <a href="${pageContext.request.contextPath}/shopowner/cashbook">
-                    <i class="fas fa-wallet"></i> 
-                    Sổ quỹ
+                <a href="">
+                    <i class="fas fa-tags"></i> 
+                    Quản lí mã khuyến mãi
                 </a>
-
-                <a href="${pageContext.request.contextPath}/cashier/restockrequest">
-                    <i class="fas fa-wallet"></i> 
-                    Request Cashier
+                <a href="">
+                    <i class="fas fa-tags"></i> 
+                    Quản lí đơn hàng
+                </a>
+                <a href="">
+                    <i class="fas fa-tags"></i> 
+                    Quản lí báo cáo
+                </a>
+                <a href="">
+                    <i class="fas fa-tags"></i> 
+                    Quản lí sản phẩm
                 </a>
 
         </aside>
