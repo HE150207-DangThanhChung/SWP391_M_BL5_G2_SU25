@@ -93,14 +93,14 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <h1 class="text-3xl font-bold text-gray-900">Quản lí nhà cung cấp</h1>
-                                <p class="text-gray-600 mt-1">Add new suppliers to your system</p>
+                                <p class="text-gray-600 mt-1">Thêm mới nhà cung cấp vào hệ thống</p>
                             </div>
                             <button onclick="history.back()"
                                     class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors duration-200">
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                                 </svg>
-                                Back
+                                Quay lại
                             </button>
                         </div>
                     </div>
@@ -115,10 +115,11 @@
                                     <!-- Supplier Name -->
                                     <div class="lg:col-span-2">
                                         <label for="supplierName" class="block text-sm font-medium text-gray-700 mb-2">
-                                            Supplier Name *
+                                            Tên nhà cung cấp *
                                         </label>
                                         <input id="supplierName" 
                                                type="text" 
+                                               value="${s.supplierName}"
                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400"
                                                placeholder="Enter supplier company name">
                                         <span id="supplierNameError" class="error-text" style="display: none;"></span>
@@ -127,10 +128,11 @@
                                     <!-- Supplier Phone -->
                                     <div>
                                         <label for="supplierPhone" class="block text-sm font-medium text-gray-700 mb-2">
-                                            Phone Number *
+                                            Số điện thoại *
                                         </label>
                                         <input id="supplierPhone" 
                                                type="tel" 
+                                               value="${s.phone}"
                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400"
                                                placeholder="0123456789 or +84123456789">
                                         <span id="supplierPhoneError" class="error-text" style="display: none;"></span>
@@ -139,10 +141,11 @@
                                     <!-- Supplier Email -->
                                     <div>
                                         <label for="supplierEmail" class="block text-sm font-medium text-gray-700 mb-2">
-                                            Email Address *
+                                            Địa chỉ Email *
                                         </label>
                                         <input id="supplierEmail" 
                                                type="email" 
+                                               value="${s.email}"
                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400"
                                                placeholder="supplier@company.com">
                                         <span id="supplierEmailError" class="error-text" style="display: none;"></span>
@@ -151,10 +154,11 @@
                                     <!-- Supplier Tax Code -->
                                     <div>
                                         <label for="supplierTaxCode" class="block text-sm font-medium text-gray-700 mb-2">
-                                            Tax Code *
+                                            Mã Thuế *
                                         </label>
                                         <input id="supplierTaxCode" 
                                                type="text" 
+                                               value="${s.taxCode}"
                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400"
                                                placeholder="Enter tax identification number">
                                         <span id="supplierTaxCodeError" class="error-text" style="display: none;"></span>
@@ -163,13 +167,13 @@
                                     <!-- Supplier Status -->
                                     <div>
                                         <label for="supplierStatus" class="block text-sm font-medium text-gray-700 mb-2">
-                                            Status *
+                                            Trạng Thái *
                                         </label>
                                         <select id="supplierStatus" 
                                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white">
                                             <option value="">-- Select Status --</option>
-                                            <option value="active">Active</option>
-                                            <option value="inactive">Inactive</option>
+                                            <option value="Active" ${s.status == 'Active' ? 'selected' : ''}>Active</option>
+                                            <option value="Deactive" ${s.status == 'Deactive' ? 'selected' : ''}>Inactive</option>
                                         </select>
                                         <span id="supplierStatusError" class="error-text" style="display: none;"></span>
                                     </div>
@@ -179,27 +183,18 @@
                                 <div class="flex flex-col sm:flex-row gap-4 mt-8 pt-6 border-t border-gray-200">
                                     <button type="button" 
                                             id="addSupplierBtn"
-                                            onclick="addSupplier()"
+                                            onclick="editSupplier()"
                                             class="inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                         </svg>
-                                        <span id="btnText">Add Supplier</span>
-                                    </button>
-
-                                    <button type="button" 
-                                            onclick="clearForm()"
-                                            class="inline-flex items-center justify-center px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                                        </svg>
-                                        Clear Form
+                                        <span id="btnText">Lưu</span>
                                     </button>
 
                                     <button type="button" 
                                             onclick="history.back()"
                                             class="inline-flex items-center justify-center px-6 py-3 bg-white hover:bg-gray-50 text-gray-600 font-medium rounded-lg border border-gray-300 transition-colors duration-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-                                        Cancel
+                                        Huỷ
                                     </button>
                                 </div>
 
@@ -364,7 +359,7 @@
                                                     return isValid;
                                                 }
 
-                                                function addSupplier() {
+                                                function editSupplier() {
                                                     if (!validateForm()) {
                                                         showToast('Please fix the validation errors before submitting', 'error');
                                                         return;
@@ -379,19 +374,19 @@
                                                     form.classList.add('loading');
 
                                                     $.ajax({
-                                                        url: '${pageContext.request.contextPath}/management/suppliers/add',
+                                                        url: '${pageContext.request.contextPath}/management/suppliers/edit',
                                                         method: 'POST',
                                                         data: {
                                                             name: document.getElementById('supplierName').value.trim(),
                                                             phone: document.getElementById('supplierPhone').value.trim(),
                                                             email: document.getElementById('supplierEmail').value.trim(),
                                                             taxCode: document.getElementById('supplierTaxCode').value.trim(),
-                                                            status: document.getElementById('supplierStatus').value
+                                                            status: document.getElementById('supplierStatus').value,
+                                                            id: ${s.supplierId}
                                                         },
                                                         success: function (response) {
                                                             if (response.ok === true) {
                                                                 showToast(response.message);
-                                                                clearForm();
                                                             } else {
                                                                 showToast(response.message, 'error');
                                                             }
