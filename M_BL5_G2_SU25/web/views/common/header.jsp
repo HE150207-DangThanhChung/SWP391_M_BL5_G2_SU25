@@ -4,7 +4,9 @@
     Author     : tayho
 --%>
 
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -210,30 +212,107 @@
                     margin-left:0;
                 }
             }
+            .dropbtn {
+                background-color: blue;
+                color: white;
+                padding: 16px;
+                font-size: 16px;
+                border: none;
+                cursor: pointer;
+            }
+
+            .dropdown {
+                position: relative;
+                display: inline-block;
+            }
+
+            .dropdown-content {
+                display: none;
+                position: absolute;
+                background-color: #f9f9f9;
+                min-width: 160px;
+                box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+                z-index: 1;
+            }
+
+            .dropdown-content a {
+                color: black;
+                padding: 12px 16px;
+                text-decoration: none;
+                display: block;
+            }
+
+            .dropdown-content a:hover {
+                background-color: #f1f1f1
+            }
+
+            .dropdown:hover .dropdown-content {
+                display: block;
+            }
+
+            .dropdown:hover .dropbtn {
+                background-color: #B266FF;
+            }
         </style>
     </head>
     <body>
         <div class="demo">
-            
+
             <nav class="navbar">
-                <div class="brand">Site name</div>
+                <div class="dropdown">
+                    <h4><%
+                        // Lay username tu trong session
+                        String username = (String) session.getAttribute("tendangnhap");
+                        if (session != null) {
+                            out.print("Xin chào " + username);
+                        } else {
+                            // Neu chua dang nhap thi se la khach
+                            out.print("Xin chào quý khách");
+                        }
+                        %>
+                    </h4>                           
+                </div>
                 <ul class="menu">
                     <li>
-                        <a class="chip" href="#">Page 1</a>
-                        <div class="submenu">
-                            <a href="#">Subpage</a>
-                            <a href="#">Subpage</a>
+                        <div class="dropdown">
+                            <button class="dropbtn">Cửa Hàng</button>
+                            <div class="dropdown-content">
+                                <a href="#">Chi Nhánh</a>
+                                <a href="#">Doanh Thu</a>
+                                <a href="#">Phản Hồi</a>
+                            </div>
                         </div>
                     </li>
-                    <li><a class="chip" href="#">Page 2</a></li>
-                    <li><a class="chip" href="#">Page 3</a></li>
+                    <li>
+                        <div class="dropdown">
+                            <button class="dropbtn">Sản Phẩm</button>
+                            <div class="dropdown-content">
+                                <a href="#">Nhãn Hàng</a>
+                                <a href="#">Danh Mục</a>
+                                <a href="#">Nhà Phân Phối</a>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="dropdown">
+                            <button class="dropbtn">Nhân Viên</button>
+                            <div class="dropdown-content">
+                                <a href="#">Hồ Sơ</a>
+                                <a href="#">Tiến Độ</a>
+
+                            </div>
+                        </div>
+                    </li>
+
                 </ul>
-                <div class="action">
-                    <button class="btn" type="button">Button</button>
-                    <div class="action-menu" aria-label="Button menu">
-                        <div class="action-item">Page</div>
-                        <div class="action-item">Page</div>
-                        <div class="action-item">Page</div>
+                <div class="dropdown">
+                    <button class="dropbtn">Hồ Sơ</button>
+                    <div class="dropdown-content">
+                        <a href="#">Cá Nhân</a>
+                        <a href="#">Cài Đặt</a>
+                        <c:url var="logoutUrl" value="/logout"/>
+                        <a href="${logoutUrl}">Đăng Xuất</a>
+
                     </div>
                 </div>
             </nav>
