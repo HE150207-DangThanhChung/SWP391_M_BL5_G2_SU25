@@ -9,9 +9,19 @@ import model.Store;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import model.Role;
 
 public class StoreDAO {
 
+    private static Connection con;
+    private static PreparedStatement ps;
+    private static ResultSet rs;
+
+    public static void main(String[] args) {
+        StoreDAO sDao = new StoreDAO();
+        System.out.println(sDao.getStoreById(1));
+    }
+    
     public List<Store> findAll() {
         List<Store> list = new ArrayList<>();
         String sql = "SELECT StoreId, StoreName, Address, Phone, Status FROM Store ORDER BY StoreId";
@@ -31,5 +41,34 @@ public class StoreDAO {
         return list;
     }
 
-}
+    public Store getStoreById(int id) {
+        Store s = new Store();
+        String sql = """
+            SELECT *
+            FROM [SWP391_M_BL5_G2_SU25].[dbo].[Store]
+            WHERE StoreId = ?
+        """;
 
+        try {
+            con = DBContext.getConnection();
+            ps = con.prepareStatement(sql);
+            ps.setInt(1, id);
+            rs = ps.executeQuery();
+
+            if (rs.next()) {
+                s.setStoreId(rs.getInt("StoreId"));
+                s.setStoreName(rs.getString("StoreName"));
+                s.setAddress(rs.getString("Address"));
+                s.setPhone(rs.getString("Phone"));
+                s.setStatus(rs.getString("Status"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBContext.closeConnection(rs);
+            DBContext.closeConnection(ps);
+            DBContext.closeConnection(con);
+        }
+        return s;
+    }
+}
