@@ -4,6 +4,8 @@
  */
 package controller;
 
+import dal.StoreDAO;
+import jakarta.servlet.RequestDispatcher;
 import java.io.IOException;
 import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
@@ -11,26 +13,23 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.List;
+import model.Store;
 
 /**
  *
  * @author tayho
  */
 /**
-Chỉnh sửa lại annotation @WebServlet theo phần cá nhân làm riêng
-*/
-@WebServlet(name = "StoreController", urlPatterns = {"/StoreController"})
+ * StoreController Chỉnh sửa lại annotation @WebServlet theo phần cá nhân làm
+ * riêng
+ */
+@WebServlet(name = "StoreController", urlPatterns = {"/stores"})
+
 public class StoreController extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    private StoreDAO storeDAO;
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -48,19 +47,19 @@ public class StoreController extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
+    public void init() {
+        storeDAO = new StoreDAO();
+    }
+
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        List<Store> stores = storeDAO.findAll();
+        request.setAttribute("stores", stores);
+        // controller/StoreController.java
+        RequestDispatcher rd = request.getRequestDispatcher("/views/store/listStore.jsp");
+        rd.forward(request, response);
+
     }
 
     /**

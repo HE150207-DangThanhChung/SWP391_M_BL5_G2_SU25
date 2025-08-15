@@ -10,27 +10,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class StoreDAO {
+
     public List<Store> findAll() {
         List<Store> list = new ArrayList<>();
         String sql = "SELECT StoreId, StoreName, Address, Phone, Status FROM Store ORDER BY StoreId";
-
-        try (Connection con = new DBContext().getConnection();
-             PreparedStatement ps = con.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-
+        try (Connection con = new DBContext().getConnection(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 Store s = new Store();
                 s.setStoreId(rs.getInt("StoreId"));
-                s.setStoreName(rs.getNString("StoreName")); // NVARCHAR → getNString
-                s.setAddress(rs.getNString("Address"));
+                s.setStoreName(rs.getString("StoreName"));
+                s.setAddress(rs.getString("Address"));
                 s.setPhone(rs.getString("Phone"));
-                s.setStatus(rs.getNString("Status"));
+                s.setStatus(rs.getString("Status"));
                 list.add(s);
             }
         } catch (SQLException e) {
-            e.printStackTrace(); // hoặc log
+            // log stacktrace để tìm lỗi kết nối/SQL
+            e.printStackTrace();
         }
         return list;
     }
-}
 
+}
