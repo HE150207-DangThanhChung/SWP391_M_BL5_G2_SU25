@@ -72,14 +72,14 @@
                             <h1 class="text-2xl font-bold">Quản lí nhà cung cấp</h1>
                             <p class="text-gray-500">Manage your suppliers efficiently</p>
                         </div>
-                        <a href="${pageContext.request.contextPath}/management/suplliers/add"
+                        <a href="${pageContext.request.contextPath}/management/suppliers/add"
                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
                             Add Supplier
                         </a>
                     </div>
 
                     <!-- Search & Filter -->
-                    <form method="get" action="${pageContext.request.contextPath}/management/suplliers" class="flex items-center gap-3 mb-4">
+                    <form method="get" action="${pageContext.request.contextPath}/management/suppliers" class="flex items-center gap-3 mb-4">
                         <input type="text" name="search" value="${param.search}" placeholder="Search..."
                                class="border border-gray-300 rounded-md px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
                         <select name="statusId" class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
@@ -88,6 +88,7 @@
                             <option value="0" ${param.statusId == '0' ? 'selected' : ''}>Inactive</option>
                         </select>
                         <button type="submit" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md">Filter</button>
+                        <a href="${pageContext.request.contextPath}/management/suppliers"><button type="button" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md">Clear Filter</button></a>
                     </form>
 
                     <!-- Table -->
