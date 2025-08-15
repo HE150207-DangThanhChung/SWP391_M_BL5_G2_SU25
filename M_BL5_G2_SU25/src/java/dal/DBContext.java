@@ -13,7 +13,7 @@ public class DBContext {
     private static final String SERVER_NAME = "localhost";
     private static final String DB_NAME = "SWP391_M_BL5_G2_SU25";
     private static final String PORT_NUMBER = "1433"; // Default SQL Server port
-    private static final String USER_ID = "sa";
+    private static final String USER_ID = "Mavinhloc";
     private static final String PASSWORD = "123";
 
     static {

@@ -38,41 +38,51 @@ public class ProductController extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
         if (pathInfo == null || "/".equals(pathInfo)) {
             List<Product> products = productDAO.getAllProducts();
             request.setAttribute("products", products);
             request.getRequestDispatcher("/views/product/listProduct.jsp").forward(request, response);
+        } else if (pathInfo.equals("/add")) {
+            List<Category> categories = productDAO.getAllCategories();
+            List<Brand> brands = productDAO.getAllBrands();
+            List<Supplier> suppliers = productDAO.getAllSuppliers();
+            request.setAttribute("categories", categories);
+            request.setAttribute("brands", brands);
+            request.setAttribute("suppliers", suppliers);
+            request.getRequestDispatcher("/views/product/addProduct.jsp").forward(request, response);
+        } else if (pathInfo.equals("/edit")) {
+            String productIdStr = request.getParameter("productId");
+            if (productIdStr != null) {
+                int productId = Integer.parseInt(productIdStr);
+                Product product = productDAO.getProductById(productId);
+                List<Category> categories = productDAO.getAllCategories();
+                List<Brand> brands = productDAO.getAllBrands();
+                List<Supplier> suppliers = productDAO.getAllSuppliers();
+                request.setAttribute("product", product);
+                request.setAttribute("categories", categories);
+                request.setAttribute("brands", brands);
+                request.setAttribute("suppliers", suppliers);
+                request.getRequestDispatcher("/views/product/editProduct.jsp").forward(request, response);
+            } else {
+                response.sendRedirect("/product");
+            }
         } else if (pathInfo.equals("/detail")) {
             String productIdStr = request.getParameter("productId");
             if (productIdStr != null) {
                 int productId = Integer.parseInt(productIdStr);
                 Product product = productDAO.getProductById(productId);
-                if (product != null) {
-                    request.setAttribute("product", product);
-                    request.getRequestDispatcher("/views/product/productDetail.jsp").forward(request, response);
-                } else {
-                    response.sendRedirect("products");
-                }
+                request.setAttribute("product", product);
+                request.getRequestDispatcher("/views/product/productDetail.jsp").forward(request, response);
             } else {
-                response.sendRedirect("products");
+                response.sendRedirect("/product");
             }
-        } else if (pathInfo.equals("/add")) {
-            List<Brand> brands = productDAO.getAllBrands();
-            List<Category> categories = productDAO.getAllCategories();
-            List<Supplier> suppliers = productDAO.getAllSuppliers();
-            request.setAttribute("brands", brands);
-            request.setAttribute("categories", categories);
-            request.setAttribute("suppliers", suppliers);
-            request.getRequestDispatcher("/views/product/addProduct.jsp").forward(request, response);
         }
     }
 
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
         if (pathInfo != null && pathInfo.equals("/add")) {
             String productName = request.getParameter("productName");
@@ -96,10 +106,43 @@ public class ProductController extends HttpServlet {
             product.setWarrantyDurationMonth(warrantyDurationMonth);
             product.setStatus(status);
 
-            productDAO.addProduct(product, imagePart, imageUrl);
-            request.getRequestDispatcher("../product/listProduct.jsp").forward(request, response);
+            productDAO.addProduct(product, imagePart, imageUrl, request);
+            
+            List<Product> products = productDAO.getAllProducts();
+            request.setAttribute("products", products);
+            request.setAttribute("message", "Product added successfully");
+            request.getRequestDispatcher("/views/product/listProduct.jsp").forward(request, response);
+        } else if (pathInfo != null && pathInfo.equals("/edit")) {
+            int productId = Integer.parseInt(request.getParameter("productId"));
+            String productName = request.getParameter("productName");
+            int categoryId = Integer.parseInt(request.getParameter("categoryId"));
+            int brandId = Integer.parseInt(request.getParameter("brandId"));
+            int supplierId = Integer.parseInt(request.getParameter("supplierId"));
+            String productCode = request.getParameter("productCode");
+            double price = Double.parseDouble(request.getParameter("price"));
+            int warrantyDurationMonth = Integer.parseInt(request.getParameter("warrantyDurationMonth"));
+            String status = request.getParameter("status");
+            Part imagePart = request.getPart("image");
+            String imageUrl = request.getParameter("imageUrl");
+
+            Product product = productDAO.getProductById(productId);
+            product.setProductName(productName);
+            product.setCategoryId(categoryId);
+            product.setBrandId(brandId);
+            product.setSupplierId(supplierId);
+            product.setProductCode(productCode);
+            product.setPrice(price);
+            product.setWarrantyDurationMonth(warrantyDurationMonth);
+            product.setStatus(status);
+
+            productDAO.updateProduct(product, imagePart, imageUrl, request);
+            List<Product> products = productDAO.getAllProducts();
+            request.setAttribute("products", products);
+            request.setAttribute("message", "Product added successfully");
+            request.getRequestDispatcher("/views/product/listProduct.jsp").forward(request, response);
         }
     }
+
     /**
      * Returns a short description of the servlet.
      *
