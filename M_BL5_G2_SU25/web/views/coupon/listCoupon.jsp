@@ -160,6 +160,11 @@
         </style>
     </head>
     <body>
+        <div class="layout-wrapper d-flex">
+            <jsp:include page="/views/common/sidebar.jsp"/>
+            <div class="main-panel">
+                <jsp:include page="/views/common/header.jsp"/>
+                <main class="content">
         <!-- Toolbar / Search & Filters -->
         <div class="toolbar">
             <input type="text" placeholder="Tìm kiếm theo trường 1, trường 2, trường 3" />
@@ -224,6 +229,9 @@
                 <a href="#" class="page" aria-label="Cuối">≫</a>
             </nav>
         </div>
-
+</main>
+                <jsp:include page="/views/common/footer.jsp"/>
+            </div>
+        </div>
     </body>
 </html>
