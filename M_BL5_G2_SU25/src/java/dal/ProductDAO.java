@@ -19,10 +19,11 @@ import java.util.List;
  * @author tayho
  */
 public class ProductDAO {
+
     public void addProduct(Product product) {
         String insertProduct = "INSERT INTO Product (productName, brandId, categoryId, status) VALUES (?, ?, ?, ?)";
         String insertVariant = "INSERT INTO ProductVariant (productCode, price, quantity, status, productId) VALUES (?, ?, ?, ?, ?)";
-        try (Connection conn = DatabaseConnection.getConnection()) {
+        try (Connection conn = DBContext.getConnection()) {
             // Start transaction
             conn.setAutoCommit(false);
             try {
@@ -64,28 +65,26 @@ public class ProductDAO {
 
     public List<Product> getAllProducts() {
         List<Product> products = new ArrayList<>();
-        String sql = "SELECT p.productId, p.productName, p.brandId, b.brandName, p.categoryId, c.categoryName, " +
-                     "pv.productCode, pv.price, pv.quantity, pv.status " +
-                     "FROM Product p " +
-                     "JOIN Brand b ON p.brandId = b.brandId " +
-                     "JOIN Category c ON p.categoryId = c.categoryId " +
-                     "JOIN ProductVariant pv ON p.productId = pv.productId " +
-                     "WHERE p.status = 'ACTIVE'";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        String sql = "SELECT p.productId, p.productName, p.brandId, b.brandName, p.categoryId, c.categoryName, "
+                + "pv.productCode, pv.price, pv.quantity, pv.status "
+                + "FROM Product p "
+                + "JOIN Brand b ON p.brandId = b.brandId "
+                + "JOIN Category c ON p.categoryId = c.categoryId "
+                + "JOIN ProductVariant pv ON p.productId = pv.productId "
+                + "WHERE p.status = 'ACTIVE'";
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 products.add(new Product(
-                    rs.getInt("productId"),
-                    rs.getString("productName"),
-                    rs.getInt("brandId"),
-                    rs.getString("brandName"),
-                    rs.getInt("categoryId"),
-                    rs.getString("categoryName"),
-                    rs.getString("productCode"),
-                    rs.getDouble("price"),
-                    rs.getInt("quantity"),
-                    rs.getString("status")
+                        rs.getInt("productId"),
+                        rs.getString("productName"),
+                        rs.getInt("brandId"),
+                        rs.getString("brandName"),
+                        rs.getInt("categoryId"),
+                        rs.getString("categoryName"),
+                        rs.getString("productCode"),
+                        rs.getDouble("price"),
+                        rs.getInt("quantity"),
+                        rs.getString("status")
                 ));
             }
         } catch (SQLException e) {
@@ -97,9 +96,7 @@ public class ProductDAO {
     public List<Brand> getAllBrands() {
         List<Brand> brands = new ArrayList<>();
         String sql = "SELECT brandId, brandName FROM Brand WHERE status = 'ACTIVE'";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 brands.add(new Brand(rs.getInt("brandId"), rs.getString("brandName")));
             }
@@ -112,9 +109,7 @@ public class ProductDAO {
     public List<Category> getAllCategories() {
         List<Category> categories = new ArrayList<>();
         String sql = "SELECT categoryId, categoryName FROM Category WHERE status = 'ACTIVE'";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 categories.add(new Category(rs.getInt("categoryId"), rs.getString("categoryName")));
             }
@@ -123,31 +118,30 @@ public class ProductDAO {
         }
         return categories;
     }
-    
+
     public Product getProductById(int productId) {
-        String sql = "SELECT p.productId, p.productName, p.brandId, b.brandName, p.categoryId, c.categoryName, " +
-                     "pv.productCode, pv.price, pv.quantity, pv.status " +
-                     "FROM Product p " +
-                     "JOIN Brand b ON p.brandId = b.brandId " +
-                     "JOIN Category c ON p.categoryId = c.categoryId " +
-                     "JOIN ProductVariant pv ON p.productId = pv.productId " +
-                     "WHERE p.productId = ? AND p.status = 'ACTIVE'";
-        try (Connection conn = DatabaseConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+        String sql = "SELECT p.productId, p.productName, p.brandId, b.brandName, p.categoryId, c.categoryName, "
+                + "pv.productCode, pv.price, pv.quantity, pv.status "
+                + "FROM Product p "
+                + "JOIN Brand b ON p.brandId = b.brandId "
+                + "JOIN Category c ON p.categoryId = c.categoryId "
+                + "JOIN ProductVariant pv ON p.productId = pv.productId "
+                + "WHERE p.productId = ? AND p.status = 'ACTIVE'";
+        try (Connection conn = DBContext.getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, productId);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return new Product(
-                        rs.getInt("productId"),
-                        rs.getString("productName"),
-                        rs.getInt("brandId"),
-                        rs.getString("brandName"),
-                        rs.getInt("categoryId"),
-                        rs.getString("categoryName"),
-                        rs.getString("productCode"),
-                        rs.getDouble("price"),
-                        rs.getInt("quantity"),
-                        rs.getString("status")
+                            rs.getInt("productId"),
+                            rs.getString("productName"),
+                            rs.getInt("brandId"),
+                            rs.getString("brandName"),
+                            rs.getInt("categoryId"),
+                            rs.getString("categoryName"),
+                            rs.getString("productCode"),
+                            rs.getDouble("price"),
+                            rs.getInt("quantity"),
+                            rs.getString("status")
                     );
                 }
             }

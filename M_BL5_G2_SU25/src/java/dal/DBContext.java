@@ -1,12 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
-/**
- *
- * @author tayho
- */
 package dal;
 
 import java.sql.Connection;
@@ -18,47 +9,63 @@ import java.sql.SQLException;
  * Project: SWP391_M_BL5_G2_SU25
  */
 public class DBContext {
-    private final String serverName = "localhost";  
-    private final String dbName = "SWP391_M_BL5_G2_SU25";
-    private final String portNumber = "1433";       // Default SQL Server port
-    private final String userID = "sa";
-    private final String password = "123";
 
-    /**
-     * Get a database connection
-     * @return Connection object
-     * @throws SQLException if connection fails
-     */
-    public Connection getConnection() throws SQLException {
-        Connection connection = null;
+    private static final String SERVER_NAME = "localhost";
+    private static final String DB_NAME = "SWP391_M_BL5_G2_SU25";
+    private static final String PORT_NUMBER = "1433"; // Default SQL Server port
+    private static final String USER_ID = "sa";
+    private static final String PASSWORD = "123";
+
+    static {
         try {
-            // Load SQL Server JDBC driver
             Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-
-            // Connection URL
-            String url = "jdbc:sqlserver://" + serverName + ":" + portNumber 
-                       + ";databaseName=" + dbName 
-                       + ";encrypt=false";
-
-            // Create connection
-            connection = DriverManager.getConnection(url, userID, password);
-            System.out.println("Connected to " + dbName + " successfully.");
         } catch (ClassNotFoundException e) {
             System.err.println("SQL Server JDBC Driver not found.");
             e.printStackTrace();
-        } catch (SQLException e) {
-            System.err.println("Connection to database failed.");
-            throw e;
         }
+    }
+
+    /**
+     * Get a new database connection.
+     * @return Connection object
+     * @throws SQLException if connection fails
+     */
+    public static Connection getConnection() throws SQLException {
+        String url = "jdbc:sqlserver://" + SERVER_NAME + ":" + PORT_NUMBER
+                   + ";databaseName=" + DB_NAME
+                   + ";encrypt=false";
+
+        Connection connection = DriverManager.getConnection(url, USER_ID, PASSWORD);
+        System.out.println("Connected to " + DB_NAME + " successfully.");
         return connection;
     }
 
+    /**
+     * Close a database connection safely.
+     * @param connection the Connection object to close
+     */
+    public static void closeConnection(Connection connection) {
+        if (connection != null) {
+            try {
+                if (!connection.isClosed()) {
+                    connection.close();
+                    System.out.println("Database connection closed.");
+                }
+            } catch (SQLException e) {
+                System.err.println("Error while closing the database connection.");
+                e.printStackTrace();
+            }
+        }
+    }
+
     public static void main(String[] args) {
+        Connection conn = null;
         try {
-            DBContext db = new DBContext();
-            db.getConnection();
+            conn = DBContext.getConnection();
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            DBContext.closeConnection(conn);
         }
     }
 }
