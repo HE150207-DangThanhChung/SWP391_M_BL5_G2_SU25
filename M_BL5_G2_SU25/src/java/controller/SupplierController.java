@@ -36,6 +36,8 @@ public class SupplierController extends HttpServlet {
                 doGetList(request, response);
             case BASE_PATH + "/add" ->
                 doGetAdd(request, response);
+            case BASE_PATH + "/edit" ->
+                doGetEdit(request, response);
         }
     }
 
@@ -48,6 +50,10 @@ public class SupplierController extends HttpServlet {
             case BASE_PATH + "/add" ->
                 doPostAdd(request, response);
         }
+    }
+
+    private void doGetEdit(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getRequestDispatcher("/views/supplier/editSupplier.jsp").forward(request, response);
     }
 
     private void doPostAdd(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

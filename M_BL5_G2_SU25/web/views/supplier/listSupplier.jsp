@@ -122,11 +122,10 @@
                                                     </span>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                                    <a href="${pageContext.request.contextPath}/management/suplliers/edit?id=${s.supplierId}"
+                                                    <a href="${pageContext.request.contextPath}/management/suppliers/edit?id=${s.supplierId}"
                                                        class="text-blue-600 hover:text-blue-900">Edit</a>
-                                                    <a href="${pageContext.request.contextPath}/management/suplliers/delete?id=${s.supplierId}"
-                                                       class="text-red-600 hover:text-red-900"
-                                                       onclick="return confirm('Are you sure you want to delete this supplier?');">Delete</a>
+                                                    <a href="${pageContext.request.contextPath}/management/suppliers/detail?id=${s.supplierId}"
+                                                       class="text-red-600 hover:text-red-900">Detail</a>
                                                 </td>
                                             </tr>
                                         </c:forEach>
