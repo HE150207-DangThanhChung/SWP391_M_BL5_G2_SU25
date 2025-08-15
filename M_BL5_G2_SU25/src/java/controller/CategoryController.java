@@ -89,6 +89,7 @@ public class CategoryController extends HttpServlet {
             String idStr = request.getParameter("id");
             String name = request.getParameter("name");
             String status = request.getParameter("status");
+            String description = request.getParameter("description");
 
             int id = Integer.parseInt(idStr);
             Category c = dao.getCategoryById(id);
@@ -100,7 +101,7 @@ public class CategoryController extends HttpServlet {
                 return;
             }
 
-            boolean success = dao.editCategory(id, name, status, status);
+            boolean success = dao.editCategory(id, name, description, status);
             if (success) {
                 jsonMap.put("ok", true);
                 jsonMap.put("message", "Category saved successfully!");

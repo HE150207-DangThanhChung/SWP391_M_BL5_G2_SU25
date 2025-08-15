@@ -110,9 +110,9 @@
                                                     </span>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                                    <a href="${pageContext.request.contextPath}/management/categories/edit?id=${c.categoryId}"
+                                                    <a href="${pageContext.request.contextPath}/management/category/edit?id=${c.categoryId}"
                                                        class="text-blue-600 hover:text-blue-900">Chỉnh sửa</a>
-                                                    <a href="${pageContext.request.contextPath}/management/categories/detail?id=${c.categoryId}"
+                                                    <a href="${pageContext.request.contextPath}/management/category/detail?id=${c.categoryId}"
                                                        class="text-red-600 hover:text-red-900">Chi tiết</a>
                                                 </td>
                                             </tr>
