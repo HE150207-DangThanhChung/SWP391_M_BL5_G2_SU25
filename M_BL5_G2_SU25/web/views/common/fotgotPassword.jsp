@@ -4,7 +4,9 @@
     Author     : tayho
 --%>
 
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -125,7 +127,7 @@
     </head>
     <body>
         <main class="card" aria-labelledby="title">
-            <h1 id="title">Forgot Password?</h1>
+            <h1 id="title">Forgot Password</h1>
             <p class="subtitle">Enter your email below and follow instruction</p>
 
             <form action="#" method="post" novalidate>

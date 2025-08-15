@@ -1,0 +1,121 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : 21 thg 6, 2025, 17:56:32
+    Author     : ntd28
+*/
+
+.sidebar {
+    background-color: white;
+    color: #d1d5db;
+    min-height: 100vh;
+    width: 16rem;
+    display: flex;
+    flex-direction: column;
+    user-select: none;
+    max-height: 100vh;
+    min-width: 255px;
+    max-width: 255px;
+}
+.sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid #ff2a2a;
+    height: 100px;
+}
+.sidebar-header img {
+    width: 32px;
+    height: 32px;
+}
+.sidebar-header span {
+    font-weight: 800;
+    font-size: 1.5rem;
+    color: #ff0e7a;
+}
+.sidebar-header i {
+    margin-left: auto;
+    color: #9ca3af;
+    cursor: pointer;
+}
+nav.sidebar-nav {
+    flex-grow: 1;
+    padding: 1rem 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+nav.sidebar-nav a {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 1rem;
+    color: black;
+    text-decoration: none;
+    border-radius: 0.375rem;
+    margin-bottom: 0.25rem;
+    white-space: nowrap;
+}
+nav.sidebar-nav a.active,
+nav.sidebar-nav a:hover {
+    background-color: blue;
+    color: white;
+}
+nav.sidebar-nav a:hover .badge {
+    background-color: blue;
+    color: #ff2a2a;
+}
+nav.sidebar-nav a .badge {
+    margin-left: auto;
+    background-color: #ff2a2a;
+    font-size: 0.75rem;
+    font-weight: 600;
+    width: 1.25rem;
+    height: 1.25rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 9999px;
+}
+.sidebar-section {
+    border-top: 1px solid #374151;
+    padding: 1rem 1.5rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #6b7280;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    text-transform: uppercase;
+    user-select: none;
+}
+.sidebar-section a {
+    color: #6b7280;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+.sidebar-section a:hover {
+    color: white;
+}
+.sidebar-bottom {
+    border-top: 1px solid #374151;
+    padding: 1rem 1.5rem;
+    font-weight: 600;
+    font-size: 0.875rem;
+    color: #6b7280;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    user-select: none;
+}
+.sidebar-bottom i {
+    font-size: 1.25rem;
+}

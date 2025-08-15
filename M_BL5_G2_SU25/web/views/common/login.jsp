@@ -146,6 +146,9 @@
                 font-size:12px;
                 opacity:.7;
             }
+            h2{
+                color:#ff0e7a;
+            }
         </style>
     </head>
     <body>
@@ -153,8 +156,8 @@
             <h1 id="title">Account Login</h1>
 
             <div class="brand" aria-hidden="true">
-                <h1>Chào mừng bạn!</h1>
-                <h1>Hãy bắt đầu 1 ngày làm việc nào!</h1>
+                <h2>Chào mừng bạn đến với HappySale!</h2>
+                <h2>Hãy bắt đầu 1 ngày làm việc nào!</h2>
                 <!-- storefront icon -->
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M3 7h18l-1.5 4a3 3 0 0 1-5.7 0A3 3 0 0 1 10 11a3 3 0 0 1-3.8 0A3 3 0 0 1 3 11L3 7Z"/>
@@ -163,8 +166,8 @@
                 <path d="M4 7l2-3h12l2 3"/>
                 </svg>
             </div>
-
-            <form action="LoginController" method="post" autocomplete="on">
+            
+            <form action="${pageContext.request.contextPath}/login" method="post" autocomplete="on">
                 <div class="field">
                     <span class="icon" aria-hidden="true">
                         <!-- user icon -->
@@ -173,8 +176,8 @@
                         <path d="M4 20a8 8 0 0 1 16 0"/>
                         </svg>
                     </span>
-                    <label class="sr-only" for="username">Username</label>
-                    <input id="username" name="username" type="text" placeholder="Username" required />
+                    <label class="sr-only" for="username">Tên đăng nhập</label>
+                    <input id="username" name="username" type="text" placeholder="Vui lòng điền tên đăng nhập" required />
                 </div>
 
                 <div class="field">
@@ -185,16 +188,16 @@
                         <path d="M8 11V7a4 4 0 1 1 8 0v4"/>
                         </svg>
                     </span>
-                    <label class="sr-only" for="password">Password</label>
-                    <input id="password" name="password" type="password" placeholder="Password" required />
+                    <label class="sr-only" for="password">Mật khẩu</label>
+                    <input id="password" name="password" type="password" placeholder="Vui lòng điền mật khẩu" required />
                 </div>
 
                 <div class="actions">
-                    <button class="btn-primary" type="submit" value="Login">LOGIN</button>
-                    <a class="link" href="#">Forgot Password?</a>
+                    <button class="btn-primary" type="submit" value="Login">Đăng Nhập</button>
+                    <a class="link" href="#">Quên mật khẩu?</a>
                 </div>
 
-                <p class="footnote">By continuing you agree to our Terms & Privacy.</p>
+                <p class="footnote">Chúng tôi rất vui mừng chào đón bạn</p>
             </form>
         </main>       
     </body>
