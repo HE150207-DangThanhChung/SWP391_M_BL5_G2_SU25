@@ -5,7 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
 <html>
@@ -105,43 +105,77 @@
             /*Search*/
             .search{
                 position: relative;
-                display: grid;
-                grid-template-columns: 3fr 1.6fr;
                 margin-bottom: 2%;
+            }
 
+            .search form {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .search-left {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .search-input-wrapper {
+                position: relative;
             }
 
             .search i{
                 position: absolute;
                 left: 12px;
-                top: 35%;
+                top: 50%;
+                transform: translateY(-50%);
                 font-size: 18px;
                 color: #000;
             }
 
             .search input {
-                width: 60%;
+                width: 320px;
                 padding: 8px 16px 8px 36px;
-                border-radius: 12px;
-                border: none;
-                font-size: 17px;
+                border-radius: 10px;
+                border: 1px solid #ccc;
+                font-size: 16px;
                 font-weight: 400;
                 color: #000;
                 background-color: #fff;
                 height: 45px;
             }
 
-            .feature{
-                display: grid;
-                grid-template-columns: 1.4fr 1fr 1fr;
+            .feature {
+                display: flex;
+                align-items: center;
                 gap: 10px;
+                flex-wrap: nowrap;
+                margin-left: auto;
             }
-            .feature button{
+            .feature button, .feature a, .feature select {
+                height: 45px;
+                border-radius: 10px;
+                font-size: 16px;
+                white-space: nowrap;
+            }
+            .feature button, .feature a {
                 background-color: #F28705;
                 color: #fff;
-                width: 90%;
-                border-radius: 10px;
-                height: 45px;
+                border: none;
+                padding: 0 16px;
+                text-decoration: none;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 135px;
+            }
+            .feature select {
+                background-color: #fff;
+                color: #000;
+                border: 1px solid #ccc;
+                padding: 0 10px;
+                min-width: 150px;
             }
 
             /*Table container*/
@@ -318,15 +352,25 @@
             <div class="">
                 <!-- Search bar -->
                 <div class="search">
-                    <div>
-                        <i class="fa fa-search" ></i>
-                        <input type="search" placeholder="Theo tên cửa hàng"/>
-                    </div>
-                    <div class="feature">
-                        <button onclick="window.location.href = 'addStore.jsp'">➕ Thêm cửa hàng</button>
-                        <button>📤 Nhập file</button>
-                        <button>📥 Xuất file</button>
-                    </div>
+                    <form action="${pageContext.request.contextPath}/stores" method="get">
+                        <div class="search-left">
+                            <div class="search-input-wrapper">
+                                <i class="fa fa-search"></i>
+                                <input type="search" name="search" value="${searchKeyword}" placeholder="Theo tên cửa hàng"/>
+                            </div>
+                            <select name="status" class="form-select">
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="Active" ${filterStatus == 'Active' ? 'selected' : ''}>Đang hoạt động</option>
+                                <option value="Inactive" ${filterStatus == 'Inactive' ? 'selected' : ''}>Ngừng hoạt động</option>
+                            </select>
+                            <button type="submit">🔍 Tìm kiếm</button>
+                        </div>
+                        <div class="feature">
+                            <a href="${pageContext.request.contextPath}/stores/add" class="btn-add">➕ Thêm cửa hàng</a>
+                            <button type="button">📤 Nhập file</button>
+                            <button type="button">📥 Xuất file</button>
+                        </div>
+                    </form>
 
 
                 </div>
@@ -351,39 +395,41 @@
                             </tr>
                         </thead>
                         <tbody>
-                        <c:forEach var="s" items="${stores}">
-                            <tr>
-                                <td><input type="checkbox"/></td>
-                                <td>
-                                    <img height="50" width="50" src="${pageContext.request.contextPath}/img/logo2.jpg" alt="logo"/>
-                                </td>
-                                <td>${s.storeId}</td>
-                                <td>${s.storeName}</td>
-                                <td>${s.phone}</td>
-                                <td>${s.address}</td>
-                                <td>${s.status}</td>
-                                <td>
-                                    <button onclick="window.location.href = 'StoreDetail.jsp?storeId=${s.storeId}'">Chi tiết</button>
-                                </td>
-                            </tr>
-                        </c:forEach>
+                            <c:forEach var="s" items="${stores}">
+                                <tr>
+                                    <td><input type="checkbox"/></td>
+                                    <td>
+                                        <img height="50" width="50" src="${pageContext.request.contextPath}/img/logo2.jpg" alt="logo"/>
+                                    </td>
+                                    <td>${s.storeId}</td>
+                                    <td>${s.storeName}</td>
+                                    <td>${s.phone}</td>
+                                    <td>${s.address}</td>
+                                    <td>${s.status == 'Active' ? 'Đang hoạt động' : 'Ngừng hoạt động'}</td>
+                                    <td>
+                                        <button onclick="window.location.href = '${pageContext.request.contextPath}/stores/view/${s.storeId}'">Chi tiết</button>
+                                    </td>
+                                </tr>
+                            </c:forEach>
                         </tbody>
                     </table>
                 </div>
 
                 <!-- Pagination -->
+
                 <nav class="pagination" aria-label="Pagination">
-                    <button class="fa fa-angle-double-left"></button>
-                    <button class="fa fa-angle-left"></button>
-                    <button class="page-num " >1</button>
-                    <button class="page-num">2</button>
-                    <button class="page-num">3</button>
-                    <button title="Next page" class="fa fa-angle-right"></button>
-                    <button title="Last page" class="fa fa-angle-double-right"></button>
+                    <c:if test="${currentPage > 1}">
+                        <a href="${pageContext.request.contextPath}/stores?page=1&search=${searchKeyword}&status=${filterStatus}" class="fa fa-angle-double-left"></a>
+                        <a href="${pageContext.request.contextPath}/stores?page=${currentPage-1}&search=${searchKeyword}&status=${filterStatus}" class="fa fa-angle-left"></a>
+                    </c:if>
+                    <c:forEach begin="${currentPage-2 > 0 ? currentPage-2 : 1}" end="${currentPage+2 < totalPages ? currentPage+2 : totalPages}" var="i">
+                        <a href="${pageContext.request.contextPath}/stores?page=${i}&search=${searchKeyword}&status=${filterStatus}" class="page-num ${currentPage == i ? 'active' : ''}">${i}</a>
+                    </c:forEach>
+                    <c:if test="${currentPage < totalPages}">
+                        <a href="${pageContext.request.contextPath}/stores?page=${currentPage+1}&search=${searchKeyword}&status=${filterStatus}" class="fa fa-angle-right"></a>
+                        <a href="${pageContext.request.contextPath}/stores?page=${totalPages}&search=${searchKeyword}&status=${filterStatus}" class="fa fa-angle-double-right"></a>
+                    </c:if>
                 </nav>
-            </div>
-        </div>
 
-
-    </body>
-</html>
+                </body>
+                </html>
