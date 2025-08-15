@@ -387,7 +387,6 @@
                                                         success: function (response) {
                                                             if (response.ok === true) {
                                                                 showToast(response.message);
-                                                                clearForm();
                                                             } else {
                                                                 showToast(response.message, 'error');
                                                             }

@@ -94,7 +94,7 @@ public class SupplierController extends HttpServlet {
                     return;
                 }
             }
-            if (s.getSupplierName().equals(name)) {
+            if (!s.getSupplierName().equals(name)) {
                 if (dao.isNameExisted(name)) {
                     jsonMap.put("ok", false);
                     jsonMap.put("message", "Name is already existed!");
@@ -102,7 +102,7 @@ public class SupplierController extends HttpServlet {
                     return;
                 }
             }
-            if (s.getPhone().equals(phone)) {
+            if (!s.getPhone().equals(phone)) {
                 if (dao.isPhoneExisted(phone)) {
                     jsonMap.put("ok", false);
                     jsonMap.put("message", "Phone is already existed!");
@@ -110,7 +110,7 @@ public class SupplierController extends HttpServlet {
                     return;
                 }
             }
-            if (s.getTaxCode().equals(taxCode)) {
+            if (!s.getTaxCode().equals(taxCode)) {
                 if (dao.isTaxCodeExisted(taxCode)) {
                     jsonMap.put("ok", false);
                     jsonMap.put("message", "Tax Code is already existed!");
@@ -119,13 +119,13 @@ public class SupplierController extends HttpServlet {
                 }
             }
 
-            boolean success = dao.addSupplier(name, phone, email, taxCode, status);
+            boolean success = dao.editSupplier(id, name, phone, email, taxCode, status);
             if (success) {
                 jsonMap.put("ok", true);
-                jsonMap.put("message", "Supplier added successfully!");
+                jsonMap.put("message", "Supplier saved successfully!");
             } else {
                 jsonMap.put("ok", false);
-                jsonMap.put("message", "Failed to add supplier. Please try again.");
+                jsonMap.put("message", "Failed to save supplier. Please try again.");
             }
             sendJson(response, jsonMap);
         } catch (IOException e) {
