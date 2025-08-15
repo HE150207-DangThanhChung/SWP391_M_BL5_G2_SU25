@@ -214,35 +214,7 @@
     </head>
     <body>
         <div class="demo">
-            <!-- Example 1: Normal state -->
-            <nav class="navbar">
-                <div class="brand">Site name</div>
-
-                <ul class="menu">
-                    <li>
-                        <a class="chip" href="#">Page 1</a>
-                        <!-- dropdown visible when hovering Page 1 -->
-                        <div class="submenu">
-                            <a href="#">Subpage</a>
-                            <a href="#">Subpage</a>
-                        </div>
-                    </li>
-                    <li><a class="chip" href="#">Page 2</a></li>
-                    <li><a class="chip" href="#">Page 3</a></li>
-                </ul>
-
-                <div class="action">
-                    <button class="btn" type="button">Button</button>
-                    <!-- stacked dropdown for the right button -->
-                    <div class="action-menu" aria-label="Button menu">
-                        <div class="action-item">Page</div>
-                        <div class="action-item">Page</div>
-                        <div class="action-item">Page</div>
-                    </div>
-                </div>
-            </nav>
-
-            <!-- Example 2: Same bar (to illustrate hover states while inspecting) -->
+            
             <nav class="navbar">
                 <div class="brand">Site name</div>
                 <ul class="menu">

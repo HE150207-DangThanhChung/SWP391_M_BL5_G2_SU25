@@ -153,6 +153,8 @@
             <h1 id="title">Account Login</h1>
 
             <div class="brand" aria-hidden="true">
+                <h1>Chào mừng bạn!</h1>
+                <h1>Hãy bắt đầu 1 ngày làm việc nào!</h1>
                 <!-- storefront icon -->
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <path d="M3 7h18l-1.5 4a3 3 0 0 1-5.7 0A3 3 0 0 1 10 11a3 3 0 0 1-3.8 0A3 3 0 0 1 3 11L3 7Z"/>
@@ -162,7 +164,7 @@
                 </svg>
             </div>
 
-            <form action="#" method="post" autocomplete="on">
+            <form action="LoginController" method="post" autocomplete="on">
                 <div class="field">
                     <span class="icon" aria-hidden="true">
                         <!-- user icon -->
@@ -188,7 +190,7 @@
                 </div>
 
                 <div class="actions">
-                    <button class="btn-primary" type="submit">LOGIN</button>
+                    <button class="btn-primary" type="submit" value="Login">LOGIN</button>
                     <a class="link" href="#">Forgot Password?</a>
                 </div>
 

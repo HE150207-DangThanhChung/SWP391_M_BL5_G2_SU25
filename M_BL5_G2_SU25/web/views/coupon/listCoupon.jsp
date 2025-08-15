@@ -160,70 +160,78 @@
         </style>
     </head>
     <body>
-        <!-- Toolbar / Search & Filters -->
-        <div class="toolbar">
-            <input type="text" placeholder="Tìm kiếm theo trường 1, trường 2, trường 3" />
-            <button class="btn">Tìm kiếm</button>
+        <div class="layout-wrapper d-flex">
+            <jsp:include page="/views/common/sidebar.jsp"/>
+            <div class="main-panel">
+                <jsp:include page="/views/common/header.jsp"/>
+                <main class="content">
+                    <!-- Toolbar / Search & Filters -->
+                    <div class="toolbar">
+                        <input type="text" placeholder="Tìm kiếm theo trường 1, trường 2, trường 3" />
+                        <button class="btn">Tìm kiếm</button>
 
-            <button class="btn">Filter 1</button>
-            <button class="btn">Filter 2</button>
-            <button class="btn">Filter 3</button>
-            <button class="btn">Lọc</button>
+                        <button class="btn">Filter 1</button>
+                        <button class="btn">Filter 2</button>
+                        <button class="btn">Filter 3</button>
+                        <button class="btn">Lọc</button>
 
-            <button class="btn btn-ghost">Reset</button>
-            <button class="btn">Action 1</button>
-            <button class="btn">Action 2</button>
+                        <button class="btn btn-ghost">Reset</button>
+                        <button class="btn">Action 1</button>
+                        <button class="btn">Action 2</button>
+                    </div>
+
+                    <!-- Data table -->
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Trường dữ liệu 1</th>
+                                    <th>Trường dữ liệu 2</th>
+                                    <th>Trường dữ liệu 3</th>
+                                    <th class="col-hide-sm">Trường dữ liệu 4</th>
+                                    <th class="col-hide-sm col-hide-md">Trường dữ liệu 5</th>
+                                    <th class="col-hide-md">Trường dữ liệu 6</th>
+                                    <th class="col-hide-sm">Trường dữ liệu 7</th>
+                                    <th class="col-actions">Hành động</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>...</td><td>...</td><td>...</td><td class="col-hide-sm">...</td><td class="col-hide-sm col-hide-md">...</td><td class="col-hide-md">...</td><td class="col-hide-sm">...</td>
+                                    <td>
+                                        <a href="#" class="act">Sửa</a>
+                                        <a href="#" class="act act--danger">Xóa</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>...</td><td>...</td><td>...</td><td class="col-hide-sm">...</td><td class="col-hide-sm col-hide-md">...</td><td class="col-hide-md">...</td><td class="col-hide-sm">...</td>
+                                    <td>
+                                        <a href="#" class="act">Sửa</a>
+                                        <a href="#" class="act act--danger">Xóa</a>
+                                    </td>
+                                </tr>
+                                <!-- add more rows here -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Footer: summary & pagination -->
+                    <div class="footer-bar">
+                        <div class="summary">Tổng có <span id="total">xxx</span> dữ liệu</div>
+                        <div>Hiển thị <strong>xxx</strong> mỗi trang</div>
+                        <nav class="pager" aria-label="Pagination">
+                            <a href="#" class="page" aria-label="Trang đầu">≪</a>
+                            <a href="#" class="page" aria-label="Trước">≪</a>
+                            <a href="#" class="page page--current">1</a>
+                            <a href="#" class="page">2</a>
+                            <a href="#" class="page">3</a>
+                            <a href="#" class="page" aria-label="Sau">≫</a>
+                            <a href="#" class="page" aria-label="Cuối">≫</a>
+                        </nav>
+                    </div>
+                </main>
+                <jsp:include page="/views/common/footer.jsp"/>
+            </div>
         </div>
-
-        <!-- Data table -->
-        <div class="table-wrap">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Trường dữ liệu 1</th>
-                        <th>Trường dữ liệu 2</th>
-                        <th>Trường dữ liệu 3</th>
-                        <th class="col-hide-sm">Trường dữ liệu 4</th>
-                        <th class="col-hide-sm col-hide-md">Trường dữ liệu 5</th>
-                        <th class="col-hide-md">Trường dữ liệu 6</th>
-                        <th class="col-hide-sm">Trường dữ liệu 7</th>
-                        <th class="col-actions">Hành động</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>...</td><td>...</td><td>...</td><td class="col-hide-sm">...</td><td class="col-hide-sm col-hide-md">...</td><td class="col-hide-md">...</td><td class="col-hide-sm">...</td>
-                        <td>
-                            <a href="#" class="act">Sửa</a>
-                            <a href="#" class="act act--danger">Xóa</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>...</td><td>...</td><td>...</td><td class="col-hide-sm">...</td><td class="col-hide-sm col-hide-md">...</td><td class="col-hide-md">...</td><td class="col-hide-sm">...</td>
-                        <td>
-                            <a href="#" class="act">Sửa</a>
-                            <a href="#" class="act act--danger">Xóa</a>
-                        </td>
-                    </tr>
-                    <!-- add more rows here -->
-                </tbody>
-            </table>
-        </div>
-
-        <!-- Footer: summary & pagination -->
-        <div class="footer-bar">
-            <div class="summary">Tổng có <span id="total">xxx</span> dữ liệu</div>
-            <div>Hiển thị <strong>xxx</strong> mỗi trang</div>
-            <nav class="pager" aria-label="Pagination">
-                <a href="#" class="page" aria-label="Trang đầu">≪</a>
-                <a href="#" class="page" aria-label="Trước">≪</a>
-                <a href="#" class="page page--current">1</a>
-                <a href="#" class="page">2</a>
-                <a href="#" class="page">3</a>
-                <a href="#" class="page" aria-label="Sau">≫</a>
-                <a href="#" class="page" aria-label="Cuối">≫</a>
-            </nav>
-        </div>
-
     </body>
 </html>
