@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * Chỉnh sửa lại annotation @WebServlet theo phần cá nhân làm riêng
  */
-@WebServlet("/admin/products/*")
+@WebServlet("/product/*")
 public class ProductController extends HttpServlet {
 
     private ProductDAO productDAO;
@@ -42,7 +42,7 @@ public class ProductController extends HttpServlet {
             // Show product list
             List<Product> products = productDAO.getAllProducts();
             request.setAttribute("products", products);
-            request.getRequestDispatcher("/views/admin/productList.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/product/listProduct.jsp").forward(request, response);
         } else if (pathInfo.startsWith("/detail")) {
             // Show product details
             String productIdStr = request.getParameter("productId");
@@ -51,7 +51,7 @@ public class ProductController extends HttpServlet {
                 Product product = productDAO.getProductById(productId);
                 if (product != null) {
                     request.setAttribute("product", product);
-                    request.getRequestDispatcher("/views/admin/productDetail.jsp").forward(request, response);
+                    request.getRequestDispatcher("/views/product/productDetail.jsp").forward(request, response);
                 } else {
                     response.sendRedirect("products");
                 }
