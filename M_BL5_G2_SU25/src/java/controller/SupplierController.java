@@ -20,11 +20,30 @@ import java.util.List;
 public class SupplierController extends HttpServlet {
 
     private final int ITEMS_PER_PAGE = 2;
+    private final String BASE_PATH = "/management/suppliers";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String path = request.getServletPath();
+        
+        switch(path){
+            case BASE_PATH -> doGetList(request, response);
+            case BASE_PATH + "/add" -> doGetAdd(request, response);
+        }
+    }
 
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        
+    }
+    
+    private void doGetAdd(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
+        request.getRequestDispatcher("/views/supplier/addSupplier.jsp").forward(request, response);
+    }
+    
+    private void doGetList(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
         String searchKey = request.getParameter("search");
         String status = request.getParameter("status");
         String pageStr = request.getParameter("page");
@@ -57,11 +76,5 @@ public class SupplierController extends HttpServlet {
         request.setAttribute("status", status);
 
         request.getRequestDispatcher("/views/supplier/listSupplier.jsp").forward(request, response);
-    }
-
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        
     }
 }
