@@ -340,6 +340,7 @@
                                 <th>Số điện thoại</th>
 
                                 <th>Địa chỉ</th>
+                                <th>Trạng thái</th>
                                 <th>Thông tin chi tiết</th>
 
                             </tr>
@@ -354,6 +355,7 @@
                                 <td>0123456789</td>
 
                                 <td>Thạch Hòa</td>
+                                <td></td>
                                 <td><button onclick="window.location.href = 'StoreDetail.jsp'">Chi tiết</button></td>
 
 
