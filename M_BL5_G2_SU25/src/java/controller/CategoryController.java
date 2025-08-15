@@ -88,7 +88,41 @@ public class CategoryController extends HttpServlet {
     }
 
     private void doGetList(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        
+        String searchKey = request.getParameter("search");
+        String status = request.getParameter("status");
+        String pageStr = request.getParameter("page");
+
+        int page = 1;
+        if (pageStr != null && !pageStr.isEmpty()) {
+            try {
+                page = Integer.parseInt(pageStr);
+                if (page < 1) {
+                    page = 1;
+                }
+            } catch (NumberFormatException ignored) {
+            }
+        }
+
+        int offset = (page - 1) * ITEMS_PER_PAGE;
+
+        SupplierDAO dao = new SupplierDAO();
+
+        List<Supplier> supList = dao.GetAllSupplierWithPagingAndFilter(searchKey, status, offset, ITEMS_PER_PAGE);
+
+        int totalSuppliers = dao.countSuppliersWithFilter(searchKey, status);
+        int totalPages = (int) Math.ceil((double) totalSuppliers / ITEMS_PER_PAGE);
+        int endItem = (offset + 1) == totalSuppliers ? offset + 1 : offset + ITEMS_PER_PAGE;
+
+        request.setAttribute("startItem", offset + 1);
+        request.setAttribute("endItem", endItem);
+        request.setAttribute("totalItems", totalSuppliers);
+        request.setAttribute("suppliers", supList);
+        request.setAttribute("currentPage", page);
+        request.setAttribute("totalPages", totalPages);
+        request.setAttribute("searchKey", searchKey);
+        request.setAttribute("status", status);
+
+        request.getRequestDispatcher("/views/category/listCategory.jsp").forward(request, response);
     }
 
     public static void sendJson(HttpServletResponse response, Object data) throws IOException {
