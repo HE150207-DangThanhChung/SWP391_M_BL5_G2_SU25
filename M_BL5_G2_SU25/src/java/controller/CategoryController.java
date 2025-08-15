@@ -124,6 +124,7 @@ public class CategoryController extends HttpServlet {
         try {
             String name = request.getParameter("name");
             String status = request.getParameter("status");
+            String description = request.getParameter("description");
 
             if (dao.isNameExisted(name)) {
                 jsonMap.put("ok", false);
@@ -132,7 +133,7 @@ public class CategoryController extends HttpServlet {
                 return;
             }
 
-            boolean success = dao.addCategory(name, status, status);
+            boolean success = dao.addCategory(name, description, status);
             if (success) {
                 jsonMap.put("ok", true);
                 jsonMap.put("message", "Category added successfully!");
