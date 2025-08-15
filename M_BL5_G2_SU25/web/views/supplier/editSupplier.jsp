@@ -171,7 +171,7 @@
                                         </label>
                                         <select id="supplierStatus" 
                                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white">
-                                            <option value="">-- Select Status --</option>
+                                            <option value="">-- Chọn trạng thái --</option>
                                             <option value="Active" ${s.status == 'Active' ? 'selected' : ''}>Active</option>
                                             <option value="Deactive" ${s.status == 'Deactive' ? 'selected' : ''}>Inactive</option>
                                         </select>
@@ -200,7 +200,7 @@
 
                                 <!-- Required Fields Note -->
                                 <p class="text-sm text-gray-500 mt-4">
-                                    <span class="text-red-500">*</span> Required fields
+                                    <span class="text-red-500">*</span> Trường thông tin bắt buộc
                                 </p>
                             </div>
                         </div>
@@ -243,7 +243,7 @@
                                                 function validateSupplierName(name) {
                                                     const trimmedName = name.trim();
                                                     if (!trimmedName || trimmedName === '') {
-                                                        return 'Supplier name is required and cannot be empty or just spaces';
+                                                        return 'Tên danh mục không được trống hoặc chỉ gồm khoảng trắng';
                                                     }
                                                     return null;
                                                 }
@@ -252,14 +252,14 @@
                                                     const trimmedPhone = phone.trim();
 
                                                     if (!trimmedPhone) {
-                                                        return 'Phone number is required and cannot be empty or just spaces';
+                                                        return 'Số điện thoại không được trống hoặc chỉ gồm khoảng trắng';
                                                     }
 
                                                     const vietnamesePhoneRegex =
                                                             /^(\+84|84|0)(3[2-9]|5[689]|7[06-9]|8[1-9]|9[0-46-9])[0-9]{7}$|^(\+84|84|0)(2[0-9])[0-9]{8}$/;
 
                                                     if (!vietnamesePhoneRegex.test(trimmedPhone)) {
-                                                        return 'Please enter a valid Vietnamese phone number (e.g., 0912345678, +84912345678)';
+                                                        return 'Số điện thoại Việt Nam chưa hợp lệ (e.g., 0912345678, +84912345678)';
                                                     }
                                                     return null;
                                                 }
@@ -267,12 +267,12 @@
                                                 function validateEmail(email) {
                                                     const trimmedEmail = email.trim();
                                                     if (!trimmedEmail || trimmedEmail === '') {
-                                                        return 'Email address is required and cannot be empty or just spaces';
+                                                        return 'Email không được trống hoặc chỉ gồm khoảng trắng';
                                                     }
 
                                                     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                                                     if (!emailRegex.test(trimmedEmail)) {
-                                                        return 'Please enter a valid email address';
+                                                        return 'Chưa đúng định dạng email';
                                                     }
                                                     return null;
                                                 }
@@ -280,14 +280,14 @@
                                                 function validateTaxCode(taxCode) {
                                                     const trimmedTaxCode = taxCode.trim();
                                                     if (!trimmedTaxCode || trimmedTaxCode === '') {
-                                                        return 'Tax code is required and cannot be empty or just spaces';
+                                                        return 'Mã số thuế không được trống hoặc chỉ gồm khoảng trắng';
                                                     }
                                                     return null;
                                                 }
 
                                                 function validateStatus(status) {
                                                     if (!status || status === '') {
-                                                        return 'Please select a status';
+                                                        return 'Chưa chọn status';
                                                     }
                                                     return null;
                                                 }
@@ -361,7 +361,7 @@
 
                                                 function editSupplier() {
                                                     if (!validateForm()) {
-                                                        showToast('Please fix the validation errors before submitting', 'error');
+                                                        showToast('Có trường thông tin chưa hợp lệ, vui lòng kiểm tra lại', 'error');
                                                         return;
                                                     }
 
@@ -370,7 +370,7 @@
                                                     const form = document.getElementById('supplierForm');
 
                                                     addBtn.disabled = true;
-                                                    btnText.textContent = 'Adding...';
+                                                    btnText.textContent = 'Đang thêm...';
                                                     form.classList.add('loading');
 
                                                     $.ajax({
@@ -393,7 +393,7 @@
                                                         },
                                                         error: function (xhr, status, error) {
                                                             console.error('Error:', error);
-                                                            let errorMessage = 'An error occurred while adding the supplier';
+                                                            let errorMessage = 'Có lỗi xảy ra trong quá trình thêm mưới nhà cung cấp';
 
                                                             if (xhr.responseJSON && xhr.responseJSON.message) {
                                                                 errorMessage = xhr.responseJSON.message;
