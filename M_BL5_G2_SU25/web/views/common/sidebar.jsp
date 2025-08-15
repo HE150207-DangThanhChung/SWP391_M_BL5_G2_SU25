@@ -125,7 +125,7 @@
                     <i class="fas fa-tags"></i> 
                     Quản lí danh mục
                 </a>
-                <a href="">
+                <a href="${pageContext.request.contextPath}/management/suplliers">
                     <i class="fas fa-tags"></i> 
                     Quản lí nhà cung cấp
                 </a>
