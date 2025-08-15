@@ -6,13 +6,13 @@ package controller;
 
 import dal.StoreDAO;
 import jakarta.servlet.RequestDispatcher;
-import java.io.IOException;
-import java.io.PrintWriter;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 import model.Store;
 
@@ -25,10 +25,14 @@ import model.Store;
  * riêng
  */
 @WebServlet(name = "StoreController", urlPatterns = {"/stores"})
-
 public class StoreController extends HttpServlet {
 
     private StoreDAO storeDAO;
+
+    @Override
+    public void init() {
+        storeDAO = new StoreDAO();
+    }
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -47,16 +51,10 @@ public class StoreController extends HttpServlet {
         }
     }
 
-    @Override
-    public void init() {
-        storeDAO = new StoreDAO();
-    }
-
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         List<Store> stores = storeDAO.findAll();
         request.setAttribute("stores", stores);
-        // controller/StoreController.java
         RequestDispatcher rd = request.getRequestDispatcher("/views/store/listStore.jsp");
         rd.forward(request, response);
 
@@ -85,5 +83,5 @@ public class StoreController extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
+    
 }

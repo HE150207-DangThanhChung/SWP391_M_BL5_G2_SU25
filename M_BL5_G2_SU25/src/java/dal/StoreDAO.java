@@ -24,9 +24,8 @@ public class StoreDAO {
                 s.setStatus(rs.getString("Status"));
                 list.add(s);
             }
-        } catch (SQLException e) {
-            // log stacktrace để tìm lỗi kết nối/SQL
-            e.printStackTrace();
+        } catch (Exception e) { // rộng hơn SQLException
+            throw new RuntimeException("findAll() failed", e);
         }
         return list;
     }

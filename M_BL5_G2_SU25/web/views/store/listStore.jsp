@@ -5,6 +5,8 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -277,6 +279,7 @@
     <body>
 
 
+
         <!-- Left Content -->
         <div class="content">
             <div class="content-left" >
@@ -327,7 +330,9 @@
 
 
                 </div>
-                <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
+
+
                 <!-- Table container -->
                 <div class="table-container">
                     <table>
@@ -346,22 +351,22 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <c:forEach var="s" items="${stores}">
-                                <tr>
-                                    <td><input type="checkbox"/></td>
-                                    <td>
-                                        <img height="50" width="50" src="${pageContext.request.contextPath}/img/logo2.jpg" alt="logo"/>
-                                    </td>
-                                    <td>${s.storeId}</td>
-                                    <td>${s.storeName}</td>
-                                    <td>${s.phone}</td>
-                                    <td>${s.address}</td>
-                                    <td>${s.status}</td>
-                                    <td>
-                                        <button onclick="window.location.href = 'StoreDetail.jsp?storeId=${s.storeId}'">Chi tiết</button>
-                                    </td>
-                                </tr>
-                            </c:forEach>
+                        <c:forEach var="s" items="${stores}">
+                            <tr>
+                                <td><input type="checkbox"/></td>
+                                <td>
+                                    <img height="50" width="50" src="${pageContext.request.contextPath}/img/logo2.jpg" alt="logo"/>
+                                </td>
+                                <td>${s.storeId}</td>
+                                <td>${s.storeName}</td>
+                                <td>${s.phone}</td>
+                                <td>${s.address}</td>
+                                <td>${s.status}</td>
+                                <td>
+                                    <button onclick="window.location.href = 'StoreDetail.jsp?storeId=${s.storeId}'">Chi tiết</button>
+                                </td>
+                            </tr>
+                        </c:forEach>
                         </tbody>
                     </table>
                 </div>
