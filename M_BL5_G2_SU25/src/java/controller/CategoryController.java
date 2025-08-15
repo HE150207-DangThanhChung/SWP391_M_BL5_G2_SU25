@@ -93,14 +93,14 @@ public class CategoryController extends HttpServlet {
             int id = Integer.parseInt(idStr);
             Category c = dao.getCategoryById(id);
 
-            if (!c.getName().equals(name) && dao.isNameExisted(name)) {
+            if (!c.getCategoryName().equals(name) && dao.isNameExisted(name)) {
                 jsonMap.put("ok", false);
                 jsonMap.put("message", "Name is already existed!");
                 sendJson(response, jsonMap);
                 return;
             }
 
-            boolean success = dao.editCategory(id, name, status);
+            boolean success = dao.editCategory(id, name, status, status);
             if (success) {
                 jsonMap.put("ok", true);
                 jsonMap.put("message", "Category saved successfully!");
@@ -132,7 +132,7 @@ public class CategoryController extends HttpServlet {
                 return;
             }
 
-            boolean success = dao.addCategory(name, status, status)
+            boolean success = dao.addCategory(name, status, status);
             if (success) {
                 jsonMap.put("ok", true);
                 jsonMap.put("message", "Category added successfully!");
