@@ -7,8 +7,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import model.Supplier;
-
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
 
 @WebServlet(name = "SupplierController", urlPatterns = {
@@ -19,6 +21,7 @@ import java.util.List;
 })
 public class SupplierController extends HttpServlet {
 
+    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private final int ITEMS_PER_PAGE = 2;
     private final String BASE_PATH = "/management/suppliers";
 
@@ -36,6 +39,14 @@ public class SupplierController extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String path = request.getServletPath();
+        
+        switch(path){
+            case BASE_PATH + "/add" -> doPostAdd(request, response);
+        }
+    }
+    
+    private void doPostAdd(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException{
         
     }
     
@@ -76,5 +87,18 @@ public class SupplierController extends HttpServlet {
         request.setAttribute("status", status);
 
         request.getRequestDispatcher("/views/supplier/listSupplier.jsp").forward(request, response);
+    }
+    
+    public static void sendJson(HttpServletResponse response, Object data) throws IOException {
+        // Set content type and encoding
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        // Convert object to JSON string
+        String json = gson.toJson(data);
+
+        // Write JSON to response
+        response.getWriter().write(json);
+        response.getWriter().flush();
     }
 }

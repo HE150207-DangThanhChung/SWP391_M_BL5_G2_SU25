@@ -27,6 +27,38 @@ public class SupplierDAO {
         System.out.println(supDao.GetAllSupplierWithPagingAndFilter("", null, 0, 10));
     }
 
+    public boolean addSupplier(String name, String phone, String email, String taxCode, String status) {
+        String sql = """
+                 INSERT INTO Supplier (SupplierName, Phone, Email, TaxCode, Status)
+                 VALUES (?, ?, ?, ?)
+                 """;
+
+        try {
+            con = DBContext.getConnection();
+            ps = con.prepareStatement(sql);
+
+            ps.setString(1, name);
+            ps.setString(2, phone);
+            ps.setString(3, email);
+            ps.setString(4, taxCode);
+            ps.setString(5, status);
+
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (ps != null) try {
+                ps.close();
+            } catch (SQLException ignored) {
+            }
+            DBContext.closeConnection(con);
+        }
+
+        return false;
+    }
+
     public List<Supplier> GetAllSupplierWithPagingAndFilter(String searchKey, String status, int offset, int limit) {
         List<Supplier> supList = new ArrayList<>();
 
@@ -155,4 +187,49 @@ public class SupplierDAO {
 
         return total;
     }
+
+    public boolean isPhoneExisted(String phone) {
+        return isFieldValueExisted("Phone", phone);
+    }
+
+    public boolean isNameExisted(String name) {
+        return isFieldValueExisted("Name", name);
+    }
+
+    public boolean isEmailExisted(String email) {
+        return isFieldValueExisted("Email", email);
+    }
+
+    public boolean isTaxCodeExisted(String taxCode) {
+        return isFieldValueExisted("TaxCode", taxCode);
+    }
+
+    private boolean isFieldValueExisted(String columnName, String value) {
+        String sql = "SELECT 1 FROM Supplier WHERE " + columnName + " = ?";
+
+        try {
+            con = DBContext.getConnection();
+            ps = con.prepareStatement(sql);
+            ps.setString(1, value);
+
+            rs = ps.executeQuery();
+            return rs.next();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) try {
+                rs.close();
+            } catch (SQLException ignored) {
+            }
+            if (ps != null) try {
+                ps.close();
+            } catch (SQLException ignored) {
+            }
+            DBContext.closeConnection(con);
+        }
+
+        return false;
+    }
+
 }
