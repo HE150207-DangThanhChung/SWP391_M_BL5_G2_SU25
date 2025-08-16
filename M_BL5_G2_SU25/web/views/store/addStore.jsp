@@ -152,6 +152,7 @@
         </style>
     </head>
     <body>
+        
         <form action="${pageContext.request.contextPath}/stores/add" method="post">
             <div class="content">
                 <div class="left">
@@ -189,5 +190,6 @@
                 </div>
             </div>
         </form>
+                    <jsp:include page="../common/footer.jsp"/>
     </body>
 </html>
