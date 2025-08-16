@@ -70,11 +70,11 @@
                     <div class="mb-6 flex items-center justify-between">
                         <div>
                             <h1 class="text-2xl font-bold">Quản lí nhà cung cấp</h1>
-                            <p class="text-gray-500">Manage your suppliers efficiently</p>
+                            <p class="text-gray-500">Quản lí tất cả các nhà cung cấp trong hệ thống</p>
                         </div>
                         <a href="${pageContext.request.contextPath}/management/suppliers/add"
                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                            Add Supplier
+                            Thêm mới
                         </a>
                     </div>
 
@@ -83,12 +83,12 @@
                         <input type="text" name="search" value="${param.search}" placeholder="Search..."
                                class="border border-gray-300 rounded-md px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
                         <select name="status" class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                            <option value="">All Status</option>
+                            <option value="">Tất cả</option>
                             <option value="Active" ${param.status == 'Active' ? 'selected' : ''}>Active</option>
                             <option value="Deactive" ${param.status == 'Deactive' ? 'selected' : ''}>Deactive</option>
                         </select>
-                        <button type="submit" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md">Filter</button>
-                        <a href="${pageContext.request.contextPath}/management/suppliers"><button type="button" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md">Clear Filter</button></a>
+                        <button type="submit" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md">Lọc</button>
+                        <a href="${pageContext.request.contextPath}/management/suppliers"><button type="button" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md">Xoá bộ lọc</button></a>
                     </form>
 
                     <!-- Table -->
@@ -97,12 +97,12 @@
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Supplier Name</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Phone</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tên nhà cung cấp</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Số điện thoại</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tax Code</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trạng thái</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hành động</th>
                                 </tr>
                             </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
@@ -112,20 +112,20 @@
                                             <tr class="hover:bg-gray-50">
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm">${s.supplierId}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">${s.supplierName}</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.supplierPhone}</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.supplierEmail}</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.supplierTaxCode}</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.phone}</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.email}</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.taxCode}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
-                                                          ${s.supplierStatus == 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                                                        ${s.supplierStatus}
+                                                          ${s.status == 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                                        ${s.status}
                                                     </span>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                                     <a href="${pageContext.request.contextPath}/management/suppliers/edit?id=${s.supplierId}"
-                                                       class="text-blue-600 hover:text-blue-900">Edit</a>
+                                                       class="text-blue-600 hover:text-blue-900">Chỉnh sửa</a>
                                                     <a href="${pageContext.request.contextPath}/management/suppliers/detail?id=${s.supplierId}"
-                                                       class="text-red-600 hover:text-red-900">Detail</a>
+                                                       class="text-red-600 hover:text-red-900">Chi tiết</a>
                                                 </td>
                                             </tr>
                                         </c:forEach>
@@ -139,8 +139,7 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                           d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                                                     </svg>
-                                                    <p class="text-sm text-gray-500">No suppliers found</p>
-                                                    <p class="text-xs text-gray-400 mt-1">Add your first supplier to get started</p>
+                                                    <p class="text-sm text-gray-500">Không tìm thấy nhà cung cấp nào</p>
                                                 </div>
                                             </td>
                                         </tr>
@@ -155,7 +154,7 @@
                         <div class="flex items-center justify-between mt-6">
                             <!-- Left side info -->
                             <div class="text-sm text-gray-700">
-                                Showing <span class="font-medium">${startItem}</span> to <span class="font-medium">${endItem}</span> of <span class="font-medium">${totalItems}</span> results
+                                Hiển thị từ <span class="font-medium">${startItem}</span> đến <span class="font-medium">${endItem}</span> của <span class="font-medium">${totalItems}</span> kết quả
                             </div>
 
                             <!-- Right side pagination buttons -->
@@ -164,7 +163,7 @@
                                 <c:if test="${currentPage > 1}">
                                     <a href="?page=${currentPage - 1}&search=${param.search}&statusId=${param.statusId}"
                                        class="px-3 py-1 text-sm bg-white border border-gray-300 text-gray-500 rounded-md hover:bg-gray-50">
-                                        Previous
+                                        Trước
                                     </a>
                                 </c:if>
 
@@ -181,7 +180,7 @@
                                 <c:if test="${currentPage < totalPages}">
                                     <a href="?page=${currentPage + 1}&search=${param.search}&statusId=${param.statusId}"
                                        class="px-3 py-1 text-sm bg-white border border-gray-300 text-gray-500 rounded-md hover:bg-gray-50">
-                                        Next
+                                        Sau
                                     </a>
                                 </c:if>
                             </div>

@@ -89,7 +89,7 @@
 
                 <main class="content flex-1 p-6 bg-gray-50">
                     <!-- Header Section -->
-                    <div class="mb-8">
+                    <div class="mb-8 pt-2 pl-2">
                         <div class="flex items-center justify-between">
                             <div>
                                 <h1 class="text-3xl font-bold text-gray-900">Quản lí nhà cung cấp</h1>
@@ -100,7 +100,7 @@
                                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                                 </svg>
-                                Back
+                                Quay lại
                             </button>
                         </div>
                     </div>
@@ -115,7 +115,7 @@
                                     <!-- Supplier Name -->
                                     <div class="lg:col-span-2">
                                         <label for="supplierName" class="block text-sm font-medium text-gray-700 mb-2">
-                                            Supplier Name *
+                                            Tên nhà cung cấp *
                                         </label>
                                         <input id="supplierName" 
                                                type="text" 
@@ -127,7 +127,7 @@
                                     <!-- Supplier Phone -->
                                     <div>
                                         <label for="supplierPhone" class="block text-sm font-medium text-gray-700 mb-2">
-                                            Phone Number *
+                                            Số điện thoại *
                                         </label>
                                         <input id="supplierPhone" 
                                                type="tel" 
@@ -139,7 +139,7 @@
                                     <!-- Supplier Email -->
                                     <div>
                                         <label for="supplierEmail" class="block text-sm font-medium text-gray-700 mb-2">
-                                            Email Address *
+                                            Địa chỉ email *
                                         </label>
                                         <input id="supplierEmail" 
                                                type="email" 
@@ -151,7 +151,7 @@
                                     <!-- Supplier Tax Code -->
                                     <div>
                                         <label for="supplierTaxCode" class="block text-sm font-medium text-gray-700 mb-2">
-                                            Tax Code *
+                                            Mã thuế *
                                         </label>
                                         <input id="supplierTaxCode" 
                                                type="text" 
@@ -163,13 +163,13 @@
                                     <!-- Supplier Status -->
                                     <div>
                                         <label for="supplierStatus" class="block text-sm font-medium text-gray-700 mb-2">
-                                            Status *
+                                            Trạng thái *
                                         </label>
                                         <select id="supplierStatus" 
                                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white">
-                                            <option value="">-- Select Status --</option>
-                                            <option value="active">Active</option>
-                                            <option value="inactive">Inactive</option>
+                                            <option value="">-- Chọn trạng thái --</option>
+                                            <option value="Active">Active</option>
+                                            <option value="Deactive">Inactive</option>
                                         </select>
                                         <span id="supplierStatusError" class="error-text" style="display: none;"></span>
                                     </div>
@@ -184,7 +184,7 @@
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                         </svg>
-                                        <span id="btnText">Add Supplier</span>
+                                        <span id="btnText">Thêm</span>
                                     </button>
 
                                     <button type="button" 
@@ -193,19 +193,19 @@
                                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                                         </svg>
-                                        Clear Form
+                                        Làm mới dữ liệu
                                     </button>
 
                                     <button type="button" 
                                             onclick="history.back()"
                                             class="inline-flex items-center justify-center px-6 py-3 bg-white hover:bg-gray-50 text-gray-600 font-medium rounded-lg border border-gray-300 transition-colors duration-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-                                        Cancel
+                                        Huỷ
                                     </button>
                                 </div>
 
                                 <!-- Required Fields Note -->
                                 <p class="text-sm text-gray-500 mt-4">
-                                    <span class="text-red-500">*</span> Required fields
+                                    <span class="text-red-500">*</span> Trương thông tin bắt buộc
                                 </p>
                             </div>
                         </div>

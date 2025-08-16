@@ -121,7 +121,7 @@
                     <i class="fas fa-tags"></i> 
                     Quản lí nhập kho
                 </a>
-                <a href="">
+                <a href="${pageContext.request.contextPath}/management/category">
                     <i class="fas fa-tags"></i> 
                     Quản lí danh mục
                 </a>
