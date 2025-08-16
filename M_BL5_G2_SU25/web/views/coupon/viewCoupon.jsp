@@ -71,12 +71,11 @@
                 border-radius:10px;
                 background:#fff;
                 min-height:42px;
-                display:flex;
-                align-items: center;
-                justify-content:flex-start;  
-                text-align:left;             
-                white-space:pre-wrap;
-                word-break:break-word;
+
+                display: block;
+                text-align: left;
+                white-space: pre-wrap;
+                word-break: break-word;
             }
             .actions{
                 display:flex;
@@ -109,10 +108,21 @@
                 }
             }
             .value--left {
-
                 justify-content: flex-start !important;
-                display: block !important;
                 text-align: left !important;
+            }
+            .value-fix{
+                width:100%;
+                padding:10px 12px;
+                border:2px solid var(--stroke);
+                border-radius:10px;
+                background:#fff;
+                min-height:42px;
+
+                display: block;
+                text-align: left;/*
+                white-space: pre-wrap;*/
+                word-break: break-word;
             }
         </style>
     </head>
@@ -140,14 +150,14 @@
 
                         <div class="row">
                             <label>Phần trăm giảm</label>
-                            <div class="value">
+                            <div class="value-fix">
                                 <fmt:formatNumber value="${coupon.discountPercent}" maxFractionDigits="2"/>% 
                             </div>
                         </div>
 
                         <div class="row">
                             <label>Giảm tối đa</label>
-                            <div class="value">
+                            <div class="value-fix">
                                 <fmt:formatNumber value="${coupon.maxDiscount}" type="number" maxFractionDigits="0"/> (VND)
                             </div>
                         </div>
@@ -159,7 +169,7 @@
 
                         <div class="row">
                             <label>Tổng tối thiểu</label>
-                            <div class="value">
+                            <div class="value-fix">
                                 <fmt:formatNumber value="${coupon.minTotal}" type="number" maxFractionDigits="0"/> (VND)
                             </div>
                         </div>
@@ -186,7 +196,7 @@
 
                         <div class="row">
                             <label>Trạng thái</label>
-                            
+
                             <div class="value">${coupon.status eq 'Active' ? 'Đang hoạt động' : 'Đã ngừng'}</div>
                         </div>
 
