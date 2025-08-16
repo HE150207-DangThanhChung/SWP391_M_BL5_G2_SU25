@@ -141,7 +141,7 @@
                     <i class="fas fa-tags"></i> 
                     Quản lí báo cáo
                 </a>
-                <a href="">
+                <a href="${pageContext.request.contextPath}/product">
                     <i class="fas fa-tags"></i> 
                     Quản lí sản phẩm
                 </a>
