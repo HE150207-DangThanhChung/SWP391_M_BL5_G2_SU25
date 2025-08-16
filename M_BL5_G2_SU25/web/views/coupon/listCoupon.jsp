@@ -242,6 +242,11 @@
                 border: none;                    /* or border-color: inherit; if you want */
             }
 
+            .btn-group {
+                display: flex;
+                gap: .5rem;
+                flex-wrap: nowrap;
+            }
         </style>
     </head>
     <body>

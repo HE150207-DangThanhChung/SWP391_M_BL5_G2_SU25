@@ -64,7 +64,7 @@
             <div class="main-panel">
                 <jsp:include page="/views/common/header.jsp"/>
                 <main class="content">
-                    <h1>This is Owner Dashboard</h1>
+<!--                    <h1>This is Owner Dashboard</h1>
                     <%
                         // Lay username tu trong session
                         String username = (String) session.getAttribute("tendangnhap");
@@ -76,7 +76,7 @@
                         }
                     %>
                     <c:url var="logoutUrl" value="/logout"/>
-                    <h1><a href="${logoutUrl}">Đăng Xuất</a></h1>
+                    <h1><a href="${logoutUrl}">Đăng Xuất</a></h1>-->
                     
                 </main>
                 <jsp:include page="/views/common/footer.jsp"/>
