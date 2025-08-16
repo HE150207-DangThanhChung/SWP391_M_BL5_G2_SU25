@@ -462,5 +462,78 @@ public class ProductDAO {
         }
         return specifications;
     }
+    
+    public List<Product> getFilteredAndSortedProducts(String categoryId, String brandId, String status, 
+                                                    Double minPrice, Double maxPrice, String sortBy, String sortOrder) {
+        List<Product> products = new ArrayList<>();
+        StringBuilder sql = new StringBuilder("SELECT p.ProductId, p.ProductName, p.Status, p.CategoryId, c.CategoryName, " +
+                                             "p.BrandId, b.BrandName, p.SupplierId, s.SupplierName " +
+                                             "FROM Product p " +
+                                             "JOIN Category c ON p.CategoryId = c.CategoryId " +
+                                             "JOIN Brand b ON p.BrandId = b.BrandId " +
+                                             "JOIN Supplier s ON p.SupplierId = s.SupplierId " +
+                                             "WHERE p.Status = 'Active' ");
+
+        // Add filter conditions
+        List<Object> params = new ArrayList<>();
+        if (categoryId != null && !categoryId.isEmpty()) {
+            sql.append("AND p.CategoryId = ? ");
+            params.add(Integer.parseInt(categoryId));
+        }
+        if (brandId != null && !brandId.isEmpty()) {
+            sql.append("AND p.BrandId = ? ");
+            params.add(Integer.parseInt(brandId));
+        }
+        if (status != null && !status.isEmpty()) {
+            sql.append("AND p.Status = ? ");
+            params.add(status);
+        }
+        if (minPrice != null) {
+            sql.append("AND (SELECT MIN(Price) FROM ProductVariant pv WHERE pv.ProductId = p.ProductId) >= ? ");
+            params.add(minPrice);
+        }
+        if (maxPrice != null) {
+            sql.append("AND (SELECT MAX(Price) FROM ProductVariant pv WHERE pv.ProductId = p.ProductId) <= ? ");
+            params.add(maxPrice);
+        }
+
+        // Add sorting
+        if (sortBy != null && !sortBy.isEmpty()) {
+            if ("price".equals(sortBy)) {
+                sql.append("ORDER BY (SELECT MIN(Price) FROM ProductVariant pv WHERE pv.ProductId = p.ProductId) ");
+            } else if ("name".equals(sortBy)) {
+                sql.append("ORDER BY p.ProductName ");
+            }
+            sql.append(sortOrder != null && "desc".equalsIgnoreCase(sortOrder) ? "DESC " : "ASC ");
+        }
+
+        try (Connection conn = new DBContext().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql.toString())) {
+            for (int i = 0; i < params.size(); i++) {
+                stmt.setObject(i + 1, params.get(i));
+            }
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    Product product = new Product();
+                    product.setProductId(rs.getInt("ProductId"));
+                    product.setProductName(rs.getString("ProductName"));
+                    product.setStatus(rs.getString("Status"));
+                    product.setCategoryId(rs.getInt("CategoryId"));
+                    product.setCategoryName(rs.getString("CategoryName"));
+                    product.setBrandId(rs.getInt("BrandId"));
+                    product.setBrandName(rs.getString("BrandName"));
+                    product.setSupplierId(rs.getInt("SupplierId"));
+                    product.setSupplierName(rs.getString("SupplierName"));
+
+                    // Fetch variants for this product
+                    product.setVariants(getVariantsByProductId(product.getProductId(), conn));
+                    products.add(product);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving filtered and sorted products: " + e.getMessage(), e);
+        }
+        return products;
+    }
 
 }

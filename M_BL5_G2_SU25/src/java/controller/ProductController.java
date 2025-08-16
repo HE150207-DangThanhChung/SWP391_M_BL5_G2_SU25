@@ -1,5 +1,6 @@
 package controller;
 
+import com.google.gson.Gson;
 import dal.ProductDAO;
 import model.Product;
 import model.ProductVariant;
@@ -18,6 +19,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,62 +42,81 @@ public class ProductController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
-        if (pathInfo == null) {
-            pathInfo = "/"; // Default to root if null
-        }
-
-        switch (pathInfo) {
-            case "/":
+        if (pathInfo == null || "/".equals(pathInfo)) {
+            if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+                // AJAX request for full product list
                 List<Product> products = productDAO.getAllProducts();
-                request.setAttribute("products", products);
-                request.getRequestDispatcher("/views/product/listProduct.jsp").forward(request, response);
-                break;
-            case "/add":
+                Gson gson = new Gson();
+                response.setContentType("application/json");
+                PrintWriter out = response.getWriter();
+                out.print(gson.toJson(products));
+                out.flush();
+                return;
+            }
+            List<Product> products = productDAO.getAllProducts();
+            List<Category> categories = productDAO.getAllCategories();
+            List<Brand> brands = productDAO.getAllBrands();
+            request.setAttribute("products", products);
+            request.setAttribute("categories", categories);
+            request.setAttribute("brands", brands);
+            request.getRequestDispatcher("/views/product/listProduct.jsp").forward(request, response);
+        } else if (pathInfo.equals("/add")) {
+            List<Category> categories = productDAO.getAllCategories();
+            List<Brand> brands = productDAO.getAllBrands();
+            List<Supplier> suppliers = productDAO.getAllSuppliers();
+            List<Specification> specifications = productDAO.getAllSpecifications();
+            request.setAttribute("categories", categories);
+            request.setAttribute("brands", brands);
+            request.setAttribute("suppliers", suppliers);
+            request.setAttribute("specifications", specifications);
+            request.getRequestDispatcher("/views/product/addProduct.jsp").forward(request, response);
+        } else if (pathInfo.equals("/edit")) {
+            String productIdStr = request.getParameter("productId");
+            if (productIdStr != null) {
+                int productId = Integer.parseInt(productIdStr);
+                Product product = productDAO.getProductById(productId);
                 List<Category> categories = productDAO.getAllCategories();
                 List<Brand> brands = productDAO.getAllBrands();
                 List<Supplier> suppliers = productDAO.getAllSuppliers();
                 List<Specification> specifications = productDAO.getAllSpecifications();
+                request.setAttribute("product", product);
                 request.setAttribute("categories", categories);
                 request.setAttribute("brands", brands);
                 request.setAttribute("suppliers", suppliers);
                 request.setAttribute("specifications", specifications);
-                request.getRequestDispatcher("/views/product/addProduct.jsp").forward(request, response);
-                break;
-            case "/edit":
-                String productIdStr = request.getParameter("productId");
-                if (productIdStr != null) {
-                    int productId = Integer.parseInt(productIdStr);
-                    Product product = productDAO.getProductById(productId);
-                    categories = productDAO.getAllCategories();
-                    brands = productDAO.getAllBrands();
-                    suppliers = productDAO.getAllSuppliers();
-                    specifications = productDAO.getAllSpecifications();
-                    request.setAttribute("product", product);
-                    request.setAttribute("categories", categories);
-                    request.setAttribute("brands", brands);
-                    request.setAttribute("suppliers", suppliers);
-                    request.setAttribute("specifications", specifications);
-                    request.getRequestDispatcher("/views/product/editProduct.jsp").forward(request, response);
-                } else {
-                    response.sendRedirect("/product");
-                }
-                break;
-            case "/detail":
-                productIdStr = request.getParameter("productId");
-                if (productIdStr != null) {
-                    int productId = Integer.parseInt(productIdStr);
-                    Product product = productDAO.getProductById(productId);
-                    specifications = productDAO.getAllSpecifications();
-                    request.setAttribute("product", product);
-                    request.setAttribute("specifications", specifications);
-                    request.getRequestDispatcher("/views/product/productDetail.jsp").forward(request, response);
-                } else {
-                    response.sendRedirect("/product");
-                }
-                break;
-            default:
+                request.getRequestDispatcher("/views/product/editProduct.jsp").forward(request, response);
+            } else {
                 response.sendRedirect("/product");
-                break;
+            }
+        } else if (pathInfo.equals("/detail")) {
+            String productIdStr = request.getParameter("productId");
+            if (productIdStr != null) {
+                int productId = Integer.parseInt(productIdStr);
+                Product product = productDAO.getProductById(productId);
+                List<Specification> specifications = productDAO.getAllSpecifications();
+                request.setAttribute("product", product);
+                request.setAttribute("specifications", specifications);
+                request.getRequestDispatcher("/views/product/productDetail.jsp").forward(request, response);
+            } else {
+                response.sendRedirect("/product");
+            }
+        } else if (pathInfo.equals("/filter")) {
+            String categoryId = request.getParameter("categoryId");
+            String brandId = request.getParameter("brandId");
+            String status = request.getParameter("status");
+            Double minPrice = request.getParameter("minPrice") != null && !request.getParameter("minPrice").isEmpty() ? Double.parseDouble(request.getParameter("minPrice")) : null;
+            Double maxPrice = request.getParameter("maxPrice") != null && !request.getParameter("maxPrice").isEmpty() ? Double.parseDouble(request.getParameter("maxPrice")) : null;
+            String sortBy = request.getParameter("sortBy");
+            String sortOrder = request.getParameter("sortOrder");
+
+            List<Product> products = productDAO.getFilteredAndSortedProducts(categoryId, brandId, status, minPrice, maxPrice, sortBy, sortOrder);
+            Gson gson = new Gson();
+            response.setContentType("application/json");
+            PrintWriter out = response.getWriter();
+            out.print(gson.toJson(products));
+            out.flush();
+        } else {
+            response.sendRedirect("/product");
         }
     }
 
