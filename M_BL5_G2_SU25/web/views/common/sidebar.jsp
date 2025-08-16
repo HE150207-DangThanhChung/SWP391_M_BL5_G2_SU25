@@ -109,7 +109,7 @@
                     <i class="fas fa-warehouse"></i>
                     Quản lý cửa hàng
                 </a>
-                <a href="">
+                <a href="${pageContext.request.contextPath}/management/employees">
                     <i class="fas fa-user-friends"></i> 
                     Quản lí nhân viên
                 </a>
