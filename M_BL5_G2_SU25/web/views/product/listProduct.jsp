@@ -55,9 +55,8 @@
                     <th>Thương hiệu</th>
                     <th>Danh mục</th>
                     <th>Nhà cung cấp</th>
-                    <th>Mã sản phẩm</th>
-                    <th>Giá</th>
-                    <th>Bảo hành (Tháng)</th>
+                    <th>Số biến thể</th>
+                    <th>Giá (Khoảng)</th>
                     <th>Trạng thái</th>
                     <th>Hành động</th>
                 </tr>
@@ -68,8 +67,8 @@
                         <td>${product.productId}</td>
                         <td>
                             <c:choose>
-                                <c:when test="${not empty product.imageUrl}">
-                                    <img src="${pageContext.request.contextPath}/${product.imageUrl}" alt="${product.productName}" class="product-img">
+                                <c:when test="${not empty product.variants and not empty product.variants[0].images and not empty product.variants[0].images[0].src}">
+                                    <img src="${pageContext.request.contextPath}/${product.variants[0].images[0].src}" alt="${product.productName}" class="product-img">
                                 </c:when>
                                 <c:otherwise>
                                     <span class="text-muted">No image</span>
@@ -84,9 +83,18 @@
                         <td>${product.brandName}</td>
                         <td>${product.categoryName}</td>
                         <td>${product.supplierName}</td>
-                        <td>${product.productCode}</td>
-                        <td>${product.price}</td>
-                        <td>${product.warrantyDurationMonth}</td>
+                        <td>${product.variants != null ? product.variants.size() : 0}</td>
+                        <td>
+                            <c:if test="${not empty product.variants}">
+                                ${minPrice = product.variants[0].price}
+                                ${maxPrice = product.variants[0].price}
+                                <c:forEach var="variant" items="${product.variants}">
+                                    <c:if test="${variant.price < minPrice}">${minPrice = variant.price}</c:if>
+                                    <c:if test="${variant.price > maxPrice}">${maxPrice = variant.price}</c:if>
+                                </c:forEach>
+                                ${minPrice} - ${maxPrice}
+                            </c:if>
+                        </td>
                         <td>
                             <span class="badge ${product.status == 'Active' ? 'bg-success' : 'bg-danger'}">
                                 ${product.status}

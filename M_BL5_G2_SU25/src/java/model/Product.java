@@ -4,10 +4,7 @@
  */
 package model;
 
-/**
- *
- * @author tayho
- */
+import java.util.List;
 
 public class Product {
     private int productId;
@@ -19,16 +16,12 @@ public class Product {
     private String brandName;
     private int supplierId;
     private String supplierName;
-    private String productCode;
-    private double price;
-    private int warrantyDurationMonth;
-    private String imageUrl; // From ProductImage
+    private List<ProductVariant> variants;
 
     // Constructors
     public Product() {}
     public Product(int productId, String productName, String status, int categoryId, String categoryName, 
-                   int brandId, String brandName, int supplierId, String supplierName, String productCode, 
-                   double price, int warrantyDurationMonth, String imageUrl) {
+                   int brandId, String brandName, int supplierId, String supplierName, List<ProductVariant> variants) {
         this.productId = productId;
         this.productName = productName;
         this.status = status;
@@ -38,10 +31,7 @@ public class Product {
         this.brandName = brandName;
         this.supplierId = supplierId;
         this.supplierName = supplierName;
-        this.productCode = productCode;
-        this.price = price;
-        this.warrantyDurationMonth = warrantyDurationMonth;
-        this.imageUrl = imageUrl;
+        this.variants = variants;
     }
 
     // Getters and Setters
@@ -63,12 +53,6 @@ public class Product {
     public void setSupplierId(int supplierId) { this.supplierId = supplierId; }
     public String getSupplierName() { return supplierName; }
     public void setSupplierName(String supplierName) { this.supplierName = supplierName; }
-    public String getProductCode() { return productCode; }
-    public void setProductCode(String productCode) { this.productCode = productCode; }
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price; }
-    public int getWarrantyDurationMonth() { return warrantyDurationMonth; }
-    public void setWarrantyDurationMonth(int warrantyDurationMonth) { this.warrantyDurationMonth = warrantyDurationMonth; }
-    public String getImageUrl() { return imageUrl; }
-    public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public List<ProductVariant> getVariants() { return variants; }
+    public void setVariants(List<ProductVariant> variants) { this.variants = variants; }
 }
