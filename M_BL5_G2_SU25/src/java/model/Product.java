@@ -4,6 +4,7 @@
  */
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Product {
@@ -16,7 +17,7 @@ public class Product {
     private String brandName;
     private int supplierId;
     private String supplierName;
-    private List<ProductVariant> variants;
+    private List<ProductVariant> variants = new ArrayList<>();
 
     // Constructors
     public Product() {}

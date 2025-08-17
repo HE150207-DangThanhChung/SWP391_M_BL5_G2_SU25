@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package model;
 
 public class ProductSerial {
@@ -9,16 +5,18 @@ public class ProductSerial {
     private String serialNumber;
     private int productVariantId;
     private int storeId;
+    private String storeName;
     private String createdAt;
     private String updatedAt;
 
     // Constructors
     public ProductSerial() {}
-    public ProductSerial(int productSerialId, String serialNumber, int productVariantId, int storeId, String createdAt, String updatedAt) {
+    public ProductSerial(int productSerialId, String serialNumber, int productVariantId, int storeId, String storeName, String createdAt, String updatedAt) {
         this.productSerialId = productSerialId;
         this.serialNumber = serialNumber;
         this.productVariantId = productVariantId;
         this.storeId = storeId;
+        this.storeName = storeName;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -32,6 +30,8 @@ public class ProductSerial {
     public void setProductVariantId(int productVariantId) { this.productVariantId = productVariantId; }
     public int getStoreId() { return storeId; }
     public void setStoreId(int storeId) { this.storeId = storeId; }
+    public String getStoreName() { return storeName; }
+    public void setStoreName(String storeName) { this.storeName = storeName; }
     public String getCreatedAt() { return createdAt; }
     public void setCreatedAt(String createdAt) { this.createdAt = createdAt; }
     public String getUpdatedAt() { return updatedAt; }
