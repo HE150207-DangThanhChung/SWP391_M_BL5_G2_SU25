@@ -90,10 +90,10 @@
 
                                 <div>
                                     <label class="block text-sm font-medium">Tên đệm</label>
-                                    <input type="text" name="lastName" value="${e.middleName}"
+                                    <input type="text" name="middleName" value="${e.middleName}"
                                            class="w-full px-4 py-2 border rounded-lg">
                                 </div>
-                                           
+
                                 <div>
                                     <label class="block text-sm font-medium">Tên</label>
                                     <input type="text" name="lastName" value="${e.lastName}"
@@ -162,7 +162,6 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
-                            // Preview avatar before upload
                             $("#avatar").on("change", function () {
                                 const file = this.files[0];
                                 if (file) {
@@ -179,7 +178,7 @@
                                 let formData = new FormData(this);
 
                                 $.ajax({
-                                    url: "${pageContext.request.contextPath}/profile/edit", // Servlet endpoint
+                                    url: "${pageContext.request.contextPath}/profile/edit",
                                     type: "POST",
                                     data: formData,
                                     processData: false,
