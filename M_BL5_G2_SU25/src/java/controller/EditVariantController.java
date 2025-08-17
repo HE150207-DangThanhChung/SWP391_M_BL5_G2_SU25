@@ -27,6 +27,7 @@ public class EditVariantController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int productVariantId = Integer.parseInt(request.getParameter("productVariantId"));
+        int productId = Integer.parseInt(request.getParameter("productId"));
         ProductVariant variant = productDAO.getVariantById(productVariantId);
         List<Specification> allSpecifications = productDAO.getAllSpecifications();
         List<Store> stores = productDAO.getAllStores();
@@ -38,6 +39,7 @@ public class EditVariantController extends HttpServlet {
         }
 
         request.setAttribute("variant", variant);
+        request.setAttribute("productId", productId);
         request.setAttribute("allSpecifications", allSpecifications);
         request.setAttribute("stores", stores);
         request.getRequestDispatcher("views/product/editProductVariant.jsp").forward(request, response);

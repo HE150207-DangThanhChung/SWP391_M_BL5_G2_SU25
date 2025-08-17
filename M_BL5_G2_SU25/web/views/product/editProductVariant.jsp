@@ -142,7 +142,7 @@
                                     </div>
                                 </div>
                                 <button type="submit" class="btn btn-primary mt-3">Lưu thay đổi</button>
-                                <a href="${pageContext.request.contextPath}/product/productDetail?productId=${variant.productId}" class="btn btn-secondary mt-3">Hủy</a>
+                                <a href="${pageContext.request.contextPath}/product" class="btn btn-secondary mt-3">Hủy</a>
                             </div>
                         </div>
                     </form>
