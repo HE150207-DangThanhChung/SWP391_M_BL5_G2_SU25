@@ -122,7 +122,11 @@
                                     <label class="form-label">Serials</label>
                                     <div class="input-group mb-2">
                                         <input type="text" class="form-control" name="variantSerial[0][0]" required>
-                                        <input type="number" class="form-control" name="variantStoreId[0][0]" required>
+                                        <select class="form-control" name="variantStoreId[0][0]" required>
+                                            <c:forEach var="store" items="${stores}">
+                                                <option value="${store.storeId}">${store.storeName}</option>
+                                            </c:forEach>
+                                        </select>
                                     </div>
                                 </div>
 
@@ -147,9 +151,6 @@
         <jsp:include page="/views/common/footer.jsp" />
     </div>
 </div>
-</body>
-</html>
-
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 <script>
@@ -174,8 +175,6 @@
                     <label class="form-label">Bảo hành (Tháng)</label>
                     <input type="number" class="form-control" name="variantWarranty[${variantCount - 1}]" required>
                 </div>
-
-                <!-- Specifications -->
                 <div class="mb-3">
                     <label class="form-label">Thông số kỹ thuật</label>
                     <c:forEach var="specDef" items="${specifications}">
@@ -185,17 +184,17 @@
                         </div>
                     </c:forEach>
                 </div>
-
-                <!-- Serials -->
                 <div class="mb-3">
                     <label class="form-label">Serials</label>
                     <div class="input-group mb-2">
                         <input type="text" class="form-control" name="variantSerial[${variantCount - 1}][0]" required>
-                        <input type="number" class="form-control" name="variantStoreId[${variantCount - 1}][0]" required>
+                        <select class="form-control" name="variantStoreId[${variantCount - 1}][0]" required>
+                            <c:forEach var="store" items="${stores}">
+                                <option value="${store.storeId}">${store.storeName}</option>
+                            </c:forEach>
+                        </select>
                     </div>
                 </div>
-
-                <!-- Images -->
                 <div class="mb-3">
                     <label class="form-label">Hình ảnh</label>
                     <input type="file" class="form-control" name="variantImage[${variantCount - 1}][]">
@@ -206,3 +205,5 @@
         container.appendChild(newVariant);
     }
 </script>
+</body>
+</html>
