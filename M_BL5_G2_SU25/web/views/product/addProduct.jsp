@@ -40,6 +40,15 @@
         .main-panel > footer.footer {
             margin-top: auto;
         }
+        .error-border {
+            border: 2px solid red !important;
+        }
+        .error-message {
+            color: red;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -54,6 +63,7 @@
                     <div class="mb-3">
                         <label class="form-label">Tên sản phẩm</label>
                         <input type="text" class="form-control" name="productName" required>
+                        <div class="error-message">Please Input</div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Danh mục</label>
@@ -62,6 +72,7 @@
                                 <option value="${category.categoryId}">${category.categoryName}</option>
                             </c:forEach>
                         </select>
+                        <div class="error-message">Please Input</div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Thương hiệu</label>
@@ -70,6 +81,7 @@
                                 <option value="${brand.brandId}">${brand.brandName}</option>
                             </c:forEach>
                         </select>
+                        <div class="error-message">Please Input</div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Nhà cung cấp</label>
@@ -78,6 +90,7 @@
                                 <option value="${supplier.supplierId}">${supplier.supplierName}</option>
                             </c:forEach>
                         </select>
+                        <div class="error-message">Please Input</div>
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Trạng thái</label>
@@ -85,6 +98,7 @@
                             <option value="Active">Active</option>
                             <option value="Inactive">Inactive</option>
                         </select>
+                        <div class="error-message">Please Input</div>
                     </div>
 
                     <!-- Variants -->
@@ -96,14 +110,17 @@
                                 <div class="mb-3">
                                     <label class="form-label">Mã sản phẩm</label>
                                     <input type="text" class="form-control" name="variantProductCode[0]" required>
+                                    <div class="error-message">Please Input</div>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Giá</label>
                                     <input type="number" step="0.01" class="form-control" name="variantPrice[0]" required>
+                                    <div class="error-message">Please Input</div>
                                 </div>
                                 <div class="mb-3">
                                     <label class="form-label">Bảo hành (Tháng)</label>
                                     <input type="number" class="form-control" name="variantWarranty[0]" required>
+                                    <div class="error-message">Please Input</div>
                                 </div>
 
                                 <!-- Specifications -->
@@ -112,7 +129,8 @@
                                     <c:forEach var="specDef" items="${specifications}">
                                         <div class="mb-2">
                                             <label class="form-label">${specDef.attributeName}</label>
-                                            <input type="text" class="form-control" name="specValue[${specDef.specificationId}][0]" placeholder="Nhập ${specDef.attributeName.toLowerCase()}">
+                                            <input type="text" class="form-control" name="specValue[${specDef.specificationId}][0]" placeholder="Nhập ${specDef.attributeName.toLowerCase()}" required>
+                                            <div class="error-message">Please Input</div>
                                         </div>
                                     </c:forEach>
                                 </div>
@@ -122,11 +140,13 @@
                                     <label class="form-label">Serials</label>
                                     <div class="input-group mb-2">
                                         <input type="text" class="form-control" name="variantSerial[0][0]" required>
+                                        <div class="error-message">Please Input</div>
                                         <select class="form-control" name="variantStoreId[0][0]" required>
                                             <c:forEach var="store" items="${stores}">
                                                 <option value="${store.storeId}">${store.storeName}</option>
                                             </c:forEach>
                                         </select>
+                                        <div class="error-message">Please Input</div>
                                     </div>
                                 </div>
 
@@ -134,7 +154,9 @@
                                 <div class="mb-3">
                                     <label class="form-label">Hình ảnh</label>
                                     <input type="file" class="form-control" name="variantImage[0][]">
+                                    <div class="error-message">Please Input</div>
                                     <input type="text" class="form-control" name="variantImageUrl[0][]" placeholder="URL (optional)">
+                                    <div class="error-message">Please Input</div>
                                 </div>
                             </div>
                         </div>
@@ -155,6 +177,8 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 <script>
     let variantCount = 1;
+
+    // Add new variant block
     function addVariant() {
         variantCount++;
         const container = document.getElementById('variants-container');
@@ -166,21 +190,25 @@
                 <div class="mb-3">
                     <label class="form-label">Mã sản phẩm</label>
                     <input type="text" class="form-control" name="variantProductCode[${variantCount - 1}]" required>
+                    <div class="error-message">Please Input</div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Giá</label>
                     <input type="number" step="0.01" class="form-control" name="variantPrice[${variantCount - 1}]" required>
+                    <div class="error-message">Please Input</div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Bảo hành (Tháng)</label>
                     <input type="number" class="form-control" name="variantWarranty[${variantCount - 1}]" required>
+                    <div class="error-message">Please Input</div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Thông số kỹ thuật</label>
                     <c:forEach var="specDef" items="${specifications}">
                         <div class="mb-2">
                             <label class="form-label">${specDef.attributeName}</label>
-                            <input type="text" class="form-control" name="specValue[${specDef.specificationId}][${variantCount - 1}]" placeholder="Nhập ${specDef.attributeName.toLowerCase()}">
+                            <input type="text" class="form-control" name="specValue[${specDef.specificationId}][${variantCount - 1}]" placeholder="Nhập ${specDef.attributeName.toLowerCase()}" required>
+                            <div class="error-message">Please Input</div>
                         </div>
                     </c:forEach>
                 </div>
@@ -188,22 +216,92 @@
                     <label class="form-label">Serials</label>
                     <div class="input-group mb-2">
                         <input type="text" class="form-control" name="variantSerial[${variantCount - 1}][0]" required>
+                        <div class="error-message">Please Input</div>
                         <select class="form-control" name="variantStoreId[${variantCount - 1}][0]" required>
                             <c:forEach var="store" items="${stores}">
                                 <option value="${store.storeId}">${store.storeName}</option>
                             </c:forEach>
                         </select>
+                        <div class="error-message">Please Input</div>
                     </div>
                 </div>
                 <div class="mb-3">
                     <label class="form-label">Hình ảnh</label>
                     <input type="file" class="form-control" name="variantImage[${variantCount - 1}][]">
+                    <div class="error-message">Please Input</div>
                     <input type="text" class="form-control" name="variantImageUrl[${variantCount - 1}][]" placeholder="URL (optional)">
+                    <div class="error-message">Please Input</div>
                 </div>
             </div>
         `;
         container.appendChild(newVariant);
     }
+
+    // Validate form before submit
+    function validateForm(event) {
+        event.preventDefault(); // Prevent default submission
+        const form = event.target;
+
+        // Reset all previous error states
+        const allFields = form.querySelectorAll("input[required], select[required], input[type='file']");
+        allFields.forEach(field => {
+            field.classList.remove("error-border");
+            const errorMessage = field.nextElementSibling;
+            if (errorMessage && errorMessage.classList.contains("error-message")) {
+                errorMessage.style.display = "none";
+            }
+        });
+
+        // Validate all required fields
+        let firstInvalid = null;
+        let valid = true;
+
+        allFields.forEach(field => {
+            let isInvalid = false;
+
+            if (field.type === "file") {
+                // Check if file input is empty
+                if (!field.files.length) {
+                    isInvalid = true;
+                }
+            } else {
+                // Check if other inputs/selects are empty
+                if (!field.value.trim()) {
+                    isInvalid = true;
+                }
+            }
+
+            if (isInvalid) {
+                valid = false;
+                field.classList.add("error-border");
+                const errorMessage = field.nextElementSibling;
+                if (errorMessage && errorMessage.classList.contains("error-message")) {
+                    errorMessage.style.display = "block";
+                }
+                if (!firstInvalid) {
+                    firstInvalid = field;
+                }
+            }
+        });
+
+        if (!valid) {
+            if (firstInvalid) {
+                firstInvalid.scrollIntoView({ behavior: "smooth", block: "center" });
+                firstInvalid.focus();
+            }
+            alert("Vui lòng nhập đầy đủ các trường bắt buộc!");
+        } else {
+            form.submit(); // Submit form if valid
+        }
+    }
+
+    // Attach validation on form submit
+    document.addEventListener("DOMContentLoaded", function() {
+        const form = document.querySelector("form[action$='/product/add']");
+        if (form) {
+            form.addEventListener("submit", validateForm);
+        }
+    });
 </script>
 </body>
 </html>
