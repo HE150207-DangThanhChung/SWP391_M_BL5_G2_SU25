@@ -95,14 +95,20 @@
                                 <h1 class="text-3xl font-bold text-gray-900">Hồ sơ cá nhân</h1>
                                 <p class="text-gray-600 mt-1">Thông tin cá nhân và công việc</p>
                             </div>
-                            <button onclick="history.back()"
-                                    class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors duration-200">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                                </svg>
-                                Quay lại
-                            </button>
+                            <div class="items-center">
+                                <button onclick="location.href = '${pageContext.request.contextPath}/profile/edit'"
+                                        class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">
+                                    Chỉnh sửa thông tin cá nhân
+                                </button>
+                                <button onclick="history.back()"
+                                        class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors duration-200">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                    </svg>
+                                    Quay lại
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -113,7 +119,7 @@
                             <div class="lg:col-span-2 flex items-center gap-4 mb-2">
                                 <img src="${e.avatar}" alt="Avatar" class="w-24 h-24 rounded-full border border-gray-300 object-cover">
                                 <div>
-                                    <p class="text-xl font-semibold">${e.firstName} ${e.lastName}</p>
+                                    <p class="text-xl font-semibold">${e.firstName} ${e.middleName} ${e.lastName}</p>
                                     <p class="text-gray-500">@${e.userName}</p>
                                 </div>
                             </div>
