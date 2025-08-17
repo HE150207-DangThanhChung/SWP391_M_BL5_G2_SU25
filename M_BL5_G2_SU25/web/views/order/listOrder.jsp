@@ -158,7 +158,7 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <%-- Row mẫu: thay bằng forEach JSTL khi đổ dữ liệu --%>
+                        
                         <tr>
                             <td>#ORD-0001</td>
                             <td>Nam</td>
@@ -184,56 +184,7 @@
                             </td>
                         </tr>
 
-                        <tr>
-                            <td>#ORD-0002</td>
-                            <td>Lan</td>
-                            <td>
-                                <span class="badge rounded-pill text-bg-warning badge-status">
-                                    <i class="bi bi-hourglass-split me-1"></i>Đang xử lý
-                                </span>
-                            </td>
-                            <td class="text-end">1</td>
-                            <td class="text-end">350.000&nbsp;₫</td>
-                            <td class="text-truncate" style="max-width: 260px;">Giao tiết kiệm, COD.</td>
-                            <td class="text-center">
-                                <div class="btn-group btn-group-sm">
-                                    <button class="btn btn-outline-primary"
-                                            onclick="window.location.href='orderDetail.jsp?id=2'">
-                                        <i class="bi bi-eye me-1"></i>Chi tiết
-                                    </button>
-                                    <button class="btn btn-outline-secondary"
-                                            onclick="window.location.href='editOrder.jsp?id=2'">
-                                        <i class="bi bi-pencil-square me-1"></i>Sửa
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>#ORD-0003</td>
-                            <td>Bình</td>
-                            <td>
-                                <span class="badge rounded-pill text-bg-secondary badge-status">
-                                    <i class="bi bi-x-circle me-1"></i>Đã huỷ
-                                </span>
-                            </td>
-                            <td class="text-end">2</td>
-                            <td class="text-end">0&nbsp;₫</td>
-                            <td class="text-truncate" style="max-width: 260px;">Khách huỷ do đổi lịch.</td>
-                            <td class="text-center">
-                                <div class="btn-group btn-group-sm">
-                                    <button class="btn btn-outline-primary"
-                                            onclick="window.location.href='orderDetail.jsp?id=3'">
-                                        <i class="bi bi-eye me-1"></i>Chi tiết
-                                    </button>
-                                    <button class="btn btn-outline-secondary"
-                                            onclick="window.location.href='editOrder.jsp?id=3'">
-                                        <i class="bi bi-pencil-square me-1"></i>Sửa
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <%-- /Row mẫu --%>
+                        
                         </tbody>
                     </table>
                 </div>
