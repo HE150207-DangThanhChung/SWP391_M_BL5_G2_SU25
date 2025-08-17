@@ -304,7 +304,7 @@
                             <select name="status" aria-label="Lọc theo trạng thái">
                                 <option value="">Tất cả trạng thái</option>
                                 <option value="Active"  ${filterStatus == 'Active'  ? 'selected' : ''}>Đang hoạt động</option>
-                                <option value="Inactive"${filterStatus == 'Inactive'? 'selected' : ''}>Ngừng hoạt động</option>
+                                <option value="Inactive"${filterStatus == 'Deactive'? 'selected' : ''}>Ngừng hoạt động</option>
                             </select>
 
                             <button type="submit" class="btn-primary"><i class="fa fa-search" style="margin-right:8px"></i>Tìm kiếm</button>
