@@ -127,7 +127,9 @@
                                                         </c:if>
                                                 </ul>
                                                 <!-- Edit Button -->
-                                                <a href="${pageContext.request.contextPath}/editVariant?productVariantId=${variant.productVariantId}" class="btn btn-primary mt-2">Chỉnh sửa biến thể</a>
+                                                <a href="${pageContext.request.contextPath}/editVariant?productId=${product.productId}&productVariantId=${variant.productVariantId}" 
+                                                   class="btn btn-primary mt-2">Chỉnh sửa biến thể</a>
+
                                             </div>
                                         </div>
                                     </c:forEach>

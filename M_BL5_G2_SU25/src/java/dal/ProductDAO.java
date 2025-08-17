@@ -21,10 +21,13 @@ public class ProductDAO {
     private static final String UPLOAD_DIR = "uploads";
 
     public void addProduct(Product product, List<List<Part>> variantImageParts, List<List<String>> variantImageUrls, HttpServletRequest request) throws IOException {
+        String checkProductName = "SELECT COUNT(*) FROM Product WHERE ProductName = ? AND Status = 'Active'";
         String insertProduct = "INSERT INTO Product (ProductName, Status, CategoryId, BrandId, SupplierId) VALUES (?, ?, ?, ?, ?)";
+        String checkProductCode = "SELECT COUNT(*) FROM ProductVariant WHERE ProductCode = ?";
         String insertVariant = "INSERT INTO ProductVariant (ProductCode, Price, WarrantyDurationMonth, ProductId) VALUES (?, ?, ?, ?)";
         String insertSpec = "INSERT INTO VariantSpecification (ProductVariantId, SpecificationId, Value) VALUES (?, ?, ?)";
         String insertImage = "INSERT INTO ProductImage (src, alt, ProductVariantId) VALUES (?, ?, ?)";
+        String checkSerialNumber = "SELECT COUNT(*) FROM ProductSerial WHERE SerialNumber = ?";
         String insertSerial = "INSERT INTO ProductSerial (SerialNumber, ProductVariantId, StoreId, CreatedAt, UpdatedAt) VALUES (?, ?, ?, ?, ?)";
         String upsertStock = "MERGE INTO StoreStock AS target " +
                              "USING (SELECT ? AS StoreId, ? AS ProductVariantId, ? AS Quantity) AS source " +
@@ -35,6 +38,15 @@ public class ProductDAO {
         try (Connection conn = new DBContext().getConnection()) {
             conn.setAutoCommit(false);
             try {
+                // Check for duplicate ProductName
+                try (PreparedStatement stmt = conn.prepareStatement(checkProductName)) {
+                    stmt.setString(1, product.getProductName());
+                    ResultSet rs = stmt.executeQuery();
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        throw new SQLException("Product with name '" + product.getProductName() + "' already exists.");
+                    }
+                }
+
                 int productId;
                 try (PreparedStatement stmt = conn.prepareStatement(insertProduct, PreparedStatement.RETURN_GENERATED_KEYS)) {
                     stmt.setString(1, product.getProductName());
@@ -54,6 +66,15 @@ public class ProductDAO {
 
                 for (int i = 0; i < product.getVariants().size(); i++) {
                     ProductVariant variant = product.getVariants().get(i);
+                    // Check for duplicate ProductCode
+                    try (PreparedStatement stmt = conn.prepareStatement(checkProductCode)) {
+                        stmt.setString(1, variant.getProductCode());
+                        ResultSet rs = stmt.executeQuery();
+                        if (rs.next() && rs.getInt(1) > 0) {
+                            throw new SQLException("Product variant with code '" + variant.getProductCode() + "' already exists.");
+                        }
+                    }
+
                     int productVariantId;
                     try (PreparedStatement stmt = conn.prepareStatement(insertVariant, PreparedStatement.RETURN_GENERATED_KEYS)) {
                         stmt.setString(1, variant.getProductCode());
@@ -119,6 +140,15 @@ public class ProductDAO {
 
                     Map<Integer, Integer> storeQuantities = new HashMap<>();
                     for (ProductSerial serial : variant.getSerials()) {
+                        // Check for duplicate SerialNumber
+                        try (PreparedStatement stmt = conn.prepareStatement(checkSerialNumber)) {
+                            stmt.setString(1, serial.getSerialNumber());
+                            ResultSet rs = stmt.executeQuery();
+                            if (rs.next() && rs.getInt(1) > 0) {
+                                throw new SQLException("Serial number '" + serial.getSerialNumber() + "' already exists.");
+                            }
+                        }
+
                         try (PreparedStatement stmt = conn.prepareStatement(insertSerial, PreparedStatement.RETURN_GENERATED_KEYS)) {
                             stmt.setString(1, serial.getSerialNumber());
                             stmt.setInt(2, productVariantId);
@@ -173,7 +203,9 @@ public class ProductDAO {
     }
 
     public void updateProduct(Product product, List<List<Part>> variantImageParts, List<List<String>> variantImageUrls, HttpServletRequest request) throws IOException {
+        String checkProductName = "SELECT COUNT(*) FROM Product WHERE ProductName = ? AND ProductId != ? AND Status = 'Active'";
         String updateProduct = "UPDATE Product SET ProductName = ?, Status = ?, CategoryId = ?, BrandId = ?, SupplierId = ? WHERE ProductId = ?";
+        String checkProductCode = "SELECT COUNT(*) FROM ProductVariant WHERE ProductCode = ? AND ProductVariantId != ?";
         String insertVariant = "INSERT INTO ProductVariant (ProductCode, Price, WarrantyDurationMonth, ProductId) VALUES (?, ?, ?, ?)";
         String updateVariant = "UPDATE ProductVariant SET ProductCode = ?, Price = ?, WarrantyDurationMonth = ? WHERE ProductVariantId = ?";
         String deleteVariant = "DELETE FROM ProductVariant WHERE ProductVariantId = ? AND ProductId = ?";
@@ -183,6 +215,7 @@ public class ProductDAO {
         String insertImage = "INSERT INTO ProductImage (src, alt, ProductVariantId) VALUES (?, ?, ?)";
         String updateImage = "UPDATE ProductImage SET src = ?, alt = ? WHERE ProductImageId = ?";
         String deleteImage = "DELETE FROM ProductImage WHERE ProductImageId = ? AND ProductVariantId = ?";
+        String checkSerialNumber = "SELECT COUNT(*) FROM ProductSerial WHERE SerialNumber = ? AND ProductSerialId != ?";
         String insertSerial = "INSERT INTO ProductSerial (SerialNumber, ProductVariantId, StoreId, CreatedAt, UpdatedAt) VALUES (?, ?, ?, ?, ?)";
         String updateSerial = "UPDATE ProductSerial SET SerialNumber = ?, StoreId = ?, UpdatedAt = ? WHERE ProductSerialId = ?";
         String deleteSerial = "DELETE FROM ProductSerial WHERE ProductSerialId = ? AND ProductVariantId = ?";
@@ -196,6 +229,16 @@ public class ProductDAO {
         try (Connection conn = new DBContext().getConnection()) {
             conn.setAutoCommit(false);
             try {
+                // Check for duplicate ProductName
+                try (PreparedStatement stmt = conn.prepareStatement(checkProductName)) {
+                    stmt.setString(1, product.getProductName());
+                    stmt.setInt(2, product.getProductId());
+                    ResultSet rs = stmt.executeQuery();
+                    if (rs.next() && rs.getInt(1) > 0) {
+                        throw new SQLException("Product with name '" + product.getProductName() + "' already exists.");
+                    }
+                }
+
                 // Update Product
                 try (PreparedStatement stmt = conn.prepareStatement(updateProduct)) {
                     stmt.setString(1, product.getProductName());
@@ -223,6 +266,16 @@ public class ProductDAO {
                 for (int i = 0; i < product.getVariants().size(); i++) {
                     ProductVariant variant = product.getVariants().get(i);
                     int productVariantId = variant.getProductVariantId();
+                    // Check for duplicate ProductCode
+                    try (PreparedStatement stmt = conn.prepareStatement(checkProductCode)) {
+                        stmt.setString(1, variant.getProductCode());
+                        stmt.setInt(2, productVariantId);
+                        ResultSet rs = stmt.executeQuery();
+                        if (rs.next() && rs.getInt(1) > 0) {
+                            throw new SQLException("Product variant with code '" + variant.getProductCode() + "' already exists.");
+                        }
+                    }
+
                     if (productVariantId > 0) {
                         // Update existing variant
                         try (PreparedStatement stmt = conn.prepareStatement(updateVariant)) {
@@ -375,6 +428,16 @@ public class ProductDAO {
                     List<Integer> submittedSerialIds = new ArrayList<>();
                     for (ProductSerial serial : variant.getSerials()) {
                         int serialId = serial.getProductSerialId();
+                        // Check for duplicate SerialNumber
+                        try (PreparedStatement stmt = conn.prepareStatement(checkSerialNumber)) {
+                            stmt.setString(1, serial.getSerialNumber());
+                            stmt.setInt(2, serialId);
+                            ResultSet rs = stmt.executeQuery();
+                            if (rs.next() && rs.getInt(1) > 0) {
+                                throw new SQLException("Serial number '" + serial.getSerialNumber() + "' already exists.");
+                            }
+                        }
+
                         if (serialId > 0) {
                             try (PreparedStatement stmt = conn.prepareStatement(updateSerial)) {
                                 stmt.setString(1, serial.getSerialNumber());
@@ -440,7 +503,6 @@ public class ProductDAO {
                 // Delete removed variants
                 for (int variantId : existingVariantIds) {
                     if (!submittedVariantIds.contains(variantId)) {
-                        // Delete associated specifications, serials, images, and stock
                         try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM VariantSpecification WHERE ProductVariantId = ?")) {
                             stmt.setInt(1, variantId);
                             stmt.executeUpdate();
@@ -504,7 +566,6 @@ public class ProductDAO {
             throw new RuntimeException("Database connection error: " + e.getMessage(), e);
         }
     }
-
     private String getUploadPath(HttpServletRequest request) {
         return request.getServletContext().getRealPath("/" + UPLOAD_DIR);
     }
