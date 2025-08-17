@@ -102,14 +102,14 @@
             </div>
             <nav class="sidebar-nav">
                 <c:set var="currentPath" value="${pageContext.request.servletPath}" />
-                // Mỗi người làm phần nào sẽ vào đây và điền link cho phần đó nhé
+                <!--Mỗi người làm phần nào sẽ vào đây và điền link cho phần đó nhé-->
                 <!--<a href="${pageContext.request.contextPath} sau đó điền link vào đây">-->
 
                 <a href="">    
                     <i class="fas fa-warehouse"></i>
                     Quản lý cửa hàng
                 </a>
-                <a href="">
+                <a href="${pageContext.request.contextPath}/management/employees">
                     <i class="fas fa-user-friends"></i> 
                     Quản lí nhân viên
                 </a>
@@ -121,7 +121,7 @@
                     <i class="fas fa-tags"></i> 
                     Quản lí nhập kho
                 </a>
-                <a href="">
+                <a href="${pageContext.request.contextPath}/management/category">
                     <i class="fas fa-tags"></i> 
                     Quản lí danh mục
                 </a>
@@ -129,7 +129,7 @@
                     <i class="fas fa-tags"></i> 
                     Quản lí nhà cung cấp
                 </a>
-                <a href="">
+                <a href="${pageContext.request.contextPath}/coupon">
                     <i class="fas fa-tags"></i> 
                     Quản lí mã khuyến mãi
                 </a>
@@ -141,7 +141,7 @@
                     <i class="fas fa-tags"></i> 
                     Quản lí báo cáo
                 </a>
-                <a href="">
+                <a href="${pageContext.request.contextPath}/product">
                     <i class="fas fa-tags"></i> 
                     Quản lí sản phẩm
                 </a>
