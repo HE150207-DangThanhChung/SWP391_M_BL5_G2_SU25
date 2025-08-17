@@ -4,17 +4,21 @@
  */
 package controller;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import dal.EmployeeDAO;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.UUID;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.List;
+import jakarta.servlet.http.Part;
 import model.Employee;
 
 @WebServlet(name = "EmployeeController", urlPatterns = {
@@ -23,24 +27,55 @@ import model.Employee;
     "/management/employees/edit",
     "/management/employees/detail",
     "/management/employees/delete",
-    "/management/employees/change-status"
+    "/management/employees/change-status",
+    "/management/employees/upload-avatar"
 })
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024, // 1 MB
+    maxFileSize = 1024 * 1024 * 10,  // 10 MB
+    maxRequestSize = 1024 * 1024 * 15 // 15 MB
+)
 public class EmployeeController extends HttpServlet {
 
-    private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private final int ITEMS_PER_PAGE = 10;
-    private final String BASE_PATH = "/management/employees";
+    private static final String UPLOAD_DIRECTORY = "uploads/avatars";
+    
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        try (PrintWriter out = response.getWriter()) {
+            out.println("<!DOCTYPE html>");
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Servlet EmployeeController</title>");
+            out.println("</head>");
+            out.println("<body>");
+            out.println("<h1>Servlet EmployeeController at " + request.getContextPath() + "</h1>");
+            out.println("</body>");
+            out.println("</html>");
+        }
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String path = request.getServletPath();
-
+        
         switch (path) {
-            case BASE_PATH -> doGetList(request, response);
-            case BASE_PATH + "/add" -> doGetAdd(request, response);
-            case BASE_PATH + "/edit" -> doGetEdit(request, response);
-            case BASE_PATH + "/detail" -> doGetDetail(request, response);
+            case "/management/employees":
+                doGetList(request, response);
+                break;
+            case "/management/employees/add":
+                doGetAdd(request, response);
+                break;
+            case "/management/employees/edit":
+                doGetEdit(request, response);
+                break;
+            case "/management/employees/detail":
+                doGetDetail(request, response);
+                break;
+            default:
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                break;
         }
     }
 
@@ -48,87 +83,138 @@ public class EmployeeController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String path = request.getServletPath();
-
+        
         switch (path) {
-            case BASE_PATH + "/add" -> doPostAdd(request, response);
-            case BASE_PATH + "/edit" -> doPostEdit(request, response);
-            case BASE_PATH + "/delete" -> doPostDelete(request, response);
-            case BASE_PATH + "/change-status" -> doPostChangeStatus(request, response);
+            case "/management/employees/add":
+                doPostAdd(request, response);
+                break;
+            case "/management/employees/edit":
+                doPostEdit(request, response);
+                break;
+            case "/management/employees/delete":
+                doPostDelete(request, response);
+                break;
+            case "/management/employees/change-status":
+                doPostChangeStatus(request, response);
+                break;
+            case "/management/employees/upload-avatar":
+                doPostUploadAvatar(request, response);
+                break;
+            default:
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
+                break;
         }
     }
-
-    private void doGetList(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        String searchKey = request.getParameter("search");
-        String status = request.getParameter("status");
-        String pageStr = request.getParameter("page");
-
+    
+    private void doGetList(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        EmployeeDAO dao = new EmployeeDAO();
+        
+        // Pagination parameters
         int page = 1;
-        if (pageStr != null && !pageStr.isEmpty()) {
-            try {
+        int limit = 10;
+        
+        try {
+            String pageStr = request.getParameter("page");
+            if (pageStr != null && !pageStr.isEmpty()) {
                 page = Integer.parseInt(pageStr);
                 if (page < 1) page = 1;
-            } catch (NumberFormatException ignored) {
             }
+        } catch (NumberFormatException e) {
+            // Keep default page value
         }
-
-        int offset = (page - 1) * ITEMS_PER_PAGE;
-        EmployeeDAO dao = new EmployeeDAO();
-
-        List<Employee> employees = dao.getAllEmployeesWithPagingAndFilter(searchKey, status, offset, ITEMS_PER_PAGE);
+        
+        // Search and filter parameters
+        String searchKey = request.getParameter("search");
+        String status = request.getParameter("status");
+        
+        // Calculate offset for pagination
+        int offset = (page - 1) * limit;
+        
+        // Get filtered and paginated data
+        java.util.List<Employee> employees = dao.getAllEmployeesWithPagingAndFilter(searchKey, status, offset, limit);
         int totalEmployees = dao.countEmployeesWithFilter(searchKey, status);
-        int totalPages = (int) Math.ceil((double) totalEmployees / ITEMS_PER_PAGE);
-        int endItem = Math.min(offset + ITEMS_PER_PAGE, totalEmployees);
-
-        request.setAttribute("startItem", totalEmployees == 0 ? 0 : offset + 1);
-        request.setAttribute("endItem", endItem);
-        request.setAttribute("totalItems", totalEmployees);
+        
+        // Calculate total pages
+        int totalPages = (int) Math.ceil((double) totalEmployees / limit);
+        
+        // Set attributes for JSP
         request.setAttribute("employees", employees);
         request.setAttribute("currentPage", page);
         request.setAttribute("totalPages", totalPages);
         request.setAttribute("searchKey", searchKey);
         request.setAttribute("status", status);
-
+        
+        // Forward to JSP
         request.getRequestDispatcher("/views/employee/listEmployee.jsp").forward(request, response);
     }
-
-    private void doGetAdd(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Get all roles and stores for the dropdown lists
-        // For now, we'll just forward to the JSP
+    
+    private void doGetAdd(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         request.getRequestDispatcher("/views/employee/addEmployee.jsp").forward(request, response);
     }
-
-    private void doGetEdit(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    
+    private void doGetEdit(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        EmployeeDAO dao = new EmployeeDAO();
         String idStr = request.getParameter("id");
+        
         if (idStr == null || idStr.isEmpty()) {
-            response.sendError(404);
+            response.sendRedirect(request.getContextPath() + "/management/employees");
             return;
         }
-        int id = Integer.parseInt(idStr);
-        EmployeeDAO dao = new EmployeeDAO();
-        Employee e = dao.getEmployeeById(id);
-        request.setAttribute("e", e);
-        request.getRequestDispatcher("/views/employee/editDetailEmployee.jsp").forward(request, response);
+        
+        try {
+            int id = Integer.parseInt(idStr);
+            Employee employee = dao.getEmployeeById(id);
+            
+            if (employee == null || employee.getEmployeeId() == 0) {
+                response.sendRedirect(request.getContextPath() + "/management/employees");
+                return;
+            }
+            
+            request.setAttribute("e", employee);
+            request.getRequestDispatcher("/views/employee/editDetailEmployee.jsp").forward(request, response);
+            
+        } catch (NumberFormatException e) {
+            response.sendRedirect(request.getContextPath() + "/management/employees");
+        }
     }
-
-    private void doGetDetail(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    
+    private void doGetDetail(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        EmployeeDAO dao = new EmployeeDAO();
         String idStr = request.getParameter("id");
+        
         if (idStr == null || idStr.isEmpty()) {
-            response.sendError(404);
+            response.sendRedirect(request.getContextPath() + "/management/employees");
             return;
         }
-        int id = Integer.parseInt(idStr);
-        EmployeeDAO dao = new EmployeeDAO();
-        Employee e = dao.getEmployeeById(id);
-        request.setAttribute("e", e);
-        request.getRequestDispatcher("/views/employee/viewEmployee.jsp").forward(request, response);
+        
+        try {
+            int id = Integer.parseInt(idStr);
+            Employee employee = dao.getEmployeeById(id);
+            
+            if (employee == null || employee.getEmployeeId() == 0) {
+                response.sendRedirect(request.getContextPath() + "/management/employees");
+                return;
+            }
+            
+            request.setAttribute("e", employee);
+            request.getRequestDispatcher("/views/employee/viewEmployee.jsp").forward(request, response);
+            
+        } catch (NumberFormatException e) {
+            response.sendRedirect(request.getContextPath() + "/management/employees");
+        }
     }
-
+    
     private void doPostAdd(HttpServletRequest request, HttpServletResponse response) throws IOException {
         EmployeeDAO dao = new EmployeeDAO();
         HashMap<String, Object> jsonMap = new HashMap<>();
         try {
             String username = request.getParameter("username");
             String firstName = request.getParameter("firstName");
+            String middleName = request.getParameter("middleName");
             String lastName = request.getParameter("lastName");
             String phone = request.getParameter("phone");
             String email = request.getParameter("email");
@@ -144,9 +230,9 @@ public class EmployeeController extends HttpServlet {
             
             // Get CCCD or use default
             String cccd = request.getParameter("cccd");
-            if (cccd == null || cccd.isEmpty()) {
-                // Default CCCD is 12 zeros
-                cccd = "000000000000";
+            if (cccd == null) {
+                // Default to empty string
+                cccd = "";
             }
             
             // Get Address or use default
@@ -218,7 +304,7 @@ public class EmployeeController extends HttpServlet {
                 return;
             }
 
-            boolean success = dao.addEmployee(username, firstName, lastName, phone, email, gender, status, roleId, storeId, password, cccd, dob, startAt, address, avatar);
+            boolean success = dao.addEmployee(username, firstName, middleName, lastName, phone, email, gender, status, roleId, storeId, password, cccd, dob, startAt, address, avatar);
             if (success) {
                 jsonMap.put("ok", true);
                 jsonMap.put("message", "Employee added successfully!");
@@ -233,7 +319,7 @@ public class EmployeeController extends HttpServlet {
             sendJson(response, jsonMap);
         }
     }
-
+    
     private void doPostEdit(HttpServletRequest request, HttpServletResponse response) throws IOException {
         EmployeeDAO dao = new EmployeeDAO();
         HashMap<String, Object> jsonMap = new HashMap<>();
@@ -241,6 +327,7 @@ public class EmployeeController extends HttpServlet {
             int id = Integer.parseInt(request.getParameter("id"));
             String username = request.getParameter("username");
             String firstName = request.getParameter("firstName");
+            String middleName = request.getParameter("middleName");
             String lastName = request.getParameter("lastName");
             String phone = request.getParameter("phone");
             String email = request.getParameter("email");
@@ -260,6 +347,9 @@ public class EmployeeController extends HttpServlet {
                 // Default to empty string
                 address = "";
             }
+            
+            // Avatar is kept as is by default
+            String avatar = request.getParameter("avatar");
             
             // Get DoB or use default
             java.sql.Date dob = null;
@@ -294,7 +384,7 @@ public class EmployeeController extends HttpServlet {
                 return;
             }
 
-            boolean success = dao.editEmployee(id, username, firstName, lastName, phone, email, gender, status, cccd, dob, address);
+            boolean success = dao.editEmployee(id, username, firstName, middleName, lastName, phone, email, gender, status, cccd, dob, address, avatar);
             if (success) {
                 jsonMap.put("ok", true);
                 jsonMap.put("message", "Employee updated successfully!");
@@ -309,32 +399,29 @@ public class EmployeeController extends HttpServlet {
             sendJson(response, jsonMap);
         }
     }
-
+    
     private void doPostDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
         EmployeeDAO dao = new EmployeeDAO();
         HashMap<String, Object> jsonMap = new HashMap<>();
         try {
-            String idStr = request.getParameter("id");
+            int id = Integer.parseInt(request.getParameter("id"));
             
-            if (idStr == null || idStr.isEmpty()) {
-                jsonMap.put("ok", false);
-                jsonMap.put("message", "Employee ID is required!");
-                sendJson(response, jsonMap);
-                return;
-            }
-            
-            int id = Integer.parseInt(idStr);
-            
-            Employee current = dao.getEmployeeById(id);
-            if (current == null || current.getEmployeeId() == 0) {
-                jsonMap.put("ok", false);
-                jsonMap.put("message", "Employee not found!");
-                sendJson(response, jsonMap);
-                return;
-            }
+            // Get the employee to check if avatar exists and should be deleted
+            Employee employee = dao.getEmployeeById(id);
             
             boolean success = dao.deleteEmployee(id);
             if (success) {
+                // If employee had an avatar, delete it from the server
+                if (employee != null && employee.getAvatar() != null && !employee.getAvatar().isEmpty()) {
+                    String avatarPath = getServletContext().getRealPath("") + File.separator + employee.getAvatar();
+                    try {
+                        Files.deleteIfExists(Paths.get(avatarPath));
+                    } catch (IOException e) {
+                        // Log error but continue
+                        System.err.println("Failed to delete avatar file: " + avatarPath);
+                    }
+                }
+                
                 jsonMap.put("ok", true);
                 jsonMap.put("message", "Employee deleted successfully!");
             } else {
@@ -353,38 +440,13 @@ public class EmployeeController extends HttpServlet {
         EmployeeDAO dao = new EmployeeDAO();
         HashMap<String, Object> jsonMap = new HashMap<>();
         try {
-            String idStr = request.getParameter("id");
+            int id = Integer.parseInt(request.getParameter("id"));
             String status = request.getParameter("status");
-            
-            if (idStr == null || idStr.isEmpty()) {
-                jsonMap.put("ok", false);
-                jsonMap.put("message", "Employee ID is required!");
-                sendJson(response, jsonMap);
-                return;
-            }
-            
-            if (status == null || status.isEmpty() || (!status.equals("Active") && !status.equals("Deactive"))) {
-                jsonMap.put("ok", false);
-                jsonMap.put("message", "Invalid status value!");
-                sendJson(response, jsonMap);
-                return;
-            }
-            
-            int id = Integer.parseInt(idStr);
-            
-            Employee current = dao.getEmployeeById(id);
-            if (current == null || current.getEmployeeId() == 0) {
-                jsonMap.put("ok", false);
-                jsonMap.put("message", "Employee not found!");
-                sendJson(response, jsonMap);
-                return;
-            }
             
             boolean success = dao.changeEmployeeStatus(id, status);
             if (success) {
                 jsonMap.put("ok", true);
                 jsonMap.put("message", "Employee status updated successfully!");
-                jsonMap.put("newStatus", status);
             } else {
                 jsonMap.put("ok", false);
                 jsonMap.put("message", "Failed to update employee status. Please try again.");
@@ -396,12 +458,79 @@ public class EmployeeController extends HttpServlet {
             sendJson(response, jsonMap);
         }
     }
-
-    public static void sendJson(HttpServletResponse response, Object data) throws IOException {
+    
+    private void doPostUploadAvatar(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+        HashMap<String, Object> jsonMap = new HashMap<>();
+        
+        try {
+            // Create upload directory if it doesn't exist
+            String uploadPath = getServletContext().getRealPath("") + File.separator + UPLOAD_DIRECTORY;
+            File uploadDir = new File(uploadPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
+            
+            // Get the file part
+            Part filePart = request.getPart("avatar");
+            if (filePart == null) {
+                jsonMap.put("ok", false);
+                jsonMap.put("message", "No file uploaded");
+                sendJson(response, jsonMap);
+                return;
+            }
+            
+            // Get file name and generate unique name to prevent overwriting
+            String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+            String fileExtension = "";
+            int i = fileName.lastIndexOf('.');
+            if (i > 0) {
+                fileExtension = fileName.substring(i);
+            }
+            
+            // Generate unique file name
+            String uniqueFileName = UUID.randomUUID().toString() + fileExtension;
+            String filePath = uploadPath + File.separator + uniqueFileName;
+            
+            // Save the file
+            filePart.write(filePath);
+            
+            // Return the relative path to the file (without context path)
+            String relativePath = UPLOAD_DIRECTORY + "/" + uniqueFileName;
+            
+            jsonMap.put("ok", true);
+            jsonMap.put("message", "File uploaded successfully");
+            jsonMap.put("filePath", relativePath);
+            
+            sendJson(response, jsonMap);
+            
+        } catch (Exception e) {
+            jsonMap.put("ok", false);
+            jsonMap.put("message", "Error uploading file: " + e.getMessage());
+            sendJson(response, jsonMap);
+        }
+    }
+    
+    private void sendJson(HttpServletResponse response, HashMap<String, Object> jsonMap) throws IOException {
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        String json = gson.toJson(data);
-        response.getWriter().write(json);
-        response.getWriter().flush();
+        
+        String jsonString = "{";
+        boolean first = true;
+        for (String key : jsonMap.keySet()) {
+            if (!first) {
+                jsonString += ",";
+            }
+            first = false;
+            
+            Object value = jsonMap.get(key);
+            if (value instanceof String) {
+                jsonString += "\"" + key + "\":\"" + value + "\"";
+            } else {
+                jsonString += "\"" + key + "\":" + value;
+            }
+        }
+        jsonString += "}";
+        
+        response.getWriter().write(jsonString);
     }
 }

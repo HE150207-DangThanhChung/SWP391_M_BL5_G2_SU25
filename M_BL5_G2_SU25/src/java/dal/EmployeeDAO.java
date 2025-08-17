@@ -42,6 +42,7 @@ public class EmployeeDAO {
                 e.setEmployeeId(rs.getInt("EmployeeId"));
                 e.setUserName(rs.getString("UserName"));
                 e.setFirstName(rs.getString("FirstName"));
+                e.setMiddleName(rs.getString("MiddleName"));
                 e.setLastName(rs.getString("LastName"));
                 e.setPhone(rs.getString("Phone"));
                 e.setEmail(rs.getString("Email"));
@@ -70,7 +71,7 @@ public class EmployeeDAO {
         Employee e = new Employee();
         
         StringBuilder sql = new StringBuilder("""
-        SELECT e.[EmployeeId], e.[UserName], e.[FirstName], e.[LastName], 
+        SELECT e.[EmployeeId], e.[UserName], e.[FirstName], e.[MiddleName], e.[LastName], 
                e.[Phone], e.[Email], e.[CCCD], e.[Status], e.[Avatar],
                e.[DoB], e.[Address], e.[StartAt], e.[Gender], 
                e.[RoleId], e.[StoreId], r.[RoleName], s.[StoreName]
@@ -90,6 +91,7 @@ public class EmployeeDAO {
                 e.setEmployeeId(rs.getInt("EmployeeId"));
                 e.setUserName(rs.getString("UserName"));
                 e.setFirstName(rs.getString("FirstName"));
+                e.setMiddleName(rs.getString("MiddleName"));
                 e.setLastName(rs.getString("LastName"));
                 e.setPhone(rs.getString("Phone"));
                 e.setEmail(rs.getString("Email"));
@@ -120,7 +122,7 @@ public class EmployeeDAO {
         List<Employee> empList = new ArrayList<>();
         
         StringBuilder sql = new StringBuilder("""
-        SELECT e.[EmployeeId], e.[UserName], e.[FirstName], e.[LastName], 
+        SELECT e.[EmployeeId], e.[UserName], e.[FirstName], e.[MiddleName], e.[LastName], 
                e.[Phone], e.[Email], e.[CCCD], e.[Status], e.[Avatar],
                e.[DoB], e.[Address], e.[StartAt], e.[Gender], 
                e.[RoleId], e.[StoreId], r.[RoleName], s.[StoreName]
@@ -131,7 +133,7 @@ public class EmployeeDAO {
         """);
         
         if (searchKey != null && !searchKey.trim().isEmpty()) {
-            sql.append(" AND (e.FirstName LIKE ? OR e.LastName LIKE ? OR e.UserName LIKE ? OR e.Phone LIKE ? OR e.Email LIKE ?) ");
+            sql.append(" AND (e.FirstName LIKE ? OR e.MiddleName LIKE ? OR e.LastName LIKE ? OR e.UserName LIKE ? OR e.Phone LIKE ? OR e.Email LIKE ?) ");
         }
         if (status != null && !status.trim().isEmpty()) {
             sql.append(" AND e.Status = ? ");
@@ -147,6 +149,7 @@ public class EmployeeDAO {
             
             if (searchKey != null && !searchKey.trim().isEmpty()) {
                 String searchPattern = "%" + searchKey.trim() + "%";
+                ps.setString(paramIndex++, searchPattern);
                 ps.setString(paramIndex++, searchPattern);
                 ps.setString(paramIndex++, searchPattern);
                 ps.setString(paramIndex++, searchPattern);
@@ -168,6 +171,7 @@ public class EmployeeDAO {
                 e.setEmployeeId(rs.getInt("EmployeeId"));
                 e.setUserName(rs.getString("UserName"));
                 e.setFirstName(rs.getString("FirstName"));
+                e.setMiddleName(rs.getString("MiddleName"));
                 e.setLastName(rs.getString("LastName"));
                 e.setPhone(rs.getString("Phone"));
                 e.setEmail(rs.getString("Email"));
@@ -246,38 +250,38 @@ public class EmployeeDAO {
         return total;
     }
     
-    public boolean addEmployee(String username, String firstName, String lastName, String phone, String email, String gender, String status) {
-        return addEmployee(username, firstName, lastName, phone, email, gender, status, 1, 1, "123456", "000000000000", java.sql.Date.valueOf("2000-01-01"), new java.sql.Date(System.currentTimeMillis()), "", null); // Default values with today's date, empty address, and null avatar
+    public boolean addEmployee(String username, String firstName, String middleName, String lastName, String phone, String email, String gender, String status) {
+        return addEmployee(username, firstName, middleName, lastName, phone, email, gender, status, 1, 1, "123456", "000000000000", java.sql.Date.valueOf("2000-01-01"), new java.sql.Date(System.currentTimeMillis()), "", null); // Default values with today's date and empty address
     }
     
-    public boolean addEmployee(String username, String firstName, String lastName, String phone, String email, String gender, String status, int roleId, int storeId) {
-        return addEmployee(username, firstName, lastName, phone, email, gender, status, roleId, storeId, "123456", "000000000000", java.sql.Date.valueOf("2000-01-01"), new java.sql.Date(System.currentTimeMillis()), "", null); // Default values with today's date, empty address, and null avatar
+    public boolean addEmployee(String username, String firstName, String middleName, String lastName, String phone, String email, String gender, String status, int roleId, int storeId) {
+        return addEmployee(username, firstName, middleName, lastName, phone, email, gender, status, roleId, storeId, "123456", "000000000000", java.sql.Date.valueOf("2000-01-01"), new java.sql.Date(System.currentTimeMillis()), "", null); // Default values with today's date and empty address
     }
     
-    public boolean addEmployee(String username, String firstName, String lastName, String phone, String email, String gender, String status, int roleId, int storeId, String password) {
-        return addEmployee(username, firstName, lastName, phone, email, gender, status, roleId, storeId, password, "000000000000", java.sql.Date.valueOf("2000-01-01"), new java.sql.Date(System.currentTimeMillis()), "", null); // Default values with today's date, empty address, and null avatar
+    public boolean addEmployee(String username, String firstName, String middleName, String lastName, String phone, String email, String gender, String status, int roleId, int storeId, String password) {
+        return addEmployee(username, firstName, middleName, lastName, phone, email, gender, status, roleId, storeId, password, "000000000000", java.sql.Date.valueOf("2000-01-01"), new java.sql.Date(System.currentTimeMillis()), "", null); // Default values with today's date and empty address
     }
     
-    public boolean addEmployee(String username, String firstName, String lastName, String phone, String email, String gender, String status, int roleId, int storeId, String password, String cccd) {
-        return addEmployee(username, firstName, lastName, phone, email, gender, status, roleId, storeId, password, cccd, java.sql.Date.valueOf("2000-01-01"), new java.sql.Date(System.currentTimeMillis()), "", null); // Default values with today's date, empty address, and null avatar
+    public boolean addEmployee(String username, String firstName, String middleName, String lastName, String phone, String email, String gender, String status, int roleId, int storeId, String password, String cccd) {
+        return addEmployee(username, firstName, middleName, lastName, phone, email, gender, status, roleId, storeId, password, cccd, java.sql.Date.valueOf("2000-01-01"), new java.sql.Date(System.currentTimeMillis()), "", null); // Default values with today's date and empty address
     }
     
-    public boolean addEmployee(String username, String firstName, String lastName, String phone, String email, String gender, String status, int roleId, int storeId, String password, String cccd, java.sql.Date dob) {
-        return addEmployee(username, firstName, lastName, phone, email, gender, status, roleId, storeId, password, cccd, dob, new java.sql.Date(System.currentTimeMillis()), "", null); // Today's date, empty address, and null avatar
+    public boolean addEmployee(String username, String firstName, String middleName, String lastName, String phone, String email, String gender, String status, int roleId, int storeId, String password, String cccd, java.sql.Date dob) {
+        return addEmployee(username, firstName, middleName, lastName, phone, email, gender, status, roleId, storeId, password, cccd, dob, new java.sql.Date(System.currentTimeMillis()), "", null); // Today's date and empty address
     }
     
-    public boolean addEmployee(String username, String firstName, String lastName, String phone, String email, String gender, String status, int roleId, int storeId, String password, String cccd, java.sql.Date dob, java.sql.Date startAt) {
-        return addEmployee(username, firstName, lastName, phone, email, gender, status, roleId, storeId, password, cccd, dob, startAt, "", null); // Empty address and null avatar
+    public boolean addEmployee(String username, String firstName, String middleName, String lastName, String phone, String email, String gender, String status, int roleId, int storeId, String password, String cccd, java.sql.Date dob, java.sql.Date startAt) {
+        return addEmployee(username, firstName, middleName, lastName, phone, email, gender, status, roleId, storeId, password, cccd, dob, startAt, "", null); // Empty address
     }
     
-    public boolean addEmployee(String username, String firstName, String lastName, String phone, String email, String gender, String status, int roleId, int storeId, String password, String cccd, java.sql.Date dob, java.sql.Date startAt, String address) {
-        return addEmployee(username, firstName, lastName, phone, email, gender, status, roleId, storeId, password, cccd, dob, startAt, address, null); // Null avatar
+    public boolean addEmployee(String username, String firstName, String middleName, String lastName, String phone, String email, String gender, String status, int roleId, int storeId, String password, String cccd, java.sql.Date dob, java.sql.Date startAt, String address) {
+        return addEmployee(username, firstName, middleName, lastName, phone, email, gender, status, roleId, storeId, password, cccd, dob, startAt, address, null); // Null avatar
     }
     
-    public boolean addEmployee(String username, String firstName, String lastName, String phone, String email, String gender, String status, int roleId, int storeId, String password, String cccd, java.sql.Date dob, java.sql.Date startAt, String address, String avatar) {
+    public boolean addEmployee(String username, String firstName, String middleName, String lastName, String phone, String email, String gender, String status, int roleId, int storeId, String password, String cccd, java.sql.Date dob, java.sql.Date startAt, String address, String avatar) {
         String sql = """
-             INSERT INTO Employee (UserName, FirstName, LastName, Phone, Email, Gender, Status, RoleId, StoreId, Password, CCCD, DoB, StartAt, Address, Avatar)
-             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+             INSERT INTO Employee (UserName, FirstName, MiddleName, LastName, Phone, Email, Gender, Status, RoleId, StoreId, Password, CCCD, DoB, StartAt, Address, Avatar)
+             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
              """;
     
         try {
@@ -286,24 +290,25 @@ public class EmployeeDAO {
             
             ps.setString(1, username);
             ps.setString(2, firstName);
-            ps.setString(3, lastName);
-            ps.setString(4, phone);
-            ps.setString(5, email);
-            ps.setString(6, gender);
-            ps.setString(7, status);
-            ps.setInt(8, roleId);
-            ps.setInt(9, storeId);
-            ps.setString(10, password);
-            ps.setString(11, cccd);
-            ps.setDate(12, dob);
-            ps.setDate(13, startAt);
-            ps.setString(14, address);
+            ps.setString(3, middleName);
+            ps.setString(4, lastName);
+            ps.setString(5, phone);
+            ps.setString(6, email);
+            ps.setString(7, gender);
+            ps.setString(8, status);
+            ps.setInt(9, roleId);
+            ps.setInt(10, storeId);
+            ps.setString(11, password);
+            ps.setString(12, cccd);
+            ps.setDate(13, dob);
+            ps.setDate(14, startAt);
+            ps.setString(15, address);
             
             // Handle null avatar
             if (avatar == null) {
-                ps.setNull(15, java.sql.Types.VARCHAR);
+                ps.setNull(16, java.sql.Types.VARCHAR);
             } else {
-                ps.setString(15, avatar);
+                ps.setString(16, avatar);
             }
             
             int rowsAffected = ps.executeUpdate();
@@ -319,15 +324,16 @@ public class EmployeeDAO {
         return false;
     }
     
-    public boolean editEmployee(int employeeId, String username, String firstName, String lastName, String phone, String email, String gender, String status) {
-        return editEmployee(employeeId, username, firstName, lastName, phone, email, gender, status, null, null, null);
+    public boolean editEmployee(int employeeId, String username, String firstName, String middleName, String lastName, String phone, String email, String gender, String status) {
+        return editEmployee(employeeId, username, firstName, middleName, lastName, phone, email, gender, status, null, null, null, null);
     }
 
-    public boolean editEmployee(int employeeId, String username, String firstName, String lastName, String phone, String email, String gender, String status, String cccd, java.sql.Date dob, String address) {
+    public boolean editEmployee(int employeeId, String username, String firstName, String middleName, String lastName, String phone, String email, String gender, String status, String cccd, java.sql.Date dob, String address, String avatar) {
         StringBuilder sql = new StringBuilder("""
             UPDATE Employee
             SET UserName = ?, 
                 FirstName = ?, 
+                MiddleName = ?,
                 LastName = ?, 
                 Phone = ?, 
                 Email = ?, 
@@ -345,6 +351,9 @@ public class EmployeeDAO {
         if (address != null) {
             sql.append(", Address = ?");
         }
+        if (avatar != null) {
+            sql.append(", Avatar = ?");
+        }
         
         sql.append(" WHERE EmployeeId = ?");
         
@@ -355,6 +364,7 @@ public class EmployeeDAO {
             int paramIndex = 1;
             ps.setString(paramIndex++, username);
             ps.setString(paramIndex++, firstName);
+            ps.setString(paramIndex++, middleName);
             ps.setString(paramIndex++, lastName);
             ps.setString(paramIndex++, phone);
             ps.setString(paramIndex++, email);
@@ -371,6 +381,9 @@ public class EmployeeDAO {
             if (address != null) {
                 ps.setString(paramIndex++, address);
             }
+            if (avatar != null) {
+                ps.setString(paramIndex++, avatar);
+            }
             
             ps.setInt(paramIndex, employeeId);
             
@@ -385,6 +398,11 @@ public class EmployeeDAO {
         }
         
         return false;
+    }
+    
+    // For backward compatibility
+    public boolean editEmployee(int employeeId, String username, String firstName, String lastName, String phone, String email, String gender, String status, String cccd, java.sql.Date dob, String address) {
+        return editEmployee(employeeId, username, firstName, null, lastName, phone, email, gender, status, cccd, dob, address, null);
     }
     
     public boolean deleteEmployee(int employeeId) {
@@ -478,6 +496,7 @@ public class EmployeeDAO {
         // Thông tin nhân viên test
         String username = "zoo_user";
         String firstName = "Zoo";
+        String middleName = "Middle";
         String lastName = "Test";
         String phone = "0987654321";
         String email = "zoo.test@example.com";
@@ -492,13 +511,13 @@ public class EmployeeDAO {
         String address = "123 Test St"; // Default address
         String avatar = null; // Default avatar is null
 
-        boolean added = eDao.addEmployee(username, firstName, lastName, phone, email, gender, status, roleId, storeId, password, cccd, dob, startAt, address, avatar);
+        boolean added = eDao.addEmployee(username, firstName, middleName, lastName, phone, email, gender, status, roleId, storeId, password, cccd, dob, startAt, address, avatar);
 
         if (added) {
             System.out.println("✅ Thêm nhân viên thành công!");
             Employee emp = eDao.getEmployeeByUsername(username);
             System.out.println("ID: " + emp.getEmployeeId());
-            System.out.println("Tên: " + emp.getFirstName() + " " + emp.getLastName());
+            System.out.println("Tên: " + emp.getFullName());
             System.out.println("Email: " + emp.getEmail());
             System.out.println("Phone: " + emp.getPhone());
             System.out.println("Address: " + emp.getAddress());

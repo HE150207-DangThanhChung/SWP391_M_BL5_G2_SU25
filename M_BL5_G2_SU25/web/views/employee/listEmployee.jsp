@@ -166,8 +166,8 @@
                                class="border border-gray-300 rounded-md px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
                         <select name="status" class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
                             <option value="">Tất cả</option>
-                            <option value="Active" ${param.status == 'Active' ? 'selected' : ''}>Active</option>
-                            <option value="Deactive" ${param.status == 'Deactive' ? 'selected' : ''}>Deactive</option>
+                            <option value="Active" ${param.status == 'Active' ? 'selected' : ''}>Hoạt động</option>
+                            <option value="Deactive" ${param.status == 'Deactive' ? 'selected' : ''}>Không hoạt động</option>
                         </select>
                         <button type="submit" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md">Lọc</button>
                         <a href="${pageContext.request.contextPath}/management/employees"><button type="button" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md">Xoá bộ lọc</button></a>
@@ -180,14 +180,16 @@
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tên đăng nhập</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Họ tên</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Họ</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tên đệm</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Tên</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Số điện thoại</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Vai trò</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trạng thái</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hành động</th>
-                                </tr>
-                            </thead>
+                </tr>
+            </thead>
                             <tbody class="bg-white divide-y divide-gray-200">
                                 <c:choose>
                                     <c:when test="${not empty employees}">
@@ -195,14 +197,16 @@
                                             <tr class="hover:bg-gray-50" id="employee-row-${e.employeeId}">
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm">${e.employeeId}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">${e.userName}</td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm">${e.firstName} ${e.lastName}</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">${e.firstName}</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">${e.middleName}</td>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm">${e.lastName}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${e.phone}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${e.email}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${e.roleName}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <span id="status-badge-${e.employeeId}" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
                                                           ${e.status == 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                                                        ${e.status}
+                                                        ${e.status == 'Active' ? 'Hoạt động' : 'Không hoạt động'}
                                                     </span>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
@@ -250,7 +254,7 @@
                                     </c:when>
                                     <c:otherwise>
                                         <tr>
-                                            <td colspan="8" class="px-6 py-12 text-center text-gray-500">
+                                            <td colspan="10" class="px-6 py-12 text-center text-gray-500">
                                                 <div class="flex flex-col items-center">
                                                     <svg class="w-12 h-12 text-gray-300 mb-4" fill="none" stroke="currentColor"
                                                          viewBox="0 0 24 24">
@@ -259,12 +263,12 @@
                                                     </svg>
                                                     <p class="text-sm text-gray-500">Không tìm thấy nhân viên nào</p>
                                                 </div>
-                                            </td>
-                                        </tr>
+                    </td>
+                </tr>
                                     </c:otherwise>
                                 </c:choose>
-                            </tbody>
-                        </table>
+            </tbody>
+        </table>
                     </div>
 
                     <!-- Pagination -->

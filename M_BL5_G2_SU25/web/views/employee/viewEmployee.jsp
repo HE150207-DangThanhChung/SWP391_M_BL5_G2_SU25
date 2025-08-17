@@ -140,23 +140,23 @@
                                     <div class="flex-shrink-0">
                                         <c:choose>
                                             <c:when test="${not empty e.avatar}">
-                                                <img src="${e.avatar}" alt="Profile" class="h-24 w-24 rounded-full object-cover border-4 border-white shadow-md">
+                                                <img src="${pageContext.request.contextPath}/${e.avatar}" alt="Profile" class="h-24 w-24 rounded-full object-cover border-4 border-white shadow-md">
                                             </c:when>
                                             <c:otherwise>
                                                 <div class="h-24 w-24 rounded-full bg-blue-100 flex items-center justify-center text-blue-500 text-2xl font-bold border-4 border-white shadow-md">
-                                                    ${fn:substring(e.firstName, 0, 1)}${fn:substring(e.lastName, 0, 1)}
+                                                    ${fn:substring(e.lastName, 0, 1)}${fn:substring(e.firstName, 0, 1)}
                                                 </div>
                                             </c:otherwise>
                                         </c:choose>
                                     </div>
                                     <div class="ml-6">
-                                        <h2 class="text-2xl font-bold text-gray-900">${e.firstName} ${e.lastName}</h2>
+                                        <h2 class="text-2xl font-bold text-gray-900">${e.lastName} ${e.middleName} ${e.firstName}</h2>
                                         <div class="mt-1 flex items-center">
                                             <span class="text-gray-600">${e.roleName}</span>
                                             <span class="mx-2 text-gray-400">•</span>
                                             <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
                                                   ${e.status == 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                                                ${e.status}
+                                                ${e.status == 'Active' ? 'Hoạt động' : 'Không hoạt động'}
                                             </span>
                                         </div>
                                         <p class="text-gray-500 mt-1">ID: ${e.employeeId}</p>
@@ -177,7 +177,7 @@
                                             </div>
                                             <div>
                                                 <dt class="text-sm font-medium text-gray-500">Họ và tên</dt>
-                                                <dd class="mt-1 text-sm text-gray-900">${e.firstName} ${e.lastName}</dd>
+                                                <dd class="mt-1 text-sm text-gray-900">${e.lastName} ${e.middleName} ${e.firstName}</dd>
                                             </div>
                                             <div>
                                                 <dt class="text-sm font-medium text-gray-500">Giới tính</dt>
@@ -248,7 +248,7 @@
                                                 <dd class="mt-1 text-sm">
                                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
                                                           ${e.status == 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                                                        ${e.status}
+                                                        ${e.status == 'Active' ? 'Hoạt động' : 'Không hoạt động'}
                                                     </span>
                                                 </dd>
                                             </div>

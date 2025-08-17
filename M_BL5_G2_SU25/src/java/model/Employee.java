@@ -16,6 +16,7 @@ public class Employee {
     private String userName;
     private String password;
     private String firstName;
+    private String middleName;
     private String lastName;
     private String phone;
     private String email;
@@ -36,11 +37,12 @@ public class Employee {
     public Employee() {
     }
 
-    public Employee(int employeeId, String userName, String password, String firstName, String lastName, String phone, String email, String cccd, String status, String avatar, Date dob, String address, Date startAt, String gender, int roleId, int storeId, String roleName, String storeName) {
+    public Employee(int employeeId, String userName, String password, String firstName, String middleName, String lastName, String phone, String email, String cccd, String status, String avatar, Date dob, String address, Date startAt, String gender, int roleId, int storeId, String roleName, String storeName) {
         this.employeeId = employeeId;
         this.userName = userName;
         this.password = password;
         this.firstName = firstName;
+        this.middleName = middleName;
         this.lastName = lastName;
         this.phone = phone;
         this.email = email;
@@ -88,6 +90,14 @@ public class Employee {
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
+    
+    public String getMiddleName() {
+        return middleName;
+    }
+
+    public void setMiddleName(String middleName) {
+        this.middleName = middleName;
+    }
 
     public String getLastName() {
         return lastName;
@@ -95,6 +105,21 @@ public class Employee {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+    
+    // Helper method to get full name
+    public String getFullName() {
+        StringBuilder fullName = new StringBuilder();
+        if (firstName != null && !firstName.isEmpty()) {
+            fullName.append(firstName).append(" ");
+        }
+        if (middleName != null && !middleName.isEmpty()) {
+            fullName.append(middleName).append(" ");
+        }
+        if (lastName != null && !lastName.isEmpty()) {
+            fullName.append(lastName);
+        }
+        return fullName.toString().trim();
     }
 
     public String getPhone() {
@@ -203,7 +228,7 @@ public class Employee {
 
     @Override
     public String toString() {
-        return "Employee{" + "employeeId=" + employeeId + ", userName=" + userName + ", password=" + password + ", firstName=" + firstName + ", lastName=" + lastName + ", phone=" + phone + ", email=" + email + ", cccd=" + cccd + ", status=" + status + ", avatar=" + avatar + ", dob=" + dob + ", address=" + address + ", startAt=" + startAt + ", gender=" + gender + ", roleId=" + roleId + ", storeId=" + storeId + ", roleName=" + roleName + ", storeName=" + storeName + '}';
+        return "Employee{" + "employeeId=" + employeeId + ", userName=" + userName + ", password=" + password + ", firstName=" + firstName + ", middleName=" + middleName + ", lastName=" + lastName + ", phone=" + phone + ", email=" + email + ", cccd=" + cccd + ", status=" + status + ", avatar=" + avatar + ", dob=" + dob + ", address=" + address + ", startAt=" + startAt + ", gender=" + gender + ", roleId=" + roleId + ", storeId=" + storeId + ", roleName=" + roleName + ", storeName=" + storeName + '}';
     }
 
 }

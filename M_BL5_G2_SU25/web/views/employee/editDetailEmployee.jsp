@@ -173,20 +173,7 @@
                                         <span id="usernameError" class="error-text" style="display: none;" ></span>
                                     </div>
 
-                                    <!-- First Name -->
-                                    <div>
-                                        <label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">
-                                            Tên *
-                                        </label>
-                                        <input id="firstName" 
-                                               type="text" 
-                                               value="${e.firstName}"
-                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400"
-                                               placeholder="Nhập tên">
-                                        <span id="firstNameError" class="error-text" style="display: none;"></span>
-                                    </div>
-
-                                    <!-- Last Name -->
+                                    <!-- Last Name (Họ) -->
                                     <div>
                                         <label for="lastName" class="block text-sm font-medium text-gray-700 mb-2">
                                             Họ *
@@ -197,6 +184,31 @@
                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400"
                                                placeholder="Nhập họ">
                                         <span id="lastNameError" class="error-text" style="display: none;"></span>
+                                    </div>
+
+                                    <!-- Middle Name (Tên đệm) -->
+                                    <div>
+                                        <label for="middleName" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Tên đệm
+                                        </label>
+                                        <input id="middleName" 
+                                               type="text" 
+                                               value="${e.middleName}"
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400"
+                                               placeholder="Nhập tên đệm (nếu có)">
+                                    </div>
+
+                                    <!-- First Name (Tên) -->
+                                    <div>
+                                        <label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Tên *
+                                        </label>
+                                        <input id="firstName" 
+                                               type="text" 
+                                               value="${e.firstName}"
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400"
+                                               placeholder="Nhập tên">
+                                        <span id="firstNameError" class="error-text" style="display: none;"></span>
                                     </div>
 
                                     <!-- Phone -->
@@ -283,10 +295,28 @@
                                         <select id="status" 
                                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white">
                                             <option value="">-- Chọn trạng thái --</option>
-                                            <option value="Active" ${e.status == 'Active' ? 'selected' : ''}>Active</option>
-                                            <option value="Deactive" ${e.status == 'Deactive' ? 'selected' : ''}>Inactive</option>
+                                            <option value="Active" ${e.status == 'Active' ? 'selected' : ''}>Hoạt động</option>
+                                            <option value="Deactive" ${e.status == 'Deactive' ? 'selected' : ''}>Không hoạt động</option>
                                         </select>
                                         <span id="statusError" class="error-text" style="display: none;"></span>
+                                    </div>
+
+                                    <!-- Avatar Upload -->
+                                    <div>
+                                        <label for="avatar" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Ảnh đại diện
+                                        </label>
+                                        <input id="avatar" 
+                                               type="file" 
+                                               accept="image/*"
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200">
+                                        <span class="text-xs text-gray-500 mt-1">Định dạng hỗ trợ: JPG, PNG, GIF. Kích thước tối đa: 2MB</span>
+                                        <c:if test="${not empty e.avatar}">
+                                            <div class="mt-2">
+                                                <p class="text-sm text-gray-500">Ảnh hiện tại:</p>
+                                                <img src="${pageContext.request.contextPath}/${e.avatar}" alt="Avatar" class="w-16 h-16 object-cover rounded-full mt-1 border border-gray-300">
+                                            </div>
+                                        </c:if>
                                     </div>
                                 </div>
 
@@ -300,12 +330,6 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                         </svg>
                                         <span id="btnText">Lưu</span>
-                                    </button>
-
-                                    <button type="button" 
-                                            onclick="history.back()"
-                                            class="action-btn btn-cancel">
-                                        Huỷ
                                     </button>
                                 </div>
 
@@ -484,6 +508,57 @@
                 btnText.textContent = 'Đang lưu...';
                 form.classList.add('loading');
 
+                // Check if avatar is selected
+                const avatarInput = document.getElementById('avatar');
+                if (avatarInput.files.length > 0) {
+                    // Upload avatar first
+                    uploadAvatar(function(avatarPath) {
+                        // Then submit employee data with avatar path
+                        submitEmployeeData(avatarPath);
+                    });
+                } else {
+                    // No avatar selected, submit without avatar
+                    submitEmployeeData(null);
+                }
+            }
+
+            function uploadAvatar(callback) {
+                const avatarInput = document.getElementById('avatar');
+                const formData = new FormData();
+                formData.append('avatar', avatarInput.files[0]);
+
+                $.ajax({
+                    url: '${pageContext.request.contextPath}/management/employees/upload-avatar',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        if (response.ok) {
+                            callback(response.filePath);
+                        } else {
+                            showNotification('Lỗi khi tải lên ảnh: ' + response.message, 'error');
+                            resetFormState();
+                        }
+                    },
+                    error: function() {
+                        showNotification('Lỗi khi tải lên ảnh. Vui lòng thử lại sau.', 'error');
+                        resetFormState();
+                    }
+                });
+            }
+
+            function resetFormState() {
+                const saveBtn = document.getElementById('saveEmployeeBtn');
+                const btnText = document.getElementById('btnText');
+                const form = document.getElementById('employeeForm');
+                
+                saveBtn.disabled = false;
+                btnText.textContent = 'Lưu';
+                form.classList.remove('loading');
+            }
+
+            function submitEmployeeData(avatarPath) {
                 $.ajax({
                     url: '${pageContext.request.contextPath}/management/employees/edit',
                     method: 'POST',
@@ -491,6 +566,7 @@
                         id: document.getElementById('employeeId').value,
                         username: document.getElementById('username').value.trim(),
                         firstName: document.getElementById('firstName').value.trim(),
+                        middleName: document.getElementById('middleName').value.trim(),
                         lastName: document.getElementById('lastName').value.trim(),
                         phone: document.getElementById('phone').value.trim(),
                         email: document.getElementById('email').value.trim(),
@@ -498,7 +574,8 @@
                         status: document.getElementById('status').value,
                         cccd: document.getElementById('cccd').value,
                         dob: document.getElementById('dob').value,
-                        address: document.getElementById('address').value
+                        address: document.getElementById('address').value,
+                        avatar: avatarPath
                     },
                     success: function (response) {
                         if (response.ok == true) {
@@ -517,9 +594,7 @@
                                 icon: 'error',
                                 confirmButtonColor: '#3b82f6'
                             });
-                            saveBtn.disabled = false;
-                            btnText.textContent = 'Lưu';
-                            form.classList.remove('loading');
+                            resetFormState();
                         }
                     },
                     error: function (xhr, status, error) {
@@ -538,9 +613,7 @@
                             icon: 'error',
                             confirmButtonColor: '#3b82f6'
                         });
-                        saveBtn.disabled = false;
-                        btnText.textContent = 'Lưu';
-                        form.classList.remove('loading');
+                        resetFormState();
                     }
                 });
             }
