@@ -152,7 +152,6 @@
         </style>
     </head>
     <body>
-        
         <form action="${pageContext.request.contextPath}/stores/add" method="post">
             <div class="content">
                 <div class="left">
@@ -178,7 +177,7 @@
                             <td>
                                 <select name="status" required>
                                     <option value="Active">Hoạt động</option>
-                                    <option value="Inactive">Ngừng hoạt động</option>
+                                    <option value="Deactive">Ngừng hoạt động</option>
                                 </select>
                             </td>
                         </tr>
@@ -190,6 +189,5 @@
                 </div>
             </div>
         </form>
-                    <jsp:include page="../common/footer.jsp"/>
     </body>
 </html>
