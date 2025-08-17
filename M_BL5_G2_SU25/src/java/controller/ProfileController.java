@@ -11,21 +11,22 @@ import dal.RoleDAO;
 import dal.StoreDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.Part;
+import java.io.File;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.sql.Date;
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import model.Employee;
@@ -43,6 +44,11 @@ import model.Store;
     "/profile",
     "/profile/edit"
 })
+@MultipartConfig(
+        fileSizeThreshold = 512 * 1024, // 512 KB (in-memory threshold)
+        maxFileSize = 5L * 1024 * 1024, // 5 MB per file
+        maxRequestSize = 6L * 1024 * 1024 // 6 MB total
+)
 public class ProfileController extends HttpServlet {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -106,7 +112,7 @@ public class ProfileController extends HttpServlet {
         HttpSession session = request.getSession(false);
 
         if (session == null) {
-            response.sendRedirect("views/common/login.jsp");
+            response.sendRedirect("../views/common/login.jsp");
             return;
         }
 
@@ -135,7 +141,9 @@ public class ProfileController extends HttpServlet {
             HttpSession session = request.getSession(false);
 
             if (session == null) {
-                response.sendRedirect("views/common/login.jsp");
+                jsonMap.put("ok", false);
+                jsonMap.put("message", "Vui lòng đăng nhập lại");
+                sendJson(response, jsonMap);
                 return;
             }
 
@@ -158,8 +166,7 @@ public class ProfileController extends HttpServlet {
             String address = trimOrNull(request.getParameter("address"));
             String gender = trimOrNull(request.getParameter("gender"));
 
-            // 4) Basic validations (extend as needed)
-            if (firstName == null || lastName == null) {
+            if (firstName == null || lastName == null || middleName == null) {
                 jsonMap.put("ok", false);
                 jsonMap.put("message", "Họ và Tên là bắt buộc.");
                 sendJson(response, jsonMap);
@@ -170,6 +177,24 @@ public class ProfileController extends HttpServlet {
                 jsonMap.put("message", "Email không hợp lệ.");
                 sendJson(response, jsonMap);
                 return;
+            }
+
+            if (!current.getPhone().equals(phone)) {
+                if (dao.isPhoneExisted(phone)) {
+                    jsonMap.put("ok", false);
+                    jsonMap.put("message", "Số điện thoại đã tồn tại.");
+                    sendJson(response, jsonMap);
+                    return;
+                }
+            }
+
+            if (!current.getEmail().equals(email)) {
+                if (dao.isEmailExisted(email)) {
+                    jsonMap.put("ok", false);
+                    jsonMap.put("message", "Email đã tồn tại.");
+                    sendJson(response, jsonMap);
+                    return;
+                }
             }
 
             LocalDate dob = null;
@@ -184,17 +209,15 @@ public class ProfileController extends HttpServlet {
                 }
             }
 
-            // 5) Handle avatar (multipart)
             Part avatarPart = null;
             try {
                 avatarPart = request.getPart("avatar");
             } catch (IllegalStateException | ServletException ignored) {
-                // not multipart or size exceeded → handled by @MultipartConfig; ignore here
+
             }
 
             String newAvatarUrl = null;
             if (avatarPart != null && avatarPart.getSize() > 0) {
-                // Validate MIME
                 String mime = safeContentType(avatarPart);
                 if (!ALLOWED_IMAGE_MIME.contains(mime)) {
                     jsonMap.put("ok", false);
@@ -203,9 +226,9 @@ public class ProfileController extends HttpServlet {
                     return;
                 }
 
-                // Build upload path inside the webapp (switch to external path if you prefer)
                 String uploadsFolder = "/uploads/avatars";
                 String absoluteUploadDir = getServletContext().getRealPath(uploadsFolder);
+
                 if (absoluteUploadDir == null) {
                     jsonMap.put("ok", false);
                     jsonMap.put("message", "Không thể xác định thư mục lưu trữ ảnh.");
@@ -213,22 +236,28 @@ public class ProfileController extends HttpServlet {
                     return;
                 }
 
+                String mainDir = absoluteUploadDir.replace(File.separator + "build" + File.separator + "web", File.separator + "web");
+
                 Path uploadDir = Path.of(absoluteUploadDir);
+                Path mainUploadDir = Path.of(mainDir);
                 Files.createDirectories(uploadDir);
+                Files.createDirectories(mainUploadDir);
 
                 String originalName = getSubmittedFileName(avatarPart);
-                String ext = guessExtension(mime, originalName); // keep original ext if possible
+                String ext = guessExtension(mime, originalName);
                 String fileName = "ava_" + username + "_" + System.currentTimeMillis() + "_" + UUID.randomUUID() + ext;
 
                 Path target = uploadDir.resolve(fileName);
+                Path mainTarget = mainUploadDir.resolve(fileName);
+
                 try (InputStream in = avatarPart.getInputStream()) {
-                    Files.copy(in, target, StandardCopyOption.REPLACE_EXISTING);
+                    byte[] data = in.readAllBytes();
+                    Files.write(target, data);
+                    Files.write(mainTarget, data);
                 }
 
-                // Public URL for the client
                 newAvatarUrl = request.getContextPath() + uploadsFolder + "/" + fileName;
 
-                // Optionally, delete old local avatar if it was in the same uploads folder
                 if (current.getAvatar() != null && current.getAvatar().startsWith(request.getContextPath() + uploadsFolder)) {
                     try {
                         String oldFileName = current.getAvatar().substring((request.getContextPath() + uploadsFolder + "/").length());
@@ -239,21 +268,10 @@ public class ProfileController extends HttpServlet {
                 }
             }
 
-            // 6) Build updated entity
-            Employee updated = new Employee();
-            updated.setEmployeeId(current.getEmployeeId());
-            updated.setFirstName(firstName);
-            updated.setMiddleName(middleName);
-            updated.setLastName(lastName);
-            updated.setPhone(phone);
-            updated.setEmail(email);
-//            updated.setDob(dob);                  // or setDob(java.sql.Date) depending on your model
-            updated.setAddress(address);
-            updated.setGender(gender);
-            updated.setAvatar(newAvatarUrl != null ? newAvatarUrl : current.getAvatar());
+            String ava = newAvatarUrl != null ? newAvatarUrl : current.getAvatar();
+            Date dobMain = Date.valueOf(dob);
 
-            // 7) Persist
-            boolean ok = dao.updateProfile(updated);
+            boolean ok = dao.editEmployee(current.getEmployeeId(), current.getUserName(), firstName, middleName, lastName, phone, email, gender, current.getStatus(), current.getCccd(), dobMain, address, ava);
 
             if (!ok) {
                 jsonMap.put("ok", false);
@@ -261,17 +279,6 @@ public class ProfileController extends HttpServlet {
             } else {
                 jsonMap.put("ok", true);
                 jsonMap.put("message", "Cập nhật thành công.");
-                Map<String, Object> data = new HashMap<>();
-                data.put("avatar", updated.getAvatar());
-                data.put("firstName", updated.getFirstName());
-                data.put("middleName", updated.getMiddleName());
-                data.put("lastName", updated.getLastName());
-                data.put("phone", updated.getPhone());
-                data.put("email", updated.getEmail());
-                data.put("dob", dob != null ? dob.toString() : null);
-                data.put("address", updated.getAddress());
-                data.put("gender", updated.getGender());
-                jsonMap.put("data", data);
             }
 
             sendJson(response, jsonMap);

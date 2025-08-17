@@ -184,7 +184,11 @@
                                     processData: false,
                                     contentType: false,
                                     success: function (res) {
-                                        showToast("Cập nhật thành công!", "success");
+                                        if (res.ok) {
+                                            showToast(res.message, 'success');
+                                        } else {
+                                            showToast(res.message, 'error');
+                                        }
                                     },
                                     error: function () {
                                         showToast("Có lỗi xảy ra, vui lòng thử lại!", "error");
