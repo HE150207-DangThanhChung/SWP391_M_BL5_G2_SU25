@@ -540,7 +540,8 @@
                                 icon: 'success',
                                 confirmButtonColor: '#3b82f6'
                             }).then(() => {
-                                clearForm();
+                                // Redirect to employee list page instead of clearing the form
+                                window.location.href = '${pageContext.request.contextPath}/management/employees';
                             });
                         } else {
                             Swal.fire({
