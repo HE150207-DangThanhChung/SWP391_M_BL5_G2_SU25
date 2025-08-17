@@ -20,6 +20,7 @@ import model.Store;
  *
  * @author tayho
  */
+
 @WebServlet(name = "StoreController", urlPatterns = {"/stores/*"})
 public class StoreController extends HttpServlet {
 
@@ -40,11 +41,11 @@ public class StoreController extends HttpServlet {
             int pageNumber = 1;
             String searchKeyword = request.getParameter("search");
             String filterStatus = request.getParameter("status");
-
+            
             try {
                 pageNumber = Integer.parseInt(request.getParameter("page"));
             } catch (NumberFormatException e) {
-
+            
             }
 
             List<Store> stores = storeDAO.findAll(pageNumber, pageSize, searchKeyword, filterStatus);
@@ -56,15 +57,15 @@ public class StoreController extends HttpServlet {
             request.setAttribute("totalPages", totalPages);
             request.setAttribute("searchKeyword", searchKeyword);
             request.setAttribute("filterStatus", filterStatus);
-
+            
             RequestDispatcher rd = request.getRequestDispatcher("/views/store/listStore.jsp");
             rd.forward(request, response);
         } else if (pathInfo.equals("/add")) {
-
+        
             RequestDispatcher rd = request.getRequestDispatcher("/views/store/addStore.jsp");
             rd.forward(request, response);
         } else if (pathInfo.startsWith("/edit/")) {
-
+     
             try {
                 int storeId = Integer.parseInt(pathInfo.substring(6));
                 Store store = storeDAO.findById(storeId);
@@ -79,7 +80,7 @@ public class StoreController extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/stores");
             }
         } else if (pathInfo.startsWith("/view/")) {
-
+       
             try {
                 int storeId = Integer.parseInt(pathInfo.substring(6));
                 Store store = storeDAO.findById(storeId);
@@ -94,7 +95,7 @@ public class StoreController extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/stores");
             }
         } else if (pathInfo.startsWith("/delete/")) {
-
+         
             try {
                 int storeId = Integer.parseInt(pathInfo.substring(8));
                 boolean deleted = storeDAO.delete(storeId);
@@ -114,12 +115,12 @@ public class StoreController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String pathInfo = request.getPathInfo();
-
+        
         if (pathInfo == null || pathInfo.equals("/")) {
-
+        
             response.sendRedirect(request.getContextPath() + "/stores");
         } else if (pathInfo.equals("/add")) {
-
+         
             Store store = new Store();
             store.setStoreName(request.getParameter("storeName"));
             store.setAddress(request.getParameter("address"));
@@ -134,7 +135,7 @@ public class StoreController extends HttpServlet {
             }
             response.sendRedirect(request.getContextPath() + "/stores");
         } else if (pathInfo.equals("/edit")) {
-
+         
             try {
                 Store store = new Store();
                 store.setStoreId(Integer.parseInt(request.getParameter("storeId")));
@@ -155,10 +156,12 @@ public class StoreController extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/stores");
         }
 
-        /**
-         * Returns a short description of the servlet.
-         *
-         * @return a String containing servlet description
-         */
+    /**
+     * Returns a short description of the servlet.
+     *
+     * @return a String containing servlet description
+     */
+ 
+    
     }
 }
