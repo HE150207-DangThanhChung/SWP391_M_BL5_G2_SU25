@@ -76,7 +76,7 @@ public class ProfileController extends HttpServlet {
         }
 
         Employee e = eDao.getEmployeeByUsername(username);
-        Store s = sDao.getStoreById(e.getStoreId());
+        Store s = sDao.findById(e.getStoreId());
         Role r = rDao.getRoleById(e.getRoleId());
 
         request.setAttribute("r", r);
