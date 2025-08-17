@@ -7,6 +7,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -14,51 +15,33 @@
         <title>Chỉnh sửa nhân viên</title>
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
         <style>
-            /* 1) Make the page span the viewport height */
             html, body {
                 height: 100%;
-            }
-
-            body {
                 font-family: "Inter", sans-serif;
-                background-color: #f9fafb;
-                color: #374151;
-                margin: 0;
-                padding: 0;
             }
-
-            /* 2) Ensure the outer wrapper and right panel are full-height flex columns */
+            
             .layout-wrapper {
                 display: flex;
-                min-height: 100vh;       /* key */
+                min-height: 100vh;
             }
-
+            
             .main-panel {
-                flex: 1 1 auto;
-                display: flex;
-                flex-direction: column;  /* header | main | footer stacked */
-                min-height: 100vh;       /* key */
-            }
-
-            /* 3) Let main content grow to fill available space */
-            .content {
-                width: 100%;
-                margin: 0;
-                padding-left: 10px;
-                padding-top: 0;
+                flex: 1;
                 display: flex;
                 flex-direction: column;
-                flex: 1 1 auto;          /* key: pushes footer down */
+                min-height: 100vh;
             }
-
-            /* 4) Footer sits at the bottom by taking remaining space above it */
-            .main-panel > .footer,
-            .main-panel > footer.footer {
-                margin-top: auto;        /* key */
+            
+            .content {
+                flex: 1;
+            }
+            
+            /* Remove underlines from links */
+            a {
+                text-decoration: none;
             }
 
             /* Error styles for validation */
@@ -79,15 +62,77 @@
                 opacity: 0.6;
                 pointer-events: none;
             }
+            
+            /* Action button styles */
+            .action-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.5rem 1rem;
+                border-radius: 0.375rem;
+                font-weight: 500;
+                transition: all 0.2s;
+                gap: 0.5rem;
+                border: none;
+                cursor: pointer;
+            }
+            
+            .action-btn svg {
+                width: 1rem;
+                height: 1rem;
+            }
+            
+            /* Primary button */
+            .btn-primary {
+                background-color: #2563eb; /* blue-600 */
+                color: white;
+            }
+            
+            .btn-primary:hover {
+                background-color: #1d4ed8; /* blue-700 */
+            }
+            
+            /* Cancel button */
+            .btn-cancel {
+                background-color: #ffffff;
+                color: #4b5563; /* gray-600 */
+                border: 1px solid #d1d5db; /* gray-300 */
+            }
+            
+            .btn-cancel:hover {
+                background-color: #f9fafb; /* gray-50 */
+            }
+            
+            /* Back button */
+            .btn-back {
+                background-color: #4b5563; /* gray-600 */
+                color: white;
+            }
+            
+            .btn-back:hover {
+                background-color: #374151; /* gray-700 */
+            }
+            
+            /* Button container */
+            .action-buttons-container {
+                display: flex;
+                gap: 0.75rem;
+            }
+            
+            @media (max-width: 640px) {
+                .action-buttons-container {
+                    flex-direction: column;
+                }
+            }
         </style>
     </head>
     <body class="bg-gray-50 text-gray-800">
-        <div class="layout-wrapper d-flex">
+        <div class="layout-wrapper">
             <jsp:include page="/views/common/sidebar.jsp"/>
-            <div class="main-panel flex flex-col min-h-screen">
+            <div class="main-panel">
                 <jsp:include page="/views/common/header.jsp"/>
 
-                <main class="content flex-1 p-6 bg-gray-50">
+                <main class="content p-6 bg-gray-50">
                     <!-- Header Section -->
                     <div class="mb-8 pt-2 pl-2">
                         <div class="flex items-center justify-between">
@@ -96,8 +141,8 @@
                                 <p class="text-gray-600 mt-1">Cập nhật thông tin nhân viên</p>
                             </div>
                             <button onclick="history.back()"
-                                    class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors duration-200">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    class="action-btn btn-back">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                                 </svg>
                                 Quay lại
@@ -118,14 +163,14 @@
                                     <!-- Username -->
                                     <div>
                                         <label for="username" class="block text-sm font-medium text-gray-700 mb-2">
-                                            Tên đăng nhập *
+                                            Tên đăng nhập 
                                         </label>
                                         <input id="username" 
                                                type="text" 
                                                value="${e.userName}"
                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400"
-                                               placeholder="Nhập tên đăng nhập">
-                                        <span id="usernameError" class="error-text" style="display: none;"></span>
+                                               placeholder="Nhập tên đăng nhập" readonly>
+                                        <span id="usernameError" class="error-text" style="display: none;" ></span>
                                     </div>
 
                                     <!-- First Name -->
@@ -179,6 +224,41 @@
                                                placeholder="employee@example.com">
                                         <span id="emailError" class="error-text" style="display: none;"></span>
                                     </div>
+                                    
+                                    <!-- CCCD (Citizen ID) -->
+                                    <div>
+                                        <label for="cccd" class="block text-sm font-medium text-gray-700 mb-2">
+                                            CCCD/CMND
+                                        </label>
+                                        <input id="cccd" 
+                                               type="text" 
+                                               value="${e.cccd}"
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400"
+                                               placeholder="Nhập số CCCD/CMND">
+                                    </div>
+                                    
+                                    <!-- Date of Birth -->
+                                    <div>
+                                        <label for="dob" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Ngày sinh
+                                        </label>
+                                        <input id="dob" 
+                                               type="date" 
+                                               value="<fmt:formatDate value="${e.dob}" pattern="yyyy-MM-dd"/>"
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400">
+                                    </div>
+                                    
+                                    <!-- Address -->
+                                    <div>
+                                        <label for="address" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Địa chỉ
+                                        </label>
+                                        <input id="address" 
+                                               type="text" 
+                                               value="${e.address}"
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400"
+                                               placeholder="Nhập địa chỉ">
+                                    </div>
 
                                     <!-- Gender -->
                                     <div>
@@ -215,8 +295,8 @@
                                     <button type="button" 
                                             id="saveEmployeeBtn"
                                             onclick="saveEmployee()"
-                                            class="inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            class="action-btn btn-primary">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                                         </svg>
                                         <span id="btnText">Lưu</span>
@@ -224,7 +304,7 @@
 
                                     <button type="button" 
                                             onclick="history.back()"
-                                            class="inline-flex items-center justify-center px-6 py-3 bg-white hover:bg-gray-50 text-gray-600 font-medium rounded-lg border border-gray-300 transition-colors duration-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                                            class="action-btn btn-cancel">
                                         Huỷ
                                     </button>
                                 </div>
@@ -243,32 +323,18 @@
         </div>
 
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
-            function showToast(message, type = 'success') {
-                let backgroundColor;
-
-                if (type === "success") {
-                    backgroundColor = "linear-gradient(to right, #00b09b, #96c93d)"; // Green
-                } else if (type === "error") {
-                    backgroundColor = "linear-gradient(to right, #ff416c, #ff4b2b)"; // Red
-                } else if (type === "warning") {
-                    backgroundColor = "linear-gradient(to right, #ffa502, #ff6348)"; // Orange
-                } else if (type === "info") {
-                    backgroundColor = "linear-gradient(to right, #1e90ff, #3742fa)"; // Blue
-                } else {
-                    backgroundColor = "#333";
-                }
-
-                Toastify({
+            function showNotification(message, type = 'success') {
+                const icon = type == 'success' ? 'success' : 'error';
+                
+                Swal.fire({
+                    title: type == 'success' ? 'Thành công!' : 'Lỗi!',
                     text: message,
-                    duration: 2000,
-                    close: true,
-                    gravity: "top",
-                    position: "right",
-                    backgroundColor: backgroundColor,
-                    stopOnFocus: true
-                }).showToast();
+                    icon: icon,
+                    confirmButtonColor: '#3b82f6',
+                    timer: 2000,
+                    timerProgressBar: true
+                });
             }
 
             function validateUsername(username) {
@@ -406,7 +472,7 @@
 
             function saveEmployee() {
                 if (!validateForm()) {
-                    showToast('Vui lòng sửa các lỗi trước khi gửi', 'error');
+                    showNotification('Vui lòng sửa các lỗi trước khi gửi', 'error');
                     return;
                 }
 
@@ -429,16 +495,28 @@
                         phone: document.getElementById('phone').value.trim(),
                         email: document.getElementById('email').value.trim(),
                         gender: document.getElementById('gender').value,
-                        status: document.getElementById('status').value
+                        status: document.getElementById('status').value,
+                        cccd: document.getElementById('cccd').value,
+                        dob: document.getElementById('dob').value,
+                        address: document.getElementById('address').value
                     },
                     success: function (response) {
-                        if (response.ok === true) {
-                            showToast(response.message);
-                            setTimeout(function() {
+                        if (response.ok == true) {
+                            Swal.fire({
+                                title: 'Thành công!',
+                                text: response.message,
+                                icon: 'success',
+                                confirmButtonColor: '#3b82f6'
+                            }).then(() => {
                                 window.location.href = '${pageContext.request.contextPath}/management/employees';
-                            }, 1500);
+                            });
                         } else {
-                            showToast(response.message, 'error');
+                            Swal.fire({
+                                title: 'Lỗi!',
+                                text: response.message,
+                                icon: 'error',
+                                confirmButtonColor: '#3b82f6'
+                            });
                             saveBtn.disabled = false;
                             btnText.textContent = 'Lưu';
                             form.classList.remove('loading');
@@ -454,7 +532,12 @@
                             errorMessage = xhr.responseText;
                         }
 
-                        showToast(errorMessage, 'error');
+                        Swal.fire({
+                            title: 'Lỗi!',
+                            text: errorMessage,
+                            icon: 'error',
+                            confirmButtonColor: '#3b82f6'
+                        });
                         saveBtn.disabled = false;
                         btnText.textContent = 'Lưu';
                         form.classList.remove('loading');

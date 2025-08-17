@@ -16,57 +16,93 @@
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
         <style>
-            /* 1) Make the page span the viewport height */
             html, body {
                 height: 100%;
-            }
-
-            body {
                 font-family: "Inter", sans-serif;
-                background-color: #f9fafb;
-                color: #374151;
-                margin: 0;
-                padding: 0;
             }
-
-            /* 2) Ensure the outer wrapper and right panel are full-height flex columns */
+            
             .layout-wrapper {
                 display: flex;
-                min-height: 100vh;       /* key */
+                min-height: 100vh;
             }
-
+            
             .main-panel {
-                flex: 1 1 auto;
-                display: flex;
-                flex-direction: column;  /* header | main | footer stacked */
-                min-height: 100vh;       /* key */
-            }
-
-            /* 3) Let main content grow to fill available space */
-            .content {
-                width: 100%;
-                margin: 0;
-                padding-left: 10px;
-                padding-top: 0;
+                flex: 1;
                 display: flex;
                 flex-direction: column;
-                flex: 1 1 auto;          /* key: pushes footer down */
+                min-height: 100vh;
             }
-
-            /* 4) Footer sits at the bottom by taking remaining space above it */
-            .main-panel > .footer,
-            .main-panel > footer.footer {
-                margin-top: auto;        /* key */
+            
+            .content {
+                flex: 1;
+            }
+            
+            /* Remove underlines from links */
+            a {
+                text-decoration: none;
+            }
+            
+            /* Action button styles */
+            .action-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.5rem 1rem;
+                border-radius: 0.375rem;
+                font-weight: 500;
+                transition: all 0.2s;
+                gap: 0.5rem;
+            }
+            
+            .action-btn svg {
+                width: 1rem;
+                height: 1rem;
+            }
+            
+            /* Edit button */
+            .btn-edit {
+                background-color: #2563eb; /* blue-600 */
+                color: white;
+            }
+            
+            .btn-edit:hover {
+                background-color: #1d4ed8; /* blue-700 */
+            }
+            
+            /* Back button */
+            .btn-back {
+                background-color: #4b5563; /* gray-600 */
+                color: white;
+            }
+            
+            .btn-back:hover {
+                background-color: #374151; /* gray-700 */
+            }
+            
+            /* Secondary button */
+            .btn-secondary {
+                background-color: #e5e7eb; /* gray-200 */
+                color: #4b5563; /* gray-600 */
+            }
+            
+            .btn-secondary:hover {
+                background-color: #d1d5db; /* gray-300 */
+            }
+            
+            /* Button container */
+            .action-buttons-container {
+                display: flex;
+                gap: 0.75rem;
             }
         </style>
     </head>
     <body class="bg-gray-50 text-gray-800">
-        <div class="layout-wrapper d-flex">
+        <div class="layout-wrapper">
             <jsp:include page="/views/common/sidebar.jsp"/>
-            <div class="main-panel flex flex-col min-h-screen">
+            <div class="main-panel">
                 <jsp:include page="/views/common/header.jsp"/>
 
-                <main class="content flex-1 p-6 bg-gray-50">
+                <main class="content p-6 bg-gray-50">
                     <!-- Header Section -->
                     <div class="mb-8 pt-2 pl-2">
                         <div class="flex items-center justify-between">
@@ -74,18 +110,20 @@
                                 <h1 class="text-3xl font-bold text-gray-900">Chi tiết nhân viên</h1>
                                 <p class="text-gray-600 mt-1">Xem thông tin chi tiết của nhân viên</p>
                             </div>
-                            <div class="flex space-x-3">
+                            <div class="action-buttons-container">
                                 <a href="${pageContext.request.contextPath}/management/employees/edit?id=${e.employeeId}"
-                                   class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                   class="action-btn btn-edit">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                     </svg>
                                     Chỉnh sửa
                                 </a>
                                 <button onclick="history.back()"
-                                        class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors duration-200">
-                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                                        class="action-btn btn-back">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                                     </svg>
                                     Quay lại
                                 </button>
@@ -223,13 +261,18 @@
                             <div class="p-6 bg-gray-50 border-t border-gray-200">
                                 <div class="flex justify-end space-x-3">
                                     <a href="${pageContext.request.contextPath}/management/employees"
-                                       class="inline-flex items-center px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-medium rounded-lg transition-colors duration-200">
+                                       class="action-btn btn-secondary">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                  d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                                        </svg>
                                         Quay lại danh sách
                                     </a>
                                     <a href="${pageContext.request.contextPath}/management/employees/edit?id=${e.employeeId}"
-                                       class="inline-flex items-center px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200">
-                                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                       class="action-btn btn-edit">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="w-4 h-4">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                                         </svg>
                                         Chỉnh sửa
                                     </a>

@@ -21,7 +21,9 @@ import model.Employee;
     "/management/employees",
     "/management/employees/add",
     "/management/employees/edit",
-    "/management/employees/detail"
+    "/management/employees/detail",
+    "/management/employees/delete",
+    "/management/employees/change-status"
 })
 public class EmployeeController extends HttpServlet {
 
@@ -50,6 +52,8 @@ public class EmployeeController extends HttpServlet {
         switch (path) {
             case BASE_PATH + "/add" -> doPostAdd(request, response);
             case BASE_PATH + "/edit" -> doPostEdit(request, response);
+            case BASE_PATH + "/delete" -> doPostDelete(request, response);
+            case BASE_PATH + "/change-status" -> doPostChangeStatus(request, response);
         }
     }
 
@@ -88,6 +92,8 @@ public class EmployeeController extends HttpServlet {
     }
 
     private void doGetAdd(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Get all roles and stores for the dropdown lists
+        // For now, we'll just forward to the JSP
         request.getRequestDispatcher("/views/employee/addEmployee.jsp").forward(request, response);
     }
 
@@ -128,6 +134,70 @@ public class EmployeeController extends HttpServlet {
             String email = request.getParameter("email");
             String status = request.getParameter("status");
             String gender = request.getParameter("gender");
+            
+            // Get password or use default
+            String password = request.getParameter("password");
+            if (password == null || password.isEmpty()) {
+                // Default password is the username + "123"
+                password = username + "123";
+            }
+            
+            // Get CCCD or use default
+            String cccd = request.getParameter("cccd");
+            if (cccd == null || cccd.isEmpty()) {
+                // Default CCCD is 12 zeros
+                cccd = "000000000000";
+            }
+            
+            // Get Address or use default
+            String address = request.getParameter("address");
+            if (address == null) {
+                // Default to empty string
+                address = "";
+            }
+            
+            // Avatar is null by default
+            String avatar = request.getParameter("avatar");
+            
+            // Get DoB or use default
+            java.sql.Date dob;
+            String dobStr = request.getParameter("dob");
+            if (dobStr != null && !dobStr.isEmpty()) {
+                try {
+                    dob = java.sql.Date.valueOf(dobStr); // Expects format YYYY-MM-DD
+                } catch (IllegalArgumentException e) {
+                    // If date format is invalid, use default
+                    dob = java.sql.Date.valueOf("2000-01-01");
+                }
+            } else {
+                // Default DoB is 2000-01-01
+                dob = java.sql.Date.valueOf("2000-01-01");
+            }
+            
+            // Always set StartAt to today's date
+            java.sql.Date startAt = new java.sql.Date(System.currentTimeMillis());
+            
+            // Get roleId and storeId with default values of 1 if not provided
+            int roleId = 1;
+            int storeId = 1;
+            
+            try {
+                String roleIdStr = request.getParameter("roleId");
+                if (roleIdStr != null && !roleIdStr.isEmpty()) {
+                    roleId = Integer.parseInt(roleIdStr);
+                }
+            } catch (NumberFormatException e) {
+                // Use default value if parsing fails
+            }
+            
+            try {
+                String storeIdStr = request.getParameter("storeId");
+                if (storeIdStr != null && !storeIdStr.isEmpty()) {
+                    storeId = Integer.parseInt(storeIdStr);
+                }
+            } catch (NumberFormatException e) {
+                // Use default value if parsing fails
+            }
 
             if (dao.isUsernameExisted(username)) {
                 jsonMap.put("ok", false);
@@ -148,7 +218,7 @@ public class EmployeeController extends HttpServlet {
                 return;
             }
 
-            boolean success = dao.addEmployee(username, firstName, lastName, phone, email, gender, status);
+            boolean success = dao.addEmployee(username, firstName, lastName, phone, email, gender, status, roleId, storeId, password, cccd, dob, startAt, address, avatar);
             if (success) {
                 jsonMap.put("ok", true);
                 jsonMap.put("message", "Employee added successfully!");
@@ -168,7 +238,7 @@ public class EmployeeController extends HttpServlet {
         EmployeeDAO dao = new EmployeeDAO();
         HashMap<String, Object> jsonMap = new HashMap<>();
         try {
-            String idStr = request.getParameter("id");
+            int id = Integer.parseInt(request.getParameter("id"));
             String username = request.getParameter("username");
             String firstName = request.getParameter("firstName");
             String lastName = request.getParameter("lastName");
@@ -176,9 +246,85 @@ public class EmployeeController extends HttpServlet {
             String email = request.getParameter("email");
             String status = request.getParameter("status");
             String gender = request.getParameter("gender");
+            
+            // Get CCCD or use default
+            String cccd = request.getParameter("cccd");
+            if (cccd == null) {
+                // Default to empty string
+                cccd = "";
+            }
+            
+            // Get Address or use default
+            String address = request.getParameter("address");
+            if (address == null) {
+                // Default to empty string
+                address = "";
+            }
+            
+            // Get DoB or use default
+            java.sql.Date dob = null;
+            String dobStr = request.getParameter("dob");
+            if (dobStr != null && !dobStr.isEmpty()) {
+                try {
+                    dob = java.sql.Date.valueOf(dobStr); // Expects format YYYY-MM-DD
+                } catch (IllegalArgumentException e) {
+                    // If date format is invalid, use default
+                    dob = null;
+                }
+            }
 
+            // Check if username, email, phone exists (except for the current employee)
+            Employee currentEmployee = dao.getEmployeeById(id);
+            if (!currentEmployee.getUserName().equals(username) && dao.isUsernameExisted(username)) {
+                jsonMap.put("ok", false);
+                jsonMap.put("message", "Username is already existed!");
+                sendJson(response, jsonMap);
+                return;
+            }
+            if (!currentEmployee.getEmail().equals(email) && dao.isEmailExisted(email)) {
+                jsonMap.put("ok", false);
+                jsonMap.put("message", "Email is already existed!");
+                sendJson(response, jsonMap);
+                return;
+            }
+            if (!currentEmployee.getPhone().equals(phone) && dao.isPhoneExisted(phone)) {
+                jsonMap.put("ok", false);
+                jsonMap.put("message", "Phone is already existed!");
+                sendJson(response, jsonMap);
+                return;
+            }
+
+            boolean success = dao.editEmployee(id, username, firstName, lastName, phone, email, gender, status, cccd, dob, address);
+            if (success) {
+                jsonMap.put("ok", true);
+                jsonMap.put("message", "Employee updated successfully!");
+            } else {
+                jsonMap.put("ok", false);
+                jsonMap.put("message", "Failed to update employee. Please try again.");
+            }
+            sendJson(response, jsonMap);
+        } catch (Exception e) {
+            jsonMap.put("ok", false);
+            jsonMap.put("message", "Something wrong, please try again later!");
+            sendJson(response, jsonMap);
+        }
+    }
+
+    private void doPostDelete(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        EmployeeDAO dao = new EmployeeDAO();
+        HashMap<String, Object> jsonMap = new HashMap<>();
+        try {
+            String idStr = request.getParameter("id");
+            
+            if (idStr == null || idStr.isEmpty()) {
+                jsonMap.put("ok", false);
+                jsonMap.put("message", "Employee ID is required!");
+                sendJson(response, jsonMap);
+                return;
+            }
+            
             int id = Integer.parseInt(idStr);
-
+            
             Employee current = dao.getEmployeeById(id);
             if (current == null || current.getEmployeeId() == 0) {
                 jsonMap.put("ok", false);
@@ -186,33 +332,62 @@ public class EmployeeController extends HttpServlet {
                 sendJson(response, jsonMap);
                 return;
             }
-
-            if (!current.getUserName().equals(username) && dao.isUsernameExisted(username)) {
-                jsonMap.put("ok", false);
-                jsonMap.put("message", "Username is already existed!");
-                sendJson(response, jsonMap);
-                return;
-            }
-            if (!current.getEmail().equals(email) && dao.isEmailExisted(email)) {
-                jsonMap.put("ok", false);
-                jsonMap.put("message", "Email is already existed!");
-                sendJson(response, jsonMap);
-                return;
-            }
-            if (!current.getPhone().equals(phone) && dao.isPhoneExisted(phone)) {
-                jsonMap.put("ok", false);
-                jsonMap.put("message", "Phone is already existed!");
-                sendJson(response, jsonMap);
-                return;
-            }
-
-            boolean success = dao.editEmployee(id, username, firstName, lastName, phone, email, gender, status);
+            
+            boolean success = dao.deleteEmployee(id);
             if (success) {
                 jsonMap.put("ok", true);
-                jsonMap.put("message", "Employee saved successfully!");
+                jsonMap.put("message", "Employee deleted successfully!");
             } else {
                 jsonMap.put("ok", false);
-                jsonMap.put("message", "Failed to save employee. Please try again.");
+                jsonMap.put("message", "Failed to delete employee. Please try again.");
+            }
+            sendJson(response, jsonMap);
+        } catch (Exception e) {
+            jsonMap.put("ok", false);
+            jsonMap.put("message", "Something wrong, please try again later!");
+            sendJson(response, jsonMap);
+        }
+    }
+    
+    private void doPostChangeStatus(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        EmployeeDAO dao = new EmployeeDAO();
+        HashMap<String, Object> jsonMap = new HashMap<>();
+        try {
+            String idStr = request.getParameter("id");
+            String status = request.getParameter("status");
+            
+            if (idStr == null || idStr.isEmpty()) {
+                jsonMap.put("ok", false);
+                jsonMap.put("message", "Employee ID is required!");
+                sendJson(response, jsonMap);
+                return;
+            }
+            
+            if (status == null || status.isEmpty() || (!status.equals("Active") && !status.equals("Deactive"))) {
+                jsonMap.put("ok", false);
+                jsonMap.put("message", "Invalid status value!");
+                sendJson(response, jsonMap);
+                return;
+            }
+            
+            int id = Integer.parseInt(idStr);
+            
+            Employee current = dao.getEmployeeById(id);
+            if (current == null || current.getEmployeeId() == 0) {
+                jsonMap.put("ok", false);
+                jsonMap.put("message", "Employee not found!");
+                sendJson(response, jsonMap);
+                return;
+            }
+            
+            boolean success = dao.changeEmployeeStatus(id, status);
+            if (success) {
+                jsonMap.put("ok", true);
+                jsonMap.put("message", "Employee status updated successfully!");
+                jsonMap.put("newStatus", status);
+            } else {
+                jsonMap.put("ok", false);
+                jsonMap.put("message", "Failed to update employee status. Please try again.");
             }
             sendJson(response, jsonMap);
         } catch (Exception e) {

@@ -13,59 +13,141 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Quản lí nhân viên</title>
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
         <style>
-            /* 1) Make the page span the viewport height */
             html, body {
                 height: 100%;
-            }
-
-            body {
                 font-family: "Inter", sans-serif;
-                background-color: #f9fafb;
-                color: #374151;
-                margin: 0;
-                padding: 0;
             }
-
-            /* 2) Ensure the outer wrapper and right panel are full-height flex columns */
+            
             .layout-wrapper {
                 display: flex;
-                min-height: 100vh;       /* key */
+                min-height: 100vh;
             }
-
+            
             .main-panel {
-                flex: 1 1 auto;
-                display: flex;
-                flex-direction: column;  /* header | main | footer stacked */
-                min-height: 100vh;       /* key */
-            }
-
-            /* 3) Let main content grow to fill available space */
-            .content {
-                width: 100%;
-                margin: 0;
-                padding-left: 10px;
-                padding-top: 0;
+                flex: 1;
                 display: flex;
                 flex-direction: column;
-                flex: 1 1 auto;          /* key: pushes footer down */
+                min-height: 100vh;
             }
-
-            /* 4) Footer sits at the bottom by taking remaining space above it */
-            .main-panel > .footer,
-            .main-panel > footer.footer {
-                margin-top: auto;        /* key */
+            
+            .content {
+                flex: 1;
+            }
+            
+            /* Remove underlines from links */
+            a {
+                text-decoration: none;
+            }
+            
+            /* Custom action button styles */
+            .action-button {
+                background: none;
+                border: none;
+                cursor: pointer;
+                font-family: inherit;
+                font-size: inherit;
+                padding: 0;
+                text-align: left;
+                margin: 0 5px;
+                position: relative;
+                display: inline-flex;
+                align-items: center;
+                transition: all 0.2s;
+            }
+            
+            .action-button:hover::after {
+                transform: scaleX(1);
+            }
+            
+            .action-button::after {
+                content: '';
+                position: absolute;
+                bottom: -2px;
+                left: 0;
+                width: 100%;
+                height: 2px;
+                transform: scaleX(0);
+                transform-origin: center;
+                transition: transform 0.2s;
+            }
+            
+            /* Edit button */
+            .btn-edit {
+                color: #2563eb; /* blue-600 */
+            }
+            
+            .btn-edit:hover {
+                color: #1d4ed8; /* blue-700 */
+            }
+            
+            .btn-edit::after {
+                background-color: #2563eb;
+            }
+            
+            /* View button */
+            .btn-view {
+                color: #4f46e5; /* indigo-600 */
+            }
+            
+            .btn-view:hover {
+                color: #4338ca; /* indigo-700 */
+            }
+            
+            .btn-view::after {
+                background-color: #4f46e5;
+            }
+            
+            /* Toggle status button */
+            .btn-toggle {
+                color: #ca8a04; /* yellow-600 */
+            }
+            
+            .btn-toggle:hover {
+                color: #a16207; /* yellow-700 */
+            }
+            
+            .btn-toggle::after {
+                background-color: #ca8a04;
+            }
+            
+            /* Delete button */
+            .btn-delete {
+                color: #dc2626; /* red-600 */
+            }
+            
+            .btn-delete:hover {
+                color: #b91c1c; /* red-700 */
+            }
+            
+            .btn-delete::after {
+                background-color: #dc2626;
+            }
+            
+            /* Action button container */
+            .action-buttons-container {
+                display: flex;
+                gap: 12px;
+            }
+            
+            /* Icon styles for action buttons */
+            .action-icon {
+                margin-right: 4px;
+                width: 16px;
+                height: 16px;
             }
         </style>
     </head>
     <body class="bg-gray-50 text-gray-800">
-        <div class="layout-wrapper d-flex">
+        <div class="layout-wrapper">
             <jsp:include page="/views/common/sidebar.jsp"/>
-            <div class="main-panel flex flex-col min-h-screen">
+            <div class="main-panel">
                 <jsp:include page="/views/common/header.jsp"/>
 
-                <main class="content flex-1 p-6">
+                <main class="content p-6">
                     <!-- Header Section -->
                     <div class="mb-6 flex items-center justify-between">
                         <div>
@@ -110,7 +192,7 @@
                                 <c:choose>
                                     <c:when test="${not empty employees}">
                                         <c:forEach var="e" items="${employees}">
-                                            <tr class="hover:bg-gray-50">
+                                            <tr class="hover:bg-gray-50" id="employee-row-${e.employeeId}">
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm">${e.employeeId}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">${e.userName}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm">${e.firstName} ${e.lastName}</td>
@@ -118,16 +200,50 @@
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${e.email}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${e.roleName}</td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
-                                                    <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                                    <span id="status-badge-${e.employeeId}" class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
                                                           ${e.status == 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
                                                         ${e.status}
                                                     </span>
                                                 </td>
-                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                                    <a href="${pageContext.request.contextPath}/management/employees/edit?id=${e.employeeId}"
-                                                       class="text-blue-600 hover:text-blue-900">Chỉnh sửa</a>
-                                                    <a href="${pageContext.request.contextPath}/management/employees/detail?id=${e.employeeId}"
-                                                       class="text-red-600 hover:text-red-900">Chi tiết</a>
+                                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                                    <div class="action-buttons-container">
+                                                        <a href="${pageContext.request.contextPath}/management/employees/edit?id=${e.employeeId}"
+                                                           class="action-button btn-edit">
+                                                            <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                                      d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                            </svg>
+                                                            Sửa
+                                                        </a>
+                                                        <a href="${pageContext.request.contextPath}/management/employees/detail?id=${e.employeeId}"
+                                                           class="action-button btn-view">
+                                                            <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                                            </svg>
+                                                            Chi tiết
+                                                        </a>
+                                                        <button type="button" 
+                                                                onclick="toggleStatus(${e.employeeId}, '${e.status == 'Active' ? 'Deactive' : 'Active'}')"
+                                                                class="action-button btn-toggle">
+                                                            <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                                      d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/>
+                                                            </svg>
+                                                            ${e.status == 'Active' ? 'Vô hiệu hoá' : 'Kích hoạt'}
+                                                        </button>
+                                                        <button type="button"
+                                                                onclick="confirmDelete(${e.employeeId}, '${e.firstName} ${e.lastName}')"
+                                                                class="action-button btn-delete">
+                                                            <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                                      d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                            </svg>
+                                                            Xoá
+                                                        </button>
+                                                    </div>
                                                 </td>
                                             </tr>
                                         </c:forEach>
@@ -193,5 +309,132 @@
                 <jsp:include page="/views/common/footer.jsp"/>
             </div>
         </div>
+        
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script>
+            function confirmDelete(employeeId, employeeName) {
+                Swal.fire({
+                    title: 'Xác nhận xoá?',
+                    html: `Bạn có chắc chắn muốn xoá nhân viên <strong>${employeeName}</strong>?<br>Hành động này không thể hoàn tác!`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Xoá',
+                    cancelButtonText: 'Huỷ',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        deleteEmployee(employeeId);
+                    }
+                });
+            }
+            
+            function deleteEmployee(employeeId) {
+                $.ajax({
+                    url: '${pageContext.request.contextPath}/management/employees/delete',
+                    method: 'POST',
+                    data: {
+                        id: employeeId
+                    },
+                    success: function(response) {
+                        if (response.ok == true) {
+                            Swal.fire({
+                                title: 'Thành công!',
+                                text: response.message,
+                                icon: 'success',
+                                confirmButtonColor: '#3b82f6'
+                            }).then(() => {
+                                // Remove the row from the table
+                                $('#employee-row-' + employeeId).fadeOut(300, function() {
+                                    $(this).remove();
+                                    
+                                    // Check if table is empty
+                                    if ($('tbody tr').length == 0) {
+                                        location.reload(); // Reload to show empty state
+                                    }
+                                });
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Lỗi!',
+                                text: response.message,
+                                icon: 'error',
+                                confirmButtonColor: '#3b82f6'
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            title: 'Lỗi!',
+                            text: 'Đã xảy ra lỗi khi xoá nhân viên. Vui lòng thử lại sau.',
+                            icon: 'error',
+                            confirmButtonColor: '#3b82f6'
+                        });
+                    }
+                });
+            }
+            
+            function toggleStatus(employeeId, newStatus) {
+                const actionText = newStatus == 'Active' ? 'kích hoạt' : 'vô hiệu hoá';
+                
+                Swal.fire({
+                    title: `Xác nhận ${actionText}?`,
+                    html: `Bạn có chắc chắn muốn ${actionText} nhân viên này?`,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3b82f6',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Xác nhận',
+                    cancelButtonText: 'Huỷ',
+                    reverseButtons: true
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        changeEmployeeStatus(employeeId, newStatus);
+                    }
+                });
+            }
+            
+            function changeEmployeeStatus(employeeId, newStatus) {
+                $.ajax({
+                    url: '${pageContext.request.contextPath}/management/employees/change-status',
+                    method: 'POST',
+                    data: {
+                        id: employeeId,
+                        status: newStatus
+                    },
+                    success: function(response) {
+                        if (response.ok == true) {
+                            Swal.fire({
+                                title: 'Thành công!',
+                                text: response.message,
+                                icon: 'success',
+                                confirmButtonColor: '#3b82f6',
+                                timer: 1500,
+                                timerProgressBar: true
+                            }).then(() => {
+                                // Reload the page to refresh all data
+                                location.reload();
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Lỗi!',
+                                text: response.message,
+                                icon: 'error',
+                                confirmButtonColor: '#3b82f6'
+                            });
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            title: 'Lỗi!',
+                            text: 'Đã xảy ra lỗi khi cập nhật trạng thái. Vui lòng thử lại sau.',
+                            icon: 'error',
+                            confirmButtonColor: '#3b82f6'
+                        });
+                    }
+                });
+            }
+        </script>
     </body>
 </html>

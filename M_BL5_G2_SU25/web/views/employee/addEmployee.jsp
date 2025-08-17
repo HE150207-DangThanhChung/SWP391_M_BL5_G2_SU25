@@ -14,51 +14,33 @@
         <title>Thêm nhân viên mới</title>
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
-        <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
         <style>
-            /* 1) Make the page span the viewport height */
             html, body {
                 height: 100%;
-            }
-
-            body {
                 font-family: "Inter", sans-serif;
-                background-color: #f9fafb;
-                color: #374151;
-                margin: 0;
-                padding: 0;
             }
-
-            /* 2) Ensure the outer wrapper and right panel are full-height flex columns */
+            
             .layout-wrapper {
                 display: flex;
-                min-height: 100vh;       /* key */
+                min-height: 100vh;
             }
-
+            
             .main-panel {
-                flex: 1 1 auto;
-                display: flex;
-                flex-direction: column;  /* header | main | footer stacked */
-                min-height: 100vh;       /* key */
-            }
-
-            /* 3) Let main content grow to fill available space */
-            .content {
-                width: 100%;
-                margin: 0;
-                padding-left: 10px;
-                padding-top: 0;
+                flex: 1;
                 display: flex;
                 flex-direction: column;
-                flex: 1 1 auto;          /* key: pushes footer down */
+                min-height: 100vh;
             }
-
-            /* 4) Footer sits at the bottom by taking remaining space above it */
-            .main-panel > .footer,
-            .main-panel > footer.footer {
-                margin-top: auto;        /* key */
+            
+            .content {
+                flex: 1;
+            }
+            
+            /* Remove underlines from links */
+            a {
+                text-decoration: none;
             }
 
             /* Error styles for validation */
@@ -79,15 +61,87 @@
                 opacity: 0.6;
                 pointer-events: none;
             }
+            
+            /* Action button styles */
+            .action-btn {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.5rem 1rem;
+                border-radius: 0.375rem;
+                font-weight: 500;
+                transition: all 0.2s;
+                gap: 0.5rem;
+                border: none;
+                cursor: pointer;
+            }
+            
+            .action-btn svg {
+                width: 1rem;
+                height: 1rem;
+            }
+            
+            /* Primary button */
+            .btn-primary {
+                background-color: #2563eb; /* blue-600 */
+                color: white;
+            }
+            
+            .btn-primary:hover {
+                background-color: #1d4ed8; /* blue-700 */
+            }
+            
+            /* Secondary button */
+            .btn-secondary {
+                background-color: #f3f4f6; /* gray-100 */
+                color: #4b5563; /* gray-600 */
+            }
+            
+            .btn-secondary:hover {
+                background-color: #e5e7eb; /* gray-200 */
+            }
+            
+            /* Cancel button */
+            .btn-cancel {
+                background-color: #ffffff;
+                color: #4b5563; /* gray-600 */
+                border: 1px solid #d1d5db; /* gray-300 */
+            }
+            
+            .btn-cancel:hover {
+                background-color: #f9fafb; /* gray-50 */
+            }
+            
+            /* Back button */
+            .btn-back {
+                background-color: #4b5563; /* gray-600 */
+                color: white;
+            }
+            
+            .btn-back:hover {
+                background-color: #374151; /* gray-700 */
+            }
+            
+            /* Button container */
+            .action-buttons-container {
+                display: flex;
+                gap: 0.75rem;
+            }
+            
+            @media (max-width: 640px) {
+                .action-buttons-container {
+                    flex-direction: column;
+                }
+            }
         </style>
     </head>
     <body class="bg-gray-50 text-gray-800">
-        <div class="layout-wrapper d-flex">
+        <div class="layout-wrapper">
             <jsp:include page="/views/common/sidebar.jsp"/>
-            <div class="main-panel flex flex-col min-h-screen">
+            <div class="main-panel">
                 <jsp:include page="/views/common/header.jsp"/>
 
-                <main class="content flex-1 p-6 bg-gray-50">
+                <main class="content p-6 bg-gray-50">
                     <!-- Header Section -->
                     <div class="mb-8 pt-2 pl-2">
                         <div class="flex items-center justify-between">
@@ -96,8 +150,8 @@
                                 <p class="text-gray-600 mt-1">Thêm nhân viên mới vào hệ thống</p>
                             </div>
                             <button onclick="history.back()"
-                                    class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors duration-200">
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    class="action-btn btn-back">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                                 </svg>
                                 Quay lại
@@ -111,6 +165,12 @@
 
                             <!-- Form Body -->
                             <div class="p-6" id="employeeForm">
+                                <!-- Hidden fields for roleId and storeId -->
+                                <input type="hidden" id="roleId" value="1">
+                                <input type="hidden" id="storeId" value="1">
+                                <!-- Hidden StartAt field with today's date -->
+                                <input type="hidden" id="startAt" value="<%= new java.sql.Date(System.currentTimeMillis()) %>">
+                                
                                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                                     <!-- Username -->
                                     <div>
@@ -122,6 +182,18 @@
                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400"
                                                placeholder="Nhập tên đăng nhập">
                                         <span id="usernameError" class="error-text" style="display: none;"></span>
+                                    </div>
+                                    
+                                    <!-- Password -->
+                                    <div>
+                                        <label for="password" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Mật khẩu
+                                        </label>
+                                        <input id="password" 
+                                               type="password" 
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400"
+                                               placeholder="Để trống để sử dụng mật khẩu mặc định">
+                                        <span class="text-xs text-gray-500 mt-1">Nếu để trống, mật khẩu mặc định sẽ là tên đăng nhập + "123"</span>
                                     </div>
 
                                     <!-- First Name -->
@@ -171,6 +243,41 @@
                                                placeholder="employee@example.com">
                                         <span id="emailError" class="error-text" style="display: none;"></span>
                                     </div>
+                                    
+                                    <!-- CCCD (Citizen ID) -->
+                                    <div>
+                                        <label for="cccd" class="block text-sm font-medium text-gray-700 mb-2">
+                                            CCCD/CMND
+                                        </label>
+                                        <input id="cccd" 
+                                               type="text" 
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400"
+                                               placeholder="Nhập số CCCD/CMND">
+                                        <span class="text-xs text-gray-500 mt-1">Nếu để trống, giá trị mặc định sẽ được sử dụng</span>
+                                    </div>
+                                    
+                                    <!-- Date of Birth -->
+                                    <div>
+                                        <label for="dob" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Ngày sinh
+                                        </label>
+                                        <input id="dob" 
+                                               type="date" 
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400"
+                                               value="2000-01-01">
+                                        <span class="text-xs text-gray-500 mt-1">Định dạng: YYYY-MM-DD</span>
+                                    </div>
+                                    
+                                    <!-- Address -->
+                                    <div>
+                                        <label for="address" class="block text-sm font-medium text-gray-700 mb-2">
+                                            Địa chỉ
+                                        </label>
+                                        <input id="address" 
+                                               type="text" 
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400"
+                                               placeholder="Nhập địa chỉ">
+                                    </div>
 
                                     <!-- Gender -->
                                     <div>
@@ -203,12 +310,12 @@
                                 </div>
 
                                 <!-- Form Actions -->
-                                <div class="flex flex-col sm:flex-row gap-4 mt-8 pt-6 border-t border-gray-200">
+                                <div class="action-buttons-container mt-8 pt-6 border-t border-gray-200">
                                     <button type="button" 
                                             id="addEmployeeBtn"
                                             onclick="addEmployee()"
-                                            class="inline-flex items-center justify-center px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            class="action-btn btn-primary">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
                                         </svg>
                                         <span id="btnText">Thêm</span>
@@ -216,8 +323,8 @@
 
                                     <button type="button" 
                                             onclick="clearForm()"
-                                            class="inline-flex items-center justify-center px-6 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors duration-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
-                                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            class="action-btn btn-secondary">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                                         </svg>
                                         Làm mới dữ liệu
@@ -225,7 +332,7 @@
 
                                     <button type="button" 
                                             onclick="history.back()"
-                                            class="inline-flex items-center justify-center px-6 py-3 bg-white hover:bg-gray-50 text-gray-600 font-medium rounded-lg border border-gray-300 transition-colors duration-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2">
+                                            class="action-btn btn-cancel">
                                         Huỷ
                                     </button>
                                 </div>
@@ -242,34 +349,20 @@
                 <jsp:include page="/views/common/footer.jsp"/>
             </div>
         </div>
-
+        
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
-            function showToast(message, type = 'success') {
-                let backgroundColor;
-
-                if (type === "success") {
-                    backgroundColor = "linear-gradient(to right, #00b09b, #96c93d)"; // Green
-                } else if (type === "error") {
-                    backgroundColor = "linear-gradient(to right, #ff416c, #ff4b2b)"; // Red
-                } else if (type === "warning") {
-                    backgroundColor = "linear-gradient(to right, #ffa502, #ff6348)"; // Orange
-                } else if (type === "info") {
-                    backgroundColor = "linear-gradient(to right, #1e90ff, #3742fa)"; // Blue
-                } else {
-                    backgroundColor = "#333";
-                }
-
-                Toastify({
+            function showNotification(message, type = 'success') {
+                const icon = type == 'success' ? 'success' : 'error';
+                
+                Swal.fire({
+                    title: type == 'success' ? 'Thành công!' : 'Lỗi!',
                     text: message,
-                    duration: 2000,
-                    close: true,
-                    gravity: "top",
-                    position: "right",
-                    backgroundColor: backgroundColor,
-                    stopOnFocus: true
-                }).showToast();
+                    icon: icon,
+                    confirmButtonColor: '#3b82f6',
+                    timer: 2000,
+                    timerProgressBar: true
+                });
             }
 
             function validateUsername(username) {
@@ -404,10 +497,10 @@
 
                 return isValid;
             }
-
+            
             function addEmployee() {
                 if (!validateForm()) {
-                    showToast('Vui lòng sửa các lỗi trước khi gửi', 'error');
+                    showNotification('Vui lòng sửa các lỗi trước khi gửi', 'error');
                     return;
                 }
 
@@ -429,27 +522,54 @@
                         phone: document.getElementById('phone').value.trim(),
                         email: document.getElementById('email').value.trim(),
                         gender: document.getElementById('gender').value,
-                        status: document.getElementById('status').value
+                        status: document.getElementById('status').value,
+                        roleId: document.getElementById('roleId').value,
+                        storeId: document.getElementById('storeId').value,
+                        password: document.getElementById('password').value,
+                        cccd: document.getElementById('cccd').value,
+                        dob: document.getElementById('dob').value,
+                        startAt: document.getElementById('startAt').value,
+                        address: document.getElementById('address').value
                     },
+                    dataType: 'json',
                     success: function (response) {
-                        if (response.ok === true) {
-                            showToast(response.message);
-                            clearForm();
+                        if (response.ok == true) {
+                            Swal.fire({
+                                title: 'Thành công!',
+                                text: response.message,
+                                icon: 'success',
+                                confirmButtonColor: '#3b82f6'
+                            }).then(() => {
+                                clearForm();
+                            });
                         } else {
-                            showToast(response.message, 'error');
+                            Swal.fire({
+                                title: 'Lỗi!',
+                                text: response.message,
+                                icon: 'error',
+                                confirmButtonColor: '#3b82f6'
+                            });
                         }
                     },
                     error: function (xhr, status, error) {
                         console.error('Error:', error);
                         let errorMessage = 'Đã xảy ra lỗi khi thêm nhân viên';
-
-                        if (xhr.responseJSON && xhr.responseJSON.message) {
-                            errorMessage = xhr.responseJSON.message;
-                        } else if (xhr.responseText) {
-                            errorMessage = xhr.responseText;
+                        try {
+                            if (xhr.responseJSON) {
+                                errorMessage = xhr.responseJSON.message || errorMessage;
+                            } else if (xhr.responseText) {
+                                const response = JSON.parse(xhr.responseText);
+                                errorMessage = response.message || errorMessage;
+                            }
+                        } catch (e) {
+                            console.error('Error parsing response:', e);
                         }
-
-                        showToast(errorMessage, 'error');
+                        Swal.fire({
+                            title: 'Lỗi!',
+                            text: errorMessage,
+                            icon: 'error',
+                            confirmButtonColor: '#3b82f6'
+                        });
                     },
                     complete: function () {
                         addBtn.disabled = false;
@@ -458,16 +578,19 @@
                     }
                 });
             }
-
-            // Clear form function
+            
             function clearForm() {
                 document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
                 document.getElementById('firstName').value = '';
                 document.getElementById('lastName').value = '';
                 document.getElementById('phone').value = '';
                 document.getElementById('email').value = '';
+                document.getElementById('cccd').value = '';
+                document.getElementById('address').value = '';
                 document.getElementById('gender').value = '';
                 document.getElementById('status').value = '';
+                
                 clearAllErrors();
             }
 
