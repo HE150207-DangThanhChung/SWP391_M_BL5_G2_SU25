@@ -152,43 +152,44 @@
         </style>
     </head>
     <body>
-        <div class="content">
-            <div class="left">
-                <img height="150" width="150" src="" />
-                <h2>
-                    <input type="file" name="name">
-                </h2>
-            </div>
-            
-            <div class="right">
-                <h2> Thêm cửa hàng</h2>
-                <table>
-                    <tr>
-                        <td>ID cửa hàng</td>
-                        <td><input type="text"/></td>
-                    </tr>
-                    <tr>
-                        <td>Tên cửa hàng</td>
-                        <td><input type="text"/></td>
-                    </tr>
-                    <tr>
-                        <td>Địa chỉ cửa hàng</td>
-                        <td><input type="text"/></td>
-                    </tr>
-                    <tr>
-                        <td>Số điện thoại của hàng</td>
-                        <td><input type="text"/></td>
-                    </tr>
-<!--                    <tr>
-                        <td>Ngày đăng kí cửa hàng</td>
-                        <td><input type="date"/></td>
-                    </tr>-->
-                </table>
-                <div class="btn">
-                    <button>Thêm mới</button> 
-                    <button onclick="window.location.href = 'listStore.jsp'">Hủy bỏ</button>
+        
+        <form action="${pageContext.request.contextPath}/stores/add" method="post">
+            <div class="content">
+                <div class="left">
+                    <img height="150" width="150" src="${pageContext.request.contextPath}/img/logo2.jpg" />
+                </div>
+                <div class="right">
+                    <h2> Thêm cửa hàng</h2>
+                    <table>
+                        <tr>
+                            <td>Tên cửa hàng</td>
+                            <td><input type="text" name="storeName" required/></td>
+                        </tr>
+                        <tr>
+                            <td>Địa chỉ cửa hàng</td>
+                            <td><input type="text" name="address" required/></td>
+                        </tr>
+                        <tr>
+                            <td>Số điện thoại cửa hàng</td>
+                            <td><input type="text" name="phone" required pattern="[0-9]{10}" title="Nhập 10 số"/></td>
+                        </tr>
+                        <tr>
+                            <td>Trạng thái</td>
+                            <td>
+                                <select name="status" required>
+                                    <option value="Active">Hoạt động</option>
+                                    <option value="Inactive">Ngừng hoạt động</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="btn">
+                        <button type="submit">Thêm mới</button>
+                        <button type="button" onclick="window.location.href = '${pageContext.request.contextPath}/stores'">Hủy bỏ</button>
+                    </div>
                 </div>
             </div>
-        </div>  
+        </form>
+                    <jsp:include page="../common/footer.jsp"/>
     </body>
 </html>

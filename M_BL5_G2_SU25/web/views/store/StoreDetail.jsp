@@ -1,7 +1,7 @@
 <%-- 
-    Document   : StoreDetail.jsp
-    Created on : 14 thg 8, 2025, 08:57:18
-    Author     : truon
+    Document   : addStore
+    Created on : Aug 13, 2025, 8:49:35 AM
+    Author     : tayho
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
@@ -9,7 +9,8 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Chi tiết của hàng</title>
+        <title>Thêm mới cửa hàng</title>
+        
         <style>
 
             body {
@@ -151,45 +152,42 @@
         </style>
     </head>
     <body>
-        <div class="content">
-            <div class="left">
-                <img height="150" width="150" src="image/logo2.jpg" />
-                <h2>
-                </h2>
-            </div>
-            <div class="right ">
-                <h2> Hồ sơ của </h2>
-                <table>
-                    <tr> 
-                        <td> ID cửa hàng</td> 
-                        <td> <input type="text"/> </td> 
-                    </tr>
-                    <tr> 
-                        <td> Tên cửa hàng</td> 
-                        <td> <input type="text"/> </td> 
-                    </tr>
-                    <tr> 
-                        <td> Địa chỉ cửa hàng </td> 
-                        <td> <input type="text"/> </td> 
-                    </tr>
-                    <tr> 
-                        <td>Số điện thoại cửa hàng </td> 
-                        <td> <input type="text"/> </td> 
-                    </tr>
-                    <!--                    <tr> 
-                                            <td>Ngày đăng kí cửa hàng </td> 
-                                            <td></i> <input type="date"/> </td> 
-                                        </tr>-->
-
-                </table>
-                <div class="btn">
-                    <button onclick="window.location.href = 'editDetailStore.jsp'">Chỉnh sửa</button>
-                    <button onclick="window.location.href = 'listStore.jsp'">Hủy bỏ</button>
+        <form action="${pageContext.request.contextPath}/stores/add" method="post">
+            <div class="content">
+                <div class="left">
+                    <img height="150" width="150" src="${pageContext.request.contextPath}/img/logo2.jpg" />
                 </div>
-
+                <div class="right">
+                    <h2> Thêm cửa hàng</h2>
+                    <table>
+                        <tr>
+                            <td>Tên cửa hàng</td>
+                            <td><input type="text" name="storeName" required/></td>
+                        </tr>
+                        <tr>
+                            <td>Địa chỉ cửa hàng</td>
+                            <td><input type="text" name="address" required/></td>
+                        </tr>
+                        <tr>
+                            <td>Số điện thoại cửa hàng</td>
+                            <td><input type="text" name="phone" required pattern="[0-9]{10}" title="Nhập 10 số"/></td>
+                        </tr>
+                        <tr>
+                            <td>Trạng thái</td>
+                            <td>
+                                <select name="status" required>
+                                    <option value="Active">Hoạt động</option>
+                                    <option value="Inactive">Ngừng hoạt động</option>
+                                </select>
+                            </td>
+                        </tr>
+                    </table>
+                    <div class="btn">
+                        <button type="submit">Thêm mới</button>
+                        <button type="button" onclick="window.location.href = '${pageContext.request.contextPath}/stores'">Hủy bỏ</button>
+                    </div>
+                </div>
             </div>
-        </div>
-
-
+        </form>
     </body>
 </html>
