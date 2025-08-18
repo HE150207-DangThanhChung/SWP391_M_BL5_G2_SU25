@@ -176,7 +176,7 @@
                         <path d="M4 20a8 8 0 0 1 16 0"/>
                         </svg>
                     </span>
-                    <label class="sr-only" for="username">Tên đăng nhập</label>
+                    <label class="sr-only" for="username">Tên đăng nhập:</label>
                     <input id="username" name="username" type="text" placeholder="Vui lòng điền tên đăng nhập" required />
                 </div>
 
@@ -188,7 +188,7 @@
                         <path d="M8 11V7a4 4 0 1 1 8 0v4"/>
                         </svg>
                     </span>
-                    <label class="sr-only" for="password">Mật khẩu</label>
+                    <label class="sr-only" for="password">Mật khẩu:</label>
                     <input id="password" name="password" type="password" placeholder="Vui lòng điền mật khẩu" required />
                 </div>
 
