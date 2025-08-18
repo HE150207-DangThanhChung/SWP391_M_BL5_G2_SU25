@@ -97,7 +97,7 @@
                     width="32"
                     height="32"
                     />
-                <span>Happy Sale</span>
+                <span>Happy Sale!</span>
 
             </div>
             <nav class="sidebar-nav">
