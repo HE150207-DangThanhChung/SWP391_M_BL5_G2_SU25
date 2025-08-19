@@ -4,87 +4,345 @@
  */
 package controller;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import dal.CityDAO;
+import dal.CustomerDAO;
+import dal.WardDAO;
+import model.Customer;
+import model.Ward;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.*;
+import java.io.IOException;
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author tayho
  */
 /**
-Chỉnh sửa lại annotation @WebServlet theo phần cá nhân làm riêng
-*/
-@WebServlet(name = "CustomerController", urlPatterns = {"/CustomerController"})
+ * Chỉnh sửa lại annotation @WebServlet theo phần cá nhân làm riêng
+ */
+@WebServlet(name = "CustomerController", urlPatterns = {"/customer"})
 public class CustomerController extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet CustomerController</title>");
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet CustomerController at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
+    // View paths
+    private static final String VIEW_LIST = "/views/customer/listCustomer.jsp";
+    private static final String VIEW_ADD = "/views/customer/addCustomer.jsp";
+    private static final String VIEW_EDIT = "/views/customer/editCustomer.jsp";
+    private static final String VIEW_DETAIL = "/views/customer/viewCustomer.jsp";
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    private final CustomerDAO customerDAO = new CustomerDAO();
+    private final CityDAO cityDAO = new CityDAO();
+    private final WardDAO wardDAO = new WardDAO();
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+
+        String action = nvl(request.getParameter("action"), "list");
+
+        switch (action) {
+            case "addForm" ->
+                handleAddForm(request, response);
+            case "editForm" ->
+                handleEditForm(request, response);
+            case "view" ->
+                handleView(request, response);
+            case "list" ->
+                handleList(request, response);
+            default ->
+                handleList(request, response);
+        }
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+
+        request.setCharacterEncoding("UTF-8");
+        String action = nvl(request.getParameter("action"), "list");
+
+        switch (action) {
+            case "add" ->
+                handleAdd(request, response);
+            case "edit" ->
+                handleEdit(request, response);
+            default ->
+                handleList(request, response);
+        }
+    }
+
+    // =================== GET handlers ===================
+    private void handleAddForm(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        req.setAttribute("cities", cityDAO.getAll());
+        req.getRequestDispatcher(VIEW_ADD).forward(req, resp);
+    }
+
+    private void handleEditForm(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        int id = parseInt(req.getParameter("customerId"), -1);
+        Customer c = customerDAO.getById(id);
+        if (c == null) {
+            req.setAttribute("error", "Customer not found.");
+            handleList(req, resp);
+            return;
+        }
+
+        // preload cities for dropdown
+        req.setAttribute("cities", cityDAO.getAll());
+
+        // try to preselect city in the form if ward known
+        if (c.getWardId() != null) {
+            Ward w = wardDAO.getById(c.getWardId());
+            if (w != null) {
+                req.setAttribute("selectedCityId", w.getCityId());
+            }
+        }
+        req.setAttribute("customer", c);
+        req.getRequestDispatcher(VIEW_EDIT).forward(req, resp);
+    }
+
+    private void handleView(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        int id = parseInt(req.getParameter("customerId"), -1);
+        Customer c = customerDAO.getById(id);
+        if (c == null) {
+            req.setAttribute("error", "Customer not found.");
+            handleList(req, resp);
+            return;
+        }
+        req.setAttribute("customer", c);
+        req.getRequestDispatcher(VIEW_DETAIL).forward(req, resp);
+    }
+
+    private void handleList(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        int pageIndex = parseInt(req.getParameter("page"), 1);
+        int pageSize = parseInt(req.getParameter("size"), 10);
+        String search = trimToNull(req.getParameter("search"));
+        String status = trimToNull(req.getParameter("status"));
+        String sortBy = nvl(trimToNull(req.getParameter("sortBy")), "id");    // id|name|email|phone|status|dob
+        String sortDir = nvl(trimToNull(req.getParameter("sortDir")), "ASC");  // ASC|DESC
+
+        int total = customerDAO.count(search, status);
+        int totalPages = Math.max(1, (int) Math.ceil((double) total / pageSize));
+        if (pageIndex > totalPages) {
+            pageIndex = totalPages;
+        }
+        if (pageIndex < 1) {
+            pageIndex = 1;
+        }
+
+        List<Customer> list = customerDAO.list(pageIndex, pageSize, search, status, sortBy, sortDir);
+
+        req.setAttribute("list", list);
+        req.setAttribute("page", pageIndex);
+        req.setAttribute("size", pageSize);
+        req.setAttribute("totalPages", totalPages);
+        req.setAttribute("totalRecords", total);
+        req.setAttribute("search", nvl(search, ""));
+        req.setAttribute("status", nvl(status, ""));
+        req.setAttribute("sortBy", sortBy);
+        req.setAttribute("sortDir", sortDir);
+
+        req.getRequestDispatcher(VIEW_LIST).forward(req, resp);
+    }
+
+    // =================== POST handlers ===================
+    private void handleAdd(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        List<String> errors = new ArrayList<>();
+        Customer c = bindFromRequest(req, errors, null);
+
+        // unique checks
+        if (c.getEmail() != null && customerDAO.emailExists(c.getEmail(), null)) {
+            errors.add("Email already exists.");
+        }
+        if (c.getPhone() != null && customerDAO.phoneExists(c.getPhone(), null)) {
+            errors.add("Phone already exists.");
+        }
+
+        // ward ∈ city validation (if both provided)
+        Integer wardId = c.getWardId();
+        int cityId = parseInt(req.getParameter("cityId"), 0);
+        if (wardId != null && cityId > 0 && !wardDAO.existsInCity(wardId, cityId)) {
+            errors.add("Selected ward does not belong to the chosen city.");
+        }
+
+        if (!errors.isEmpty()) {
+            req.setAttribute("errors", errors);
+            req.setAttribute("customer", c);
+            req.setAttribute("cities", cityDAO.getAll());
+            req.getRequestDispatcher(VIEW_ADD).forward(req, resp);
+            return;
+        }
+
+        boolean ok = customerDAO.insert(c);
+        if (ok) {
+            resp.sendRedirect(req.getContextPath() + "/customer?action=list&msg=added");
+        } else {
+            errors.add("Failed to add customer. Please try again.");
+            req.setAttribute("errors", errors);
+            req.setAttribute("customer", c);
+            req.setAttribute("cities", cityDAO.getAll());
+            req.getRequestDispatcher(VIEW_ADD).forward(req, resp);
+        }
+    }
+
+    private void handleEdit(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        int id = parseInt(req.getParameter("customerId"), -1);
+        List<String> errors = new ArrayList<>();
+        Customer c = bindFromRequest(req, errors, id);
+        c.setCustomerId(id);
+
+        if (id <= 0) {
+            errors.add("Invalid customerId.");
+        }
+
+        // unique checks (exclude current id)
+        if (c.getEmail() != null && customerDAO.emailExists(c.getEmail(), id)) {
+            errors.add("Email already exists on another record.");
+        }
+        if (c.getPhone() != null && customerDAO.phoneExists(c.getPhone(), id)) {
+            errors.add("Phone already exists on another record.");
+        }
+
+        // ward ∈ city validation
+        Integer wardId = c.getWardId();
+        int cityId = parseInt(req.getParameter("cityId"), 0);
+        if (wardId != null && cityId > 0 && !wardDAO.existsInCity(wardId, cityId)) {
+            errors.add("Selected ward does not belong to the chosen city.");
+        }
+
+        if (!errors.isEmpty()) {
+            req.setAttribute("errors", errors);
+            req.setAttribute("customer", c);
+            req.setAttribute("cities", cityDAO.getAll());
+            req.getRequestDispatcher(VIEW_EDIT).forward(req, resp);
+            return;
+        }
+
+        boolean ok = customerDAO.update(c);
+        if (ok) {
+            resp.sendRedirect(req.getContextPath() + "/customer?action=list&msg=updated");
+        } else {
+            errors.add("Failed to update customer. Please try again.");
+            req.setAttribute("errors", errors);
+            req.setAttribute("customer", c);
+            req.setAttribute("cities", cityDAO.getAll());
+            req.getRequestDispatcher(VIEW_EDIT).forward(req, resp);
+        }
+    }
+
+    // =================== Binding & Utils ===================
+    /**
+     * Bind request params into a Customer and collect validation errors.
+     */
+    private Customer bindFromRequest(HttpServletRequest req, List<String> errors, Integer idForUpdate) {
+        Customer c = new Customer();
+
+        String first = trimToNull(req.getParameter("firstName"));
+        String last = trimToNull(req.getParameter("lastName"));
+        String email = trimToNull(req.getParameter("email"));
+        String phone = trimToNull(req.getParameter("phone"));
+        String gender = trimToNull(req.getParameter("gender"));
+        String address = trimToNull(req.getParameter("address"));
+        String status = nvl(trimToNull(req.getParameter("status")), "Active");
+
+        if (first == null) {
+            errors.add("First name is required.");
+        }
+        if (last == null) {
+            errors.add("Last name is required.");
+        }
+        if (email == null) {
+            errors.add("Email is required.");
+        }
+        if (phone == null) {
+            errors.add("Phone is required.");
+        }
+        if (gender == null) {
+            errors.add("Gender is required.");
+        }
+        if (address == null) {
+            errors.add("Address is required.");
+        }
+
+        c.setFirstName(first);
+        c.setMiddleName(trimToNull(req.getParameter("middleName")));
+        c.setLastName(last);
+        c.setEmail(email);
+        c.setPhone(phone);
+        c.setGender(gender);
+        c.setAddress(address);
+        c.setStatus(status);
+        c.setTaxCode(trimToNull(req.getParameter("taxCode")));
+
+        // Ward is optional (nullable)
+        Integer wardId = null;
+        String wardRaw = req.getParameter("wardId");
+        if (wardRaw != null && !wardRaw.isBlank()) {
+            try {
+                wardId = Integer.parseInt(wardRaw.trim());
+            } catch (NumberFormatException ignore) {
+            }
+        }
+        c.setWardId(wardId);
+
+        // DoB is optional
+        c.setDob(parseSqlDate(req.getParameter("dob"), null));
+
+        return c;
+    }
+
+    private static String trimToNull(String s) {
+        if (s == null) {
+            return null;
+        }
+        String t = s.trim();
+        return t.isEmpty() ? null : t;
+    }
+
+    private static String nvl(String s, String def) {
+        return s == null ? def : s;
+    }
+
+    private static int parseInt(String s, int def) {
+        try {
+            return Integer.parseInt(s);
+        } catch (Exception e) {
+            return def;
+        }
     }
 
     /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
+     * Accepts yyyy-MM-dd; returns null and optionally adds an error message.
      */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
+    private static Date parseSqlDate(String s, List<String> errors) {
+        return parseSqlDate(s, errors, null);
+    }
 
+    private static Date parseSqlDate(String s, List<String> errors, String msgIfBlank) {
+        if (s == null || s.isBlank()) {
+            if (errors != null && msgIfBlank != null) {
+                errors.add(msgIfBlank);
+            }
+            return null;
+        }
+        try {
+            return Date.valueOf(s.trim());
+        } catch (IllegalArgumentException ex) {
+            if (errors != null) {
+                errors.add("Invalid date format for DoB (expected yyyy-MM-dd).");
+            }
+            return null;
+        }
+    }
 }
