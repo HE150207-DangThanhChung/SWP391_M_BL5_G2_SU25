@@ -699,7 +699,7 @@ public class ProductDAO {
                 + "JOIN Category c ON p.CategoryId = c.CategoryId "
                 + "JOIN Brand b ON p.BrandId = b.BrandId "
                 + "JOIN Supplier s ON p.SupplierId = s.SupplierId "
-                + "WHERE p.ProductId = ? AND p.Status = 'Active'";
+                + "WHERE p.ProductId = ?";
         try (Connection conn = new DBContext().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, productId);
             try (ResultSet rs = stmt.executeQuery()) {
