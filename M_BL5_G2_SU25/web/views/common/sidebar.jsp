@@ -105,7 +105,7 @@
                 <!--Mỗi người làm phần nào sẽ vào đây và điền link cho phần đó nhé-->
                 <!--<a href="${pageContext.request.contextPath} sau đó điền link vào đây">-->
 
-                <a href="">    
+                <a href="${pageContext.request.contextPath}/stores">    
                     <i class="fas fa-warehouse"></i>
                     Quản lý cửa hàng
                 </a>

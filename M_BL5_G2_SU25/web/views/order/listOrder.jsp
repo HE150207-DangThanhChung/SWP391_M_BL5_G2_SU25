@@ -173,7 +173,7 @@
                             <td class="text-center">
                                 <div class="btn-group btn-group-sm">
                                     <button class="btn btn-outline-primary"
-                                            onclick="window.location.href='orderDetail.jsp?id=1'">
+                                            onclick="window.location.href='viewOrder.jsp?id=1'">
                                         <i class="bi bi-eye me-1"></i>Chi tiết
                                     </button>
                                     <button class="btn btn-outline-secondary"

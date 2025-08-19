@@ -1,6 +1,6 @@
 <%-- 
     Document   : listStore
-    Created on : Aug 13, 2025, 8:49:14 AM
+    Created on : Aug 13, 2025, 8:49:14 AM
     Author     : tayho
 --%>
 
@@ -13,25 +13,40 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Danh sách Cửa hàng</title>
 
-        <!--        <link
-                    rel="stylesheet"
-                    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"
-                    />-->
-
         <style>
+            :root{
+                --header-h: 64px;
+                --sidebar-w: 260px;
+                --radius: 12px;
+                --bg: #f5f7fb;
+                --card: #ffffff;
+                --text: #111;
+                --muted: #4a4a4a;
+                --line: #e9edf3;
+                --brand: #F28705;
+            }
 
+            * {
+                box-sizing: border-box;
+            }
+            html, body {
+                height: 100%;
+            }
             body {
                 margin: 0;
                 font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
                     "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
                     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-                background-color: #ccc;
-                color: #000;
-                font-weight: 400;
+                background: var(--bg);
+                color: var(--text);
                 font-size: 14px;
                 line-height: 1.5;
             }
 
+            a {
+                color: inherit;
+                text-decoration: none;
+            }
             button {
                 background: none;
                 border: none;
@@ -41,395 +56,315 @@
                 color: inherit;
             }
 
-            input[type="checkbox"] {
-                width: 16px;
-                height: 16px;
-            }
-
-
-            .content{
-                margin: 30px;
+            /* ======= LAYOUT (Grid 3 hàng x 2 cột) ======= */
+            .layout{
+                min-height: 100vh;
                 display: grid;
-                grid-template-columns: 1fr 4fr;
-                gap: 5%;
+                grid-template-columns: var(--sidebar-w) 1fr;
+                grid-template-rows: var(--header-h) 1fr auto;
+                grid-template-areas:
+                    "header header"
+                    "sidebar main"
+                    "footer footer";
             }
 
-            /*Left filters*/
-            .content-left {
-                display: flex;
-                flex-direction: column;
-                gap: 25px;
+            .app-header{
+                grid-area: header;
+                position: sticky;
+                top: 0;
+                z-index: 50;
+                background: var(--card);
+                border-bottom: 1px solid var(--line);
+            }
+            .app-sidebar{
+                grid-area: sidebar;
+                background: var(--card);
+                border-right: 1px solid var(--line);
+                overflow-y: auto;
+            }
+            .app-main{
+                grid-area: main;
+                padding: 24px;
                 width: 100%;
-                font-size: 16px
+                max-width: 1280px;
+                margin: 0 auto;
+            }
+            .app-footer{
+                grid-area: footer;
+                background: var(--card);
+                border-top: 1px solid var(--line);
+                padding: 16px 24px;
+                text-align: center;
             }
 
-            .content-left h2 {
+            /* ======= SEARCH + ACTIONS ======= */
+            .page-title{
+                margin: 0 0 16px;
+                font-size: 24px;
                 font-weight: 700;
-                font-size: 28px;
-                margin: 0;
             }
 
-            .filter-box {
-                background-color: #fff;
-                border-radius: 12px;
-                padding-top: 16px;
-                width: 100%;
-                min-height: 150px;
-            }
-
-            .filter-box header,.filter-box form{
-                margin: 0 20px;
-            }
-
-            .filter-box span{
-                font-weight: bold
-            }
-
-            .filter-box form input {
-                width: 16px;
-                height: 16px;
-                margin-left:  16px;
-            }
-
-            .filter-box form label {
+            .toolbar{
                 display: flex;
+                gap: 12px;
                 align-items: center;
-                gap: 8px;
-                font-weight: 400;
-                font-size: 15px;
-                color: #4a4a4a;
+                flex-wrap: wrap;
+                background: var(--card);
+                padding: 16px;
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+                margin-bottom: 16px;
             }
-
-            /*Right content*/
-
-            /*Search*/
-            .search{
-                position: relative;
-                margin-bottom: 2%;
-            }
-
-            .search form {
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                gap: 10px;
-            }
-
-            .search-left {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            }
-
-            .search-input-wrapper {
+            .search-box{
                 position: relative;
             }
-
-            .search i{
+            .search-box input{
+                width: 320px;
+                max-width: 100%;
+                height: 42px;
+                padding: 8px 14px 8px 36px;
+                border-radius: 10px;
+                border: 1px solid #ccc;
+                background: #fff;
+            }
+            .search-box .icon{
                 position: absolute;
                 left: 12px;
                 top: 50%;
                 transform: translateY(-50%);
-                font-size: 18px;
-                color: #000;
             }
-
-            .search input {
-                width: 320px;
-                padding: 8px 16px 8px 36px;
+            .toolbar select{
+                height: 42px;
                 border-radius: 10px;
                 border: 1px solid #ccc;
-                font-size: 16px;
-                font-weight: 400;
-                color: #000;
-                background-color: #fff;
-                height: 45px;
+                background: #fff;
+                padding: 0 10px;
+                min-width: 180px;
             }
-
-            .feature {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                flex-wrap: nowrap;
-                margin-left: auto;
+            .spacer{
+                flex: 1 1 auto;
             }
-            .feature button, .feature a, .feature select {
-                height: 45px;
-                border-radius: 10px;
-                font-size: 16px;
-                white-space: nowrap;
-            }
-            .feature button, .feature a {
-                background-color: #F28705;
-                color: #fff;
-                border: none;
-                padding: 0 16px;
-                text-decoration: none;
-                display: flex;
+            .btn{
+                display: inline-flex;
                 align-items: center;
                 justify-content: center;
-                min-width: 135px;
-            }
-            .feature select {
-                background-color: #fff;
-                color: #000;
-                border: 1px solid #ccc;
-                padding: 0 10px;
-                min-width: 150px;
-            }
-
-            /*Table container*/
-            .table-container {
-                /*overflow-x: auto;*/
-                border-radius: 12px;
-                text-align: center;
-            }
-
-            .table-container button {
-                background-color: #28a745;
-                color: #fff;
-                width: 50%;
+                gap: 6px;
+                height: 42px;
+                padding: 0 14px;
                 border-radius: 10px;
-                height: 45px;
+                white-space: nowrap;
+            }
+            .btn-primary{
+                background: var(--brand);
+                color: #fff;
+            }
+            .btn-ghost{
+                background: #fff;
+                border: 1px solid #ccc;
             }
 
-            table {
+            /* ======= TABLE ======= */
+            .card{
+                background: var(--card);
+                border: 1px solid var(--line);
+                border-radius: var(--radius);
+            }
+            .table-container{
+                overflow-x: auto;
+            }
+            table{
                 width: 100%;
                 border-collapse: collapse;
-                border-radius: 12px;
-                overflow: hidden;
+                min-width: 900px;
             }
-            thead tr {
-                background-color: #A9A9A9;
+            thead th{
+                background: #eef2f8;
                 color: #000;
                 font-weight: 700;
                 font-size: 14px;
+                padding: 10px 12px;
+                text-align: left;
+                border-bottom: 1px solid var(--line);
             }
-            thead th {
-                padding: 8px 12px;
-                font-size: 16px;
-                height: 40px
+            tbody td{
+                padding: 10px 12px;
+                color: var(--text);
+                border-bottom: 1px solid var(--line);
+                vertical-align: middle;
             }
-            thead th:first-child {
-                border-top-left-radius: 12px;
+            tbody tr:nth-child(even){
+                background: #fafbfe;
             }
-            thead th:last-child {
-                border-top-right-radius: 12px;
+            .td-center{
+                text-align: center;
             }
-            tbody tr {
-                font-weight: 400;
-                font-size: 16px;
-                color: #000;
-                height: 50px;
+            .store-thumb{
+                width: 46px;
+                height: 46px;
+                border-radius: 8px;
+                object-fit: cover;
+                border: 1px solid var(--line);
             }
-            tbody tr:nth-child(odd) {
-                background-color: #fff;
-            }
-            tbody tr:nth-child(even) {
-                background-color: #f0f0f3;
-            }
-            tbody td {
-                padding: 8px 12px;
+            .btn-view{
+                background: #28a745;
+                color: #fff;
+                height: 36px;
+                padding: 0 12px;
+                border-radius: 8px;
             }
 
-            /*Pagination*/
-            .pagination {
+            /* ======= PAGINATION ======= */
+            .pagination{
                 display: flex;
+                gap: 8px;
                 align-items: center;
-                gap: 12px;
-                font-weight: 700;
-                font-size: 18px;
-                margin-top: 10px;
+                justify-content: center;
+                padding: 12px;
+                flex-wrap: wrap;
             }
-            .pagination button {
-                border: none;
-                background: none;
-                cursor: pointer;
-                color: #000;
-                font-weight: 700;
-                font-size: 18px;
-                padding: 0;
-                height: 25px;
+            .page-link{
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                min-width: 36px;
+                height: 36px;
+                padding: 0 10px;
+                border: 1px solid #ccc;
+                border-radius: 8px;
+                background: #fff;
+                font-weight: 600;
             }
-
-            .pagination .page-num {
-                border: 1px solid #000;
-                border-radius: 6px;
-                padding: 2px 8px;
-                font-weight: 700;
-                font-size: 14px;
-                line-height: 1;
-                cursor: pointer;
-                background-color: #fff;
+            .page-link.active{
+                border-color: var(--brand);
+                color: var(--brand);
+            }
+            .page-link[aria-disabled="true"]{
+                opacity: .5;
+                pointer-events: none;
             }
 
-
-            /*Responsive*/
-            @media only screen and (max-width: 768px){
-                .content{
-                    display:flex;
-                    flex-direction: column;
-                }
-
-                .filter-box {
-                    width: 100%;
-                }
-
-                .feature {
+            /* ======= RESPONSIVE ======= */
+            @media (max-width: 992px){
+                .layout{
                     grid-template-columns: 1fr;
+                    grid-template-rows: var(--header-h) auto 1fr auto;
+                    grid-template-areas:
+                        "header"
+                        "sidebar"
+                        "main"
+                        "footer";
                 }
-
-                .feature {
-                    display: grid;
-                    grid-template-columns: 1fr 1fr 1fr;
-                }
-
-                .search {
-                    margin-top: 5%;
-                    grid-template-columns: 1fr;
-                    gap: 20px;
-                }
-
-                .search input{
-                    width: 100%
-                }
-
-                .search i {
-                    top: 14%
-                }
-
-                .table-container {
-                    overflow-x: auto;  /* Cho phép cuộn ngang trên mobile */
-                }
-
-                .pagination{
-                    justify-self: center
+                .app-sidebar{
+                    border-right: none;
+                    border-bottom: 1px solid var(--line);
                 }
             }
-
-
         </style>
     </head>
     <body>
 
+        <div class="layout">
+            <!-- Header (sticky) -->
+            <header class="app-header">
+                <jsp:include page="/views/common/header.jsp"/>
+            </header>
 
+            <!-- Sidebar (scroll riêng) -->
+            <aside class="app-sidebar">
+                <jsp:include page="/views/common/sidebar.jsp"/>
+            </aside>
 
-        <!-- Left Content -->
-        <div class="content">
-            <div class="content-left" >
-                <h2>Cửa hàng</h2>
+            <!-- Main content -->
+            <main class="app-main">
+                <h1 class="page-title">Danh sách Cửa hàng</h1>
 
-                <!-- Filter 1 -->
-                <!--                <section class="filter-box" >
-                                    <header>
-                                        <span>Trạng thái cửa hàng</span>
-                                        <i class="fa fa-chevron-down"></i>
-                                    </header>
-                
-                                </section>
-                
-                                 Filter 2 
-                                <section class="filter-box">
-                                    <header>
-                                        <span>Chi nhánh làm việc</span>
-                                        <div style="display:flex; align-items:center; gap:8px;">
-                                            <i class="fa fa-plus" ></i>
-                                            <i class="fa fa-chevron-down" ></i>
-                                        </div>
-                                    </header>
-                                </section>
-                
-                                 Filter 3 
-                                <section class="filter-box">
-                                    <header>
-                                        <span>Chức danh</span>
-                                        <i class="fa fa-chevron-down" ></i>
-                                    </header>
-                                </section>-->
-            </div>
-
-            <!-- Right Content -->
-            <div class="">
-                <!-- Search bar -->
-                <div class="search">
-                    <form action="${pageContext.request.contextPath}/stores" method="get">
-                        <div class="search-left">
-                            <div class="search-input-wrapper">
-                                <i class="fa fa-search"></i>
-                                <input type="search" name="search" value="${searchKeyword}" placeholder="Theo tên cửa hàng"/>
-                            </div>
-                            <select name="status" class="form-select">
-                                <option value="">Tất cả trạng thái</option>
-                                <option value="Active" ${filterStatus == 'Active' ? 'selected' : ''}>Đang hoạt động</option>
-                                <option value="Deactive" ${filterStatus == 'Deactive' ? 'selected' : ''}>Ngừng hoạt động</option>
-                            </select>
-                            <button type="submit">🔍 Tìm kiếm</button>
+                <!-- Toolbar: Search + Status + Actions -->
+                <div class="toolbar">
+                    <form action="${pageContext.request.contextPath}/stores" method="get" style="display:flex; gap:12px; align-items:center; flex-wrap:wrap; width:100%;">
+                        <div class="search-box">
+                            <span class="icon">🔍</span>
+                            <input type="search" name="search" value="${searchKeyword}" placeholder="Tìm theo tên cửa hàng"/>
                         </div>
-                        <div class="feature">
-                            <a href="${pageContext.request.contextPath}/stores/add" class="btn-add">➕ Thêm cửa hàng</a>
-                            <button type="button">📤 Nhập file</button>
-                            <button type="button">📥 Xuất file</button>
-                        </div>
+
+                        <select name="status">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="Active"  ${filterStatus == 'Active'  ? 'selected' : ''}>Đang hoạt động</option>
+                            <option value="Deactive" ${filterStatus == 'Deactive' ? 'selected' : ''}>Ngừng hoạt động</option>
+                        </select>
+
+                        <button type="submit" class="btn btn-ghost">Tìm kiếm</button>
+
+                        <span class="spacer"></span>
+
+                        <a href="${pageContext.request.contextPath}/stores/add" class="btn btn-primary">➕ Thêm cửa hàng</a>
+                        <button type="button" class="btn btn-ghost">📤 Nhập file</button>
+                        <button type="button" class="btn btn-ghost">📥 Xuất file</button>
                     </form>
-
-
                 </div>
 
-
-
-                <!-- Table container -->
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th><input type="checkbox"/></th>
-                                <th>Ảnh của hàng</th>
-                                <th>Mã cửa hàng</th>
-                                <th>Tên cửa hàng</th>
-                                <th>Số điện thoại</th>
-
-                                <th>Địa chỉ</th>
-                                <th>Trạng thái</th>
-                                <th>Thông tin chi tiết</th>
-
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <c:forEach var="s" items="${stores}">
+                <!-- Bảng Store -->
+                <div class="card">
+                    <div class="table-container">
+                        <table>
+                            <thead>
                                 <tr>
-                                    <td><input type="checkbox"/></td>
-                                    <td>
-                                        <img height="50" width="50" src="${pageContext.request.contextPath}/img/logo2.jpg" alt="logo"/>
-                                    </td>
-                                    <td>${s.storeId}</td>
-                                    <td>${s.storeName}</td>
-                                    <td>${s.phone}</td>
-                                    <td>${s.address}</td>
-                                    <td>${s.status == 'Active' ? 'Đang hoạt động' : 'Ngừng hoạt động'}</td>
-                                    <td>
-                                        <button onclick="window.location.href = '${pageContext.request.contextPath}/stores/view/${s.storeId}'">Chi tiết</button>
-                                    </td>
+                                    <th class="td-center"><input type="checkbox"/></th>
+                                    <th>Ảnh cửa hàng</th>
+                                    <th>Mã cửa hàng</th>
+                                    <th>Tên cửa hàng</th>
+                                    <th>Số điện thoại</th>
+                                    <th>Địa chỉ</th>
+                                    <th>Trạng thái</th>
+                                    <th class="td-center">Thông tin chi tiết</th>
                                 </tr>
-                            </c:forEach>
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody>
+                                <c:forEach var="s" items="${stores}">
+                                    <tr>
+                                        <td class="td-center"><input type="checkbox"/></td>
+                                        <td>
+                                            <img class="store-thumb" src="${pageContext.request.contextPath}/img/logo2.jpg" alt="logo"/>
+                                        </td>
+                                        <td>${s.storeId}</td>
+                                        <td>${s.storeName}</td>
+                                        <td>${s.phone}</td>
+                                        <td>${s.address}</td>
+                                        <td><c:out value="${s.status == 'Active' ? 'Đang hoạt động' : 'Ngừng hoạt động'}"/></td>
+                                        <td class="td-center">
+                                            <button class="btn-view" onclick="window.location.href = '${pageContext.request.contextPath}/stores/view/${s.storeId}'">Chi tiết</button>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    <nav class="pagination" aria-label="Pagination">
+                        <c:set var="ctx" value="${pageContext.request.contextPath}"/>
+                        <c:if test="${currentPage > 1}">
+                            <a class="page-link" href="${ctx}/stores?page=1&search=${searchKeyword}&status=${filterStatus}" title="Trang đầu">«</a>
+                            <a class="page-link" href="${ctx}/stores?page=${currentPage-1}&search=${searchKeyword}&status=${filterStatus}" title="Trang trước">‹</a>
+                        </c:if>
+
+                        <c:forEach begin="${currentPage-2 > 1 ? currentPage-2 : 1}" end="${currentPage+2 < totalPages ? currentPage+2 : totalPages}" var="i">
+                            <a class="page-link ${currentPage == i ? 'active' : ''}"
+                               href="${ctx}/stores?page=${i}&search=${searchKeyword}&status=${filterStatus}">${i}</a>
+                        </c:forEach>
+
+                        <c:if test="${currentPage < totalPages}">
+                            <a class="page-link" href="${ctx}/stores?page=${currentPage+1}&search=${searchKeyword}&status=${filterStatus}" title="Trang sau">›</a>
+                            <a class="page-link" href="${ctx}/stores?page=${totalPages}&search=${searchKeyword}&status=${filterStatus}" title="Trang cuối">»</a>
+                        </c:if>
+                    </nav>
                 </div>
+            </main>
 
-                <!-- Pagination -->
+            <!-- Footer -->
+            <footer class="app-footer">
+                <jsp:include page="/views/common/footer.jsp"/>
+            </footer>
+        </div>
 
-                <nav class="pagination" aria-label="Pagination">
-                    <c:if test="${currentPage > 1}">
-                        <a href="${pageContext.request.contextPath}/stores?page=1&search=${searchKeyword}&status=${filterStatus}" class="fa fa-angle-double-left"></a>
-                        <a href="${pageContext.request.contextPath}/stores?page=${currentPage-1}&search=${searchKeyword}&status=${filterStatus}" class="fa fa-angle-left"></a>
-                    </c:if>
-                    <c:forEach begin="${currentPage-2 > 0 ? currentPage-2 : 1}" end="${currentPage+2 < totalPages ? currentPage+2 : totalPages}" var="i">
-                        <a href="${pageContext.request.contextPath}/stores?page=${i}&search=${searchKeyword}&status=${filterStatus}" class="page-num ${currentPage == i ? 'active' : ''}">${i}</a>
-                    </c:forEach>
-                    <c:if test="${currentPage < totalPages}">
-                        <a href="${pageContext.request.contextPath}/stores?page=${currentPage+1}&search=${searchKeyword}&status=${filterStatus}" class="fa fa-angle-right"></a>
-                        <a href="${pageContext.request.contextPath}/stores?page=${totalPages}&search=${searchKeyword}&status=${filterStatus}" class="fa fa-angle-double-right"></a>
-                    </c:if>
-                </nav>
-
-                </body>
-                </html>
+    </body>
+</html>

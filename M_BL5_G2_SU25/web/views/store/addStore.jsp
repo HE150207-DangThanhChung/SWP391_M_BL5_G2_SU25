@@ -1,193 +1,254 @@
 <%-- 
     Document   : addStore
-    Created on : Aug 13, 2025, 8:49:35 AM
+    Created on : Aug 13, 2025, 8:49:35 AM
     Author     : tayho
 --%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Thêm mới cửa hàng</title>
-        
+
         <style>
-
-            body {
-                margin: 0;
-                font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-                    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
-                    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-                background-color: #ccc;
-                color: #000;
-                font-weight: 400;
-                font-size: 14px;
-                line-height: 1.5;
+            :root{
+                --header-h: 64px;
+                --sidebar-w: 260px;
+                --radius: 12px;
+                --bg: #f5f7fb;
+                --card: #ffffff;
+                --line:#e9edf3;
+                --brand:#F28705;
+                --success:#28a745;
+            }
+            *{
+                box-sizing: border-box;
+            }
+            html,body{
+                height:100%;
+            }
+            body{
+                margin:0;
+                font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, "Noto Sans", sans-serif;
+                background: var(--bg);
+                color:#111;
+                line-height:1.5;
+            }
+            a{
+                color:inherit;
+                text-decoration:none;
             }
 
-            button {
-                background: none;
-                border: none;
-                cursor: pointer;
-                padding: 0;
-                font: inherit;
-                color: inherit;
+            /* ===== Layout Grid ===== */
+            .layout{
+                min-height:100vh;
+                display:grid;
+                grid-template-columns: var(--sidebar-w) 1fr;
+                grid-template-rows: var(--header-h) 1fr auto;
+                grid-template-areas:
+                    "header header"
+                    "sidebar main"
+                    "footer footer";
+            }
+            .app-header{
+                grid-area: header;
+                position: sticky;
+                top:0;
+                z-index:50;
+                background:var(--card);
+                border-bottom:1px solid var(--line);
+            }
+            .app-sidebar{
+                grid-area: sidebar;
+                background:var(--card);
+                border-right:1px solid var(--line);
+                overflow-y:auto;
+            }
+            .app-main{
+                grid-area: main;
+                padding:24px;
+                width:100%;
+                max-width:1100px;
+                margin:0 auto;
+            }
+            .app-footer{
+                grid-area: footer;
+                background:var(--card);
+                border-top:1px solid var(--line);
+                padding:16px 24px;
+                text-align:center;
             }
 
-            .content{
-                display: grid;
-                grid-template-columns: 1.5fr 3fr;
-                background-color: white;
-                margin: 25px 0;
-                width: 70%;
-                justify-self:  center;
-                border-radius: 30px;
-                padding-bottom: 3%;
-                margin-bottom: 6.5%;
+            /* ===== Card + Form ===== */
+            .page-title{
+                margin:0 0 16px;
+                font-size:24px;
+                font-weight:700;
+            }
+            .card{
+                background:var(--card);
+                border:1px solid var(--line);
+                border-radius: var(--radius);
+                padding:24px;
             }
 
-            /*Left*/
-            .left {
-                display: flex;
-                flex-direction: column; /* xếp dọc */
-                align-items: center;    /* căn giữa ngang */
-                justify-content: center;/* căn giữa dọc */
-                margin: 10% 0;
-                height: 95%;
-                width: 100%;
-                border-right: 2px solid #ccc;
+            .form-two-col{
+                display:grid;
+                grid-template-columns: 320px 1fr;
+                gap:24px;
+                align-items:start;
             }
 
-            .left img {
-                border-radius: 15%;
-                border: 4px solid #2bb6f0;
-                margin-bottom: 1%;
+            .media-box{
+                display:flex;
+                flex-direction:column;
+                align-items:center;
+                gap:12px;
+                padding:16px;
+                border:1px dashed var(--line);
+                border-radius:12px;
+                background:#fff;
+            }
+            .store-image{
+                width:160px;
+                height:160px;
+                object-fit:cover;
+                border-radius:12px;
+                border:1px solid var(--line);
             }
 
-            /*Right*/
-            .right h2{
-                margin-top: 7%;
+            .form-grid{
+                display:grid;
+                grid-template-columns: 1fr;
+                gap:16px;
             }
-            .right table {
-                width: 68%;
-                border-spacing: 15px;
-                justify-self: center
+            .form-row{
+                display:grid;
+                gap:8px;
             }
-
-            .right button{
-                background-color: #28a745;
-                color: #fff;
-                border-radius: 15px;
-                padding: 8px 24px;
-                border:none;
+            label{
+                font-weight:600;
             }
-
-            .right table td:first-child {
-                /*width: 10%;*/
-                font-size: 17px;
-                white-space: nowrap; /* tránh bị xuống dòng label */
+            input[type="text"], input[type="tel"], select{
+                height:42px;
+                padding:0 12px;
+                border:1px solid #cdd6e1;
+                border-radius:10px;
+                background:#fff;
+                font-size:14px;
             }
 
-            .right table td:last-child {
-                width: 70%;
+            .actions{
+                display:flex;
+                gap:12px;
+                justify-content:center;
+                margin-top:12px;
             }
-
-            .right input[type="text"], .right input[type="date"]  {
-                height: 35px;
-                border: 3px solid black;
-                border-radius: 15px;
-                width: 100%;
-                font-size: 16px;
-                padding: 0 10px
-            }
-
             .btn{
-                margin-top: 1%;
+                display:inline-flex;
+                align-items:center;
+                justify-content:center;
+                gap:6px;
+                height:42px;
+                padding:0 16px;
+                border-radius:10px;
+                border:1px solid transparent;
+                cursor:pointer;
             }
-            .right h2,.btn  {
-                text-align: center;
+            .btn-primary{
+                background: var(--success);
+                color:#fff;
+            }
+            .btn-secondary{
+                background:#fff;
+                border-color:#cdd6e1;
             }
 
-            .right select {
-                height: 41px;
-                border: 3px solid black;
-                border-radius: 16px;
-                width: 108%;
-                padding: 0 10px;
-                font-size: 16px;
-                background-color: white;
-            }
-
-            @media only screen and (max-width: 768px){
-                .content {
+            @media (max-width: 992px){
+                .layout{
                     grid-template-columns: 1fr;
-                    width: 90%;
+                    grid-template-rows: var(--header-h) auto 1fr auto;
+                    grid-template-areas:
+                        "header"
+                        "sidebar"
+                        "main"
+                        "footer";
                 }
-
-                .left {
-                    border-right: none;
-                    border-bottom: 2px solid #ccc;
-                    margin: 0;
+                .form-two-col{
+                    grid-template-columns: 1fr;
                 }
-
-                .right{
-                    height: 100%;
-                }
-
-                .right table {
-                    width: 100%;
-                }
-
-                .right input[type="text"], .right input[type="date"]  {
-                    width: 90%;
-                }
-
-                .right select {
-                    width: 98%;
-                }
-
             }
-
-
         </style>
     </head>
     <body>
-        <form action="${pageContext.request.contextPath}/stores/add" method="post">
-            <div class="content">
-                <div class="left">
-                    <img height="150" width="150" src="${pageContext.request.contextPath}/img/logo2.jpg" />
-                </div>
-                <div class="right">
-                    <h2> Thêm cửa hàng</h2>
-                    <table>
-                        <tr>
-                            <td>Tên cửa hàng</td>
-                            <td><input type="text" name="storeName" required/></td>
-                        </tr>
-                        <tr>
-                            <td>Địa chỉ cửa hàng</td>
-                            <td><input type="text" name="address" required/></td>
-                        </tr>
-                        <tr>
-                            <td>Số điện thoại cửa hàng</td>
-                            <td><input type="text" name="phone" required pattern="[0-9]{10}" title="Nhập 10 số"/></td>
-                        </tr>
-                        <tr>
-                            <td>Trạng thái</td>
-                            <td>
-                                <select name="status" required>
+
+        <div class="layout">
+            <!-- Header -->
+            <header class="app-header">
+                <jsp:include page="/views/common/header.jsp"/>
+            </header>
+
+            <!-- Sidebar -->
+            <aside class="app-sidebar">
+                <jsp:include page="/views/common/sidebar.jsp"/>
+            </aside>
+
+            <!-- Main -->
+            <main class="app-main">
+                <h1 class="page-title">Thêm cửa hàng</h1>
+
+                <form action="${pageContext.request.contextPath}/stores/add" method="post" class="card" novalidate>
+                    <div class="form-two-col">
+                        <!-- Left: Ảnh/logo -->
+                        <div class="media-box">
+                            <img class="store-image" src="${pageContext.request.contextPath}/img/logo2.jpg" alt="Logo Store"/>
+                            <div style="font-size:13px; color:#555;">Ảnh minh họa cửa hàng</div>
+                        </div>
+
+                        <!-- Right: Thông tin -->
+                        <div class="form-grid">
+                            <div class="form-row">
+                                <label for="storeName">Tên cửa hàng</label>
+                                <input id="storeName" name="storeName" type="text" required>
+                            </div>
+
+                            <div class="form-row">
+                                <label for="address">Địa chỉ cửa hàng</label>
+                                <input id="address" name="address" type="text" required>
+                            </div>
+
+                            <div class="form-row">
+                                <label for="phone">Số điện thoại cửa hàng</label>
+                                <!-- Linh hoạt: chấp nhận số, khoảng trắng, +, -, (), .  (đồng bộ với trang Edit) -->
+                                <input id="phone" name="phone" type="tel" required
+                                       pattern="^[0-9+()\-.\s]{6,}$"
+                                       title="Nhập số điện thoại hợp lệ (cho phép số, khoảng trắng, +, -, (), .)">
+                            </div>
+
+                            <div class="form-row">
+                                <label for="status">Trạng thái</label>
+                                <!-- Đồng bộ giá trị với list/edit: Active / Deactive -->
+                                <select id="status" name="status" required>
                                     <option value="Active">Hoạt động</option>
                                     <option value="Deactive">Ngừng hoạt động</option>
                                 </select>
-                            </td>
-                        </tr>
-                    </table>
-                    <div class="btn">
-                        <button type="submit">Thêm mới</button>
-                        <button type="button" onclick="window.location.href = '${pageContext.request.contextPath}/stores'">Hủy bỏ</button>
+                            </div>
+
+                            <div class="actions">
+                                <button type="submit" class="btn btn-primary">➕ Thêm mới</button>
+                                <button type="button" class="btn btn-secondary"
+                                        onclick="window.location.href = '${pageContext.request.contextPath}/stores'">Hủy bỏ</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        </form>
+                </form>
+            </main>
+
+            <!-- Footer -->
+            <footer class="app-footer">
+                <jsp:include page="/views/common/footer.jsp"/>
+            </footer>
+        </div>
+
     </body>
 </html>
