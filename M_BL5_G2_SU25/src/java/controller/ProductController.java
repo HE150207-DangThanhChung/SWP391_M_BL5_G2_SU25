@@ -314,7 +314,7 @@ public class ProductController extends HttpServlet {
 
                 productDAO.updateProduct(product, variantImageParts, variantImageUrls, request);
                 request.setAttribute("message", "Product updated successfully");
-                request.getRequestDispatcher("/views/product/editProduct.jsp").forward(request, response);
+                response.sendRedirect(request.getContextPath() + "/product/edit?productId=" + productId);
                 break;
             }
             default:

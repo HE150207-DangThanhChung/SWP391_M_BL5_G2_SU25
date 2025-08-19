@@ -121,141 +121,142 @@
             }
         </style>
     </head>
-    <c:set var="ctx" value="${pageContext.request.contextPath}"/>
+    <body>
+        <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 
-    <section class="card">
-        <div class="card__header">Sửa Mã Khuyến Mãi</div>
+        <section class="card">
+            <div class="card__header">Sửa Mã Khuyến Mãi</div>
 
-        <!-- Validation errors -->
-        <c:if test="${not empty errors}">
-            <ul class="errors">
-                <c:forEach items="${errors}" var="e"><li>${e}</li></c:forEach>
-                </ul>
-        </c:if>
+            <!-- Validation errors -->
+            <c:if test="${not empty errors}">
+                <ul class="errors">
+                    <c:forEach items="${errors}" var="e"><li>${e}</li></c:forEach>
+                    </ul>
+            </c:if>
 
-        <!-- Pre-format dates and money values like in viewCoupon -->
-        <fmt:formatDate value="${coupon.fromDate}" pattern="yyyy-MM-dd" var="fromFmt"/>
-        <fmt:formatDate value="${coupon.toDate}"   pattern="yyyy-MM-dd" var="toFmt"/>
-        <fmt:formatNumber value="${coupon.maxDiscount}" type="number" maxFractionDigits="0" var="maxFmt"/>
-        <fmt:formatNumber value="${coupon.minTotal}"   type="number" maxFractionDigits="0" var="minFmt"/>
-        
+            <!-- Pre-format dates and money values like in viewCoupon -->
+            <fmt:formatDate value="${coupon.fromDate}" pattern="yyyy-MM-dd" var="fromFmt"/>
+            <fmt:formatDate value="${coupon.toDate}"   pattern="yyyy-MM-dd" var="toFmt"/>
+            <fmt:formatNumber value="${coupon.maxDiscount}" type="number" maxFractionDigits="0" var="maxFmt"/>
+            <fmt:formatNumber value="${coupon.minTotal}"   type="number" maxFractionDigits="0" var="minFmt"/>
 
-        <form id="editCouponForm" action="${ctx}/coupon" method="post" accept-charset="UTF-8">
-            <input type="hidden" name="action" value="editCoupon"/>
-            <input type="hidden" name="couponId" value="${coupon.couponId}"/>
 
-            <div class="row">
-                <label for="code">Mã coupon</label>
-                <input id="code" name="couponCode" type="text" value="${coupon.couponCode}" required />
-            </div>
+            <form id="editCouponForm" action="${ctx}/coupon" method="post" accept-charset="UTF-8">
+                <input type="hidden" name="action" value="editCoupon"/>
+                <input type="hidden" name="couponId" value="${coupon.couponId}"/>
 
-            <div class="row">
-                <label for="discountPercent">Phần trăm giảm (%)</label>
-                <input id="discountPercent" name="discountPercent" type="number" step="0.01" min="0" max="100"
-                       value="${coupon.discountPercent}" required />
-            </div>
+                <div class="row">
+                    <label for="code">Mã coupon</label>
+                    <input id="code" name="couponCode" type="text" value="${coupon.couponCode}" required />
+                </div>
 
-            <div class="row">
-                <label for="maxDiscount">Giảm tối đa (VND)</label>
-                <!-- type=text to allow thousand separators; JS will normalize on submit -->
-                <input id="maxDiscount" class="money-input" inputmode="numeric"
-                       name="maxDiscount" type="text" value="${maxFmt}" required />
-            </div>
+                <div class="row">
+                    <label for="discountPercent">Phần trăm giảm (%)</label>
+                    <input id="discountPercent" name="discountPercent" type="number" step="0.01" min="0" max="100"
+                           value="${coupon.discountPercent}" required />
+                </div>
 
-            <div class="row">
-                <label for="requirement">Yêu cầu áp dụng</label>
-                <textarea id="requirement" name="requirement">${coupon.requirement}</textarea>
-            </div>
+                <div class="row">
+                    <label for="maxDiscount">Giảm tối đa (VND)</label>
+                    <!-- type=text to allow thousand separators; JS will normalize on submit -->
+                    <input id="maxDiscount" class="money-input" inputmode="numeric"
+                           name="maxDiscount" type="text" value="${maxFmt}" required />
+                </div>
 
-            <div class="row">
-                <label for="minTotal">Tổng tối thiểu (VND)</label>
-                <!-- type=text to allow thousand separators; JS will normalize on submit -->
-                <input id="minTotal" class="money-input" inputmode="numeric"
-                       name="minTotal" type="text" value="${minFmt}" required />
-            </div>
+                <div class="row">
+                    <label for="requirement">Yêu cầu áp dụng</label>
+                    <textarea id="requirement" name="requirement">${coupon.requirement}</textarea>
+                </div>
 
-            <div class="row">
-                <label for="minProduct">Số SP tối thiểu</label>
-                <input id="minProduct" name="minProduct" type="number" step="1" min="0"
-                       value="${coupon.minProduct}" />
-            </div>
+                <div class="row">
+                    <label for="minTotal">Tổng tối thiểu (VND)</label>
+                    <!-- type=text to allow thousand separators; JS will normalize on submit -->
+                    <input id="minTotal" class="money-input" inputmode="numeric"
+                           name="minTotal" type="text" value="${minFmt}" required />
+                </div>
 
-            <div class="row">
-                <label for="applyLimit">Giới hạn sử dụng</label>
-                <input id="applyLimit" name="applyLimit" type="number" step="1" min="0"
-                       value="${coupon.applyLimit}" />
-            </div>
+                <div class="row">
+                    <label for="minProduct">Số SP tối thiểu</label>
+                    <input id="minProduct" name="minProduct" type="number" step="1" min="0"
+                           value="${coupon.minProduct}" />
+                </div>
 
-            <div class="row">
-                <label for="fromDate">Từ ngày</label>
-                <input id="fromDate" name="fromDate" type="date" value="${fromFmt}" required />
-            </div>
+                <div class="row">
+                    <label for="applyLimit">Giới hạn sử dụng</label>
+                    <input id="applyLimit" name="applyLimit" type="number" step="1" min="0"
+                           value="${coupon.applyLimit}" />
+                </div>
 
-            <div class="row">
-                <label for="toDate">Đến ngày</label>
-                <input id="toDate" name="toDate" type="date" value="${toFmt}" required />
-            </div>
+                <div class="row">
+                    <label for="fromDate">Từ ngày</label>
+                    <input id="fromDate" name="fromDate" type="date" value="${fromFmt}" required />
+                </div>
 
-            <div class="row">
-                <label for="status">Trạng thái</label>
-                <select id="status" name="status">
-                    <option value="Active"     ${coupon.status == 'Active' ? 'selected' : ''}>Hoạt động</option>
-                    <option value="Deactivate" ${coupon.status == 'Deactivate' ? 'selected' : ''}>Ngừng hoạt động</option>
-                </select>
-            </div>
+                <div class="row">
+                    <label for="toDate">Đến ngày</label>
+                    <input id="toDate" name="toDate" type="date" value="${toFmt}" required />
+                </div>
 
-            <div class="actions">
-                <button class="btn" type="submit">Lưu thay đổi</button>
-                <!-- Hủy now returns to the LIST -->
-                <a class="btn btn--ghost" href="${ctx}/coupon?action=list">Hủy</a>
-            </div>
-        </form>
-    </section>
+                <div class="row">
+                    <label for="status">Trạng thái</label>
+                    <select id="status" name="status">
+                        <option value="Active"     ${coupon.status == 'Active' ? 'selected' : ''}>Hoạt động</option>
+                        <option value="Deactivate" ${coupon.status == 'Deactivate' ? 'selected' : ''}>Ngừng hoạt động</option>
+                    </select>
+                </div>
 
-    <script>
-        /* Format money fields like the view page, but send raw numbers to server */
-        (function () {
-            const moneyEls = document.querySelectorAll('.money-input');
-            // Use same style as view (commas as thousand separators)
-            const fmt = new Intl.NumberFormat('en-US');
+                <div class="actions">
+                    <button class="btn" type="submit">Lưu thay đổi</button>
+                    <!-- Hủy now returns to the LIST -->
+                    <a class="btn btn--ghost" href="${ctx}/coupon?action=list">Hủy</a>
+                </div>
+            </form>
+        </section>
 
-            function unformat(v) {
-                // remove all characters except digits and dot
-                return (v || '').toString().replace(/[^\d.]/g, '');
-            }
-            function format(el) {
-                const raw = unformat(el.value);
-                if (raw.length === 0) {
-                    el.value = '';
-                    return;
+        <script>
+            /* Format money fields like the view page, but send raw numbers to server */
+            (function () {
+                const moneyEls = document.querySelectorAll('.money-input');
+                // Use same style as view (commas as thousand separators)
+                const fmt = new Intl.NumberFormat('en-US');
+
+                function unformat(v) {
+                    // remove all characters except digits and dot
+                    return (v || '').toString().replace(/[^\d.]/g, '');
                 }
-                el.value = fmt.format(Number(raw));
-            }
+                function format(el) {
+                    const raw = unformat(el.value);
+                    if (raw.length === 0) {
+                        el.value = '';
+                        return;
+                    }
+                    el.value = fmt.format(Number(raw));
+                }
 
-            moneyEls.forEach(el => {
-                // Keep formatted on load (values already preformatted from JSTL)
-                el.addEventListener('focus', () => {
-                    el.value = unformat(el.value);
-                    el.select();
-                });
-                el.addEventListener('blur', () => format(el));
-                el.addEventListener('input', () => {
-                    // optional live formatting: comment out if you prefer only on blur
-                    const pos = el.selectionStart;
-                    const before = unformat(el.value);
-                    el.value = before;
-                    // don't reformat while typing; formatting happens on blur
-                });
-            });
-
-            // Before submit, convert to plain numbers
-            document.getElementById('editCouponForm').addEventListener('submit', function () {
                 moneyEls.forEach(el => {
-                    el.value = unformat(el.value);
+                    // Keep formatted on load (values already preformatted from JSTL)
+                    el.addEventListener('focus', () => {
+                        el.value = unformat(el.value);
+                        el.select();
+                    });
+                    el.addEventListener('blur', () => format(el));
+                    el.addEventListener('input', () => {
+                        // optional live formatting: comment out if you prefer only on blur
+                        const pos = el.selectionStart;
+                        const before = unformat(el.value);
+                        el.value = before;
+                        // don't reformat while typing; formatting happens on blur
+                    });
                 });
-            });
-        })();
-    </script>
-</body>
+
+                // Before submit, convert to plain numbers
+                document.getElementById('editCouponForm').addEventListener('submit', function () {
+                    moneyEls.forEach(el => {
+                        el.value = unformat(el.value);
+                    });
+                });
+            })();
+        </script>
+    </body>
 
 </html>

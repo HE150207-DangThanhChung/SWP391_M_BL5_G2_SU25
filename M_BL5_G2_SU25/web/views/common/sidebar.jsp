@@ -97,7 +97,7 @@
                     width="32"
                     height="32"
                     />
-                <span>Happy Sale</span>
+                <span>Happy Sale!</span>
 
             </div>
             <nav class="sidebar-nav">
@@ -125,7 +125,7 @@
                     <i class="fas fa-tags"></i> 
                     Quản lí danh mục
                 </a>
-                <a href="${pageContext.request.contextPath}/management/suplliers">
+                <a href="${pageContext.request.contextPath}/management/suppliers">
                     <i class="fas fa-tags"></i> 
                     Quản lí nhà cung cấp
                 </a>
