@@ -205,8 +205,6 @@
                                     <td>
                                         <a href="${pageContext.request.contextPath}/product/edit?productId=${product.productId}" 
                                            class="btn btn-sm btn-warning">Sửa</a>
-                                        <a href="${pageContext.request.contextPath}/product/delete?productId=${product.productId}" 
-                                           class="btn btn-sm btn-danger">Xóa</a>
                                     </td>
                                 </tr>
                             </c:forEach>
