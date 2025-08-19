@@ -45,11 +45,15 @@ public class LoginController extends HttpServlet {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
 
-        boolean isValid = loginDAO.checkLogin(username, password);
+        Employee employee = loginDAO.checkLogin(username, password);
 
-        if (isValid) {
+        if (employee != null) {
             HttpSession session = request.getSession();
             session.setAttribute("tendangnhap", username);
+            session.setAttribute("employeeId", employee.getEmployeeId());
+            
+            String employeeName = employee.getLastName() + " " + employee.getMiddleName() + " " + employee.getFirstName();
+            session.setAttribute("employeeName", employeeName);
 
             // Avoid form resubmission on refresh
             response.sendRedirect(request.getContextPath() + "/views/dashboard/ownerDashboard.jsp");
