@@ -11,7 +11,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>JSP Page</title>
+        <title>Trang chủ</title>
         <style>
             /* 1) Make the page span the viewport height */
             html, body {

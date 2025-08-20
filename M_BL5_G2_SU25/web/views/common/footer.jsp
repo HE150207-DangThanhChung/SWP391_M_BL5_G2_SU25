@@ -20,7 +20,7 @@
             }
             .footer {
                 background-color: #cfe6ff;
-                border-radius: 25px;
+                /*border-radius: 25px;*/
                 padding: 20px;
                 display: flex;
                 justify-content: space-between;

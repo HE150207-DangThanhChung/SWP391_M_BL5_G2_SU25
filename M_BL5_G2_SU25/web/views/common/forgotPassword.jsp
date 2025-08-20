@@ -7,6 +7,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -127,21 +129,31 @@
     </head>
     <body>
         <main class="card" aria-labelledby="title">
-            <h1 id="title">Forgot Password</h1>
-            <p class="subtitle">Enter your email below and follow instruction</p>
+            <h1 id="title">Quên Mật Khẩu</h1>
+            <p class="subtitle">Nhập email của bạn vào ô bên dưới</p>
 
-            <form action="#" method="post" novalidate>
+            <form action="${pageContext.request.contextPath}/forgot" method="post" novalidate>
+                <c:if test="${not empty error}">
+                    <div class="alert alert-danger" role="alert">${error}</div>
+                </c:if>
+                <c:if test="${not empty success}">
+                    <div class="alert alert-success" role="alert">${success}</div>
+                </c:if>
+
                 <label for="email">Email</label>
                 <div class="field">
-                    <input id="email" name="email" type="email" placeholder="you@example.com" required />
+                    <input id="email" name="email" type="email"
+                           placeholder="you@example.com"
+                           value="${fn:escapeXml(email)}"
+                           required />
                 </div>
 
                 <div class="actions">
                     <button class="btn-primary" type="submit">Reset Password</button>
-                    <a class="btn-ghost" href="login.html">Back to Log in</a>
+                    <a class="btn-ghost" href="${pageContext.request.contextPath}/login">Back to Log in</a>
                 </div>
 
-                <p class="note">We will send a password reset link to your email if an account exists.</p>
+                <p class="note">We will send a new password to your email if an account exists.</p>
             </form>
         </main>
     </body>

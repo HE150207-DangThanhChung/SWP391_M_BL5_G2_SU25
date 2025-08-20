@@ -28,7 +28,7 @@ public class LoginController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         // Show login page
         request.getRequestDispatcher("/views/common/login.jsp").forward(request, response);
     }
@@ -38,22 +38,50 @@ public class LoginController extends HttpServlet {
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
 
-        String username = request.getParameter("username");
-        String password = request.getParameter("password");
+        final String username = request.getParameter("username");
+        final String password = request.getParameter("password");
+        // Empty input
+        if (username == null || username.isBlank() || password == null || password.isBlank()) {
+            request.setAttribute("error", "Vui lòng nhập tên đăng nhập và mật khẩu.");
+            request.setAttribute("username", username);
+            request.getRequestDispatcher("/views/common/login.jsp").forward(request, response);
+            return;
+        }
 
-        boolean isValid = loginDAO.checkLogin(username, password);
-
-        if (isValid) {
-            HttpSession session = request.getSession();
-            session.setAttribute("tendangnhap", username);
-
-            // Avoid form resubmission on refresh
-            response.sendRedirect(request.getContextPath() + "/views/dashboard/ownerDashboard.jsp");
-        } else {
-            request.setAttribute("error", "Invalid username or password");
+        // Basic credential check (Status='Active' enforced in DAO)
+        boolean ok = loginDAO.checkLogin(username, password);
+        if (!ok) {
+            request.setAttribute("error", "Sai tên đăng nhập hoặc mật khẩu!");
+            request.setAttribute("username", username); // keep entered username
             RequestDispatcher rd = request.getRequestDispatcher("/views/common/login.jsp");
             rd.forward(request, response);
+            return;
         }
+        // Load full profile for session
+        Employee profile = loginDAO.getProfile(username);
+        if (profile == null) {
+            // Defensive fallback: treat as failure if profile could not be loaded
+            request.setAttribute("error", "Không thể lấy hồ sơ người dùng.");
+            request.setAttribute("username", username);
+            request.getRequestDispatcher("/views/common/login.jsp").forward(request, response);
+            return;
+        }
+        // Session rotation (mitigate session fixation)
+        HttpSession old = request.getSession(false);
+        if (old != null) {
+            old.invalidate();
+        }
+        HttpSession session = request.getSession(true);
+        session.setAttribute("authUser", profile);     // preferred key for the full profile
+        session.setAttribute("tendangnhap", username);
+        session.setMaxInactiveInterval(30 * 60);       // 30 minutes
+
+        // Redirect to dashboard 
+        response.sendRedirect(request.getContextPath() + "/views/dashboard/ownerDashboard.jsp");
+        
+//        Will change to this after complete dashboard
+//        response.sendRedirect(request.getContextPath() + "/owner/dashboard");
+
     }
 
 }

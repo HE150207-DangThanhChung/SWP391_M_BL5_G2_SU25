@@ -44,7 +44,7 @@
             /* NAVBAR */
             .navbar{
                 background:var(--bar-bg);
-                border-radius:22px; /* slightly rounder than inside chips */
+                /*border-radius:22px;  slightly rounder than inside chips */
                 padding:14px 20px;
                 box-shadow:var(--shadow);
                 border:2px solid #b9d6ff;

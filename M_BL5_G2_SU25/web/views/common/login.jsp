@@ -4,7 +4,9 @@
     Author     : tayho
 --%>
 
-<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -155,6 +157,13 @@
         <main class="card" aria-labelledby="title">
             <h1 id="title">Account Login</h1>
 
+            <!-- Error message (if any) -->
+            <c:if test="${not empty error}">
+                <div class="alert alert-danger" role="alert">
+                    ${error}
+                </div>
+            </c:if>
+
             <div class="brand" aria-hidden="true">
                 <h2>Chào mừng bạn đến với HappySale!</h2>
                 <h2>Hãy bắt đầu 1 ngày làm việc nào!</h2>
@@ -166,35 +175,45 @@
                 <path d="M4 7l2-3h12l2 3"/>
                 </svg>
             </div>
-            
+
             <form action="${pageContext.request.contextPath}/login" method="post" autocomplete="on">
                 <div class="field">
                     <span class="icon" aria-hidden="true">
-                        <!-- user icon -->
                         <svg viewBox="0 0 24 24">
                         <circle cx="12" cy="8" r="4" />
                         <path d="M4 20a8 8 0 0 1 16 0"/>
                         </svg>
                     </span>
                     <label class="sr-only" for="username">Tên đăng nhập:</label>
-                    <input id="username" name="username" type="text" placeholder="Vui lòng điền tên đăng nhập" required />
+                    <input id="username"
+                           name="username"
+                           type="text"
+                           placeholder="Vui lòng điền tên đăng nhập"
+                           value="${fn:escapeXml(username)}"
+                           required
+                           autofocus
+                           autocomplete="username"/>
                 </div>
 
                 <div class="field">
                     <span class="icon" aria-hidden="true">
-                        <!-- lock icon -->
                         <svg viewBox="0 0 24 24">
                         <rect x="5" y="11" width="14" height="10" rx="2" />
                         <path d="M8 11V7a4 4 0 1 1 8 0v4"/>
                         </svg>
                     </span>
                     <label class="sr-only" for="password">Mật khẩu:</label>
-                    <input id="password" name="password" type="password" placeholder="Vui lòng điền mật khẩu" required />
+                    <input id="password"
+                           name="password"
+                           type="password"
+                           placeholder="Vui lòng điền mật khẩu"
+                           required
+                           autocomplete="current-password"/>
                 </div>
 
                 <div class="actions">
                     <button class="btn-primary" type="submit" value="Login">Đăng Nhập</button>
-                    <a class="link" href="#">Quên mật khẩu?</a>
+                    <a class="link" href="${pageContext.request.contextPath}/forgot">Quên mật khẩu?</a>
                 </div>
 
                 <p class="footnote">Chúng tôi rất vui mừng chào đón bạn</p>
