@@ -42,19 +42,13 @@ public class LoginController extends HttpServlet {
         String password = request.getParameter("password");
 
         boolean isValid = loginDAO.checkLogin(username, password);
-
-        if (isValid) {
-            HttpSession session = request.getSession();
-            session.setAttribute("tendangnhap", username);
-
-            // Avoid form resubmission on refresh
-            response.sendRedirect(request.getContextPath() + "/views/dashboard/ownerDashboard.jsp");
-        } else {
+        if (!isValid) {
             request.setAttribute("error", "Invalid username or password");
             RequestDispatcher rd = request.getRequestDispatcher("/views/common/login.jsp");
             rd.forward(request, response);
             return;
         }
+
         // Load full profile for session
         Employee profile = loginDAO.getProfile(username);
         if (profile == null) {
@@ -64,6 +58,7 @@ public class LoginController extends HttpServlet {
             request.getRequestDispatcher("/views/common/login.jsp").forward(request, response);
             return;
         }
+
         // Session rotation (mitigate session fixation)
         HttpSession old = request.getSession(false);
         if (old != null) {
@@ -74,7 +69,12 @@ public class LoginController extends HttpServlet {
         session.setAttribute("tendangnhap", username);
         session.setMaxInactiveInterval(30 * 60);       // 30 minutes
 
-        // Redirect to dashboard 
+        // Set employeeId and employeeName for later use
+        session.setAttribute("employeeId", profile.getEmployeeId());
+        String employeeName = profile.getLastName() + " " + profile.getMiddleName() + " " + profile.getFirstName();
+        session.setAttribute("employeeName", employeeName);
+
+        // Redirect to dashboard only after all session work is done
         response.sendRedirect(request.getContextPath() + "/views/dashboard/ownerDashboard.jsp");
         
 //        Will change to this after complete dashboard
