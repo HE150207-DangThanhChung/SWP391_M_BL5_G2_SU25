@@ -150,6 +150,16 @@
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Địa chỉ</label>
                                     <p class="px-4 py-3 border border-gray-300 rounded-lg bg-gray-50">${e.address}</p>
                                 </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Thành phố</label>
+                                    <p class="px-4 py-3 border border-gray-300 rounded-lg bg-gray-50">${c.cityName}</p>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Phường</label>
+                                    <p class="px-4 py-3 border border-gray-300 rounded-lg bg-gray-50">${w.wardName}</p>
+                                </div>
 
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-1">Ngày bắt đầu</label>

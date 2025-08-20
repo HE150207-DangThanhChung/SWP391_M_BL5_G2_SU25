@@ -52,6 +52,7 @@ public class EmployeeDAO {
                 e.setRoleId(rs.getInt("RoleId"));
                 e.setStoreId(rs.getInt("StoreId"));
                 e.setMiddleName(rs.getString("MiddleName"));
+                e.setWardId(rs.getInt("WardId"));
             }
         } catch (SQLException ex) {
             ex.printStackTrace();

@@ -48,6 +48,10 @@
             .main-panel > footer.footer {
                 margin-top: auto;
             }
+            
+            a {
+                text-decoration: none;
+            }
         </style>
     </head>
     <body class="bg-gray-50 text-gray-800">
@@ -59,7 +63,7 @@
                 <main class="content flex-1 p-6">
                     <!-- Header Section -->
                     <div class="mb-6 flex items-center justify-between">
-                        <div>
+                        <div class="p-3">
                             <h1 class="text-2xl font-bold">Quản lí danh mục</h1>
                             <p class="text-gray-500">Quản lí tất cả các danh mục trong hệ thống</p>
                         </div>
@@ -72,15 +76,15 @@
                     <!-- Search & Filter -->
                     <form method="get" action="${pageContext.request.contextPath}/management/category" class="flex items-center gap-3 mb-4">
                         <input type="text" name="search" value="${param.search}" placeholder="Search..."
-                               class="border border-gray-300 rounded-md px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-                        <select name="status" class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                               class="border border-gray-300 rounded-md px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"/>
+                        <select name="status" class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
                             <option value="">Tất cả</option>
                             <option value="Active" ${param.status == 'Active' ? 'selected' : ''}>Active</option>
                             <option value="Deactive" ${param.status == 'Deactive' ? 'selected' : ''}>Deactive</option>
                         </select>
-                        <button type="submit" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md">Lọc</button>
+                        <button type="submit" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded">Lọc</button>
                         <a href="${pageContext.request.contextPath}/management/category">
-                            <button type="button" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md">Xoá bộ lọc</button>
+                            <button type="button" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded">Xoá bộ lọc</button>
                         </a>
                     </form>
 

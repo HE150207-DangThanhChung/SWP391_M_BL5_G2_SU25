@@ -6,9 +6,11 @@ package controller;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import dal.CityDAO;
 import dal.EmployeeDAO;
 import dal.RoleDAO;
 import dal.StoreDAO;
+import dal.WardDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -29,9 +31,11 @@ import java.sql.Date;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.UUID;
+import model.City;
 import model.Employee;
 import model.Role;
 import model.Store;
+import model.Ward;
 
 /**
  *
@@ -93,6 +97,8 @@ public class ProfileController extends HttpServlet {
         EmployeeDAO eDao = new EmployeeDAO();
         StoreDAO sDao = new StoreDAO();
         RoleDAO rDao = new RoleDAO();
+        WardDAO wDao = new WardDAO();
+        CityDAO cDao = new CityDAO();
 
         if (username == null || username.isEmpty()) {
             response.sendError(404);
@@ -101,7 +107,11 @@ public class ProfileController extends HttpServlet {
         Employee e = eDao.getEmployeeByUsername(username);
         Store s = sDao.findById(e.getStoreId());
         Role r = rDao.getRoleById(e.getRoleId());
+        Ward w = wDao.getById(e.getWardId());
+        City c = cDao.getById(w.getCityId());
 
+        request.setAttribute("c", c);
+        request.setAttribute("w", w);
         request.setAttribute("r", r);
         request.setAttribute("s", s);
         request.setAttribute("e", e);
