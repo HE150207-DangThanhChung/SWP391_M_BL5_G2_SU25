@@ -28,9 +28,9 @@ public class LoginController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-
-        // Show login page
-        request.getRequestDispatcher("/views/common/login.jsp").forward(request, response);
+        // Show the login page (adjust path to where your JSP actually lives)
+        RequestDispatcher rd = request.getRequestDispatcher("/views/common/login.jsp");
+        rd.forward(request, response);
     }
 
     @Override
@@ -38,21 +38,19 @@ public class LoginController extends HttpServlet {
             throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
 
-        final String username = request.getParameter("username");
-        final String password = request.getParameter("password");
-        // Empty input
-        if (username == null || username.isBlank() || password == null || password.isBlank()) {
-            request.setAttribute("error", "Vui lòng nhập tên đăng nhập và mật khẩu.");
-            request.setAttribute("username", username);
-            request.getRequestDispatcher("/views/common/login.jsp").forward(request, response);
-            return;
-        }
+        String username = request.getParameter("username");
+        String password = request.getParameter("password");
 
-        // Basic credential check (Status='Active' enforced in DAO)
-        boolean ok = loginDAO.checkLogin(username, password);
-        if (!ok) {
-            request.setAttribute("error", "Sai tên đăng nhập hoặc mật khẩu!");
-            request.setAttribute("username", username); // keep entered username
+        boolean isValid = loginDAO.checkLogin(username, password);
+
+        if (isValid) {
+            HttpSession session = request.getSession();
+            session.setAttribute("tendangnhap", username);
+
+            // Avoid form resubmission on refresh
+            response.sendRedirect(request.getContextPath() + "/views/dashboard/ownerDashboard.jsp");
+        } else {
+            request.setAttribute("error", "Invalid username or password");
             RequestDispatcher rd = request.getRequestDispatcher("/views/common/login.jsp");
             rd.forward(request, response);
             return;
