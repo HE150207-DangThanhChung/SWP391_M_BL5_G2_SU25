@@ -65,7 +65,7 @@
             }
         </style>
     </head>
-    <body class="bg-gray-50 text-gray-800">
+    <body class="">
         <div class="layout-wrapper d-flex">
             <jsp:include page="/views/common/sidebar.jsp"/>
             <div class="main-panel flex flex-col min-h-screen">
