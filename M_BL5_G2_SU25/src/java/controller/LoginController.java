@@ -4,18 +4,14 @@
  */
 package controller;
 
-import java.io.IOException;
-import java.io.PrintWriter;
+import dal.LoginDAO;
+import jakarta.servlet.RequestDispatcher;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import dal.LoginDAO;
-import jakarta.servlet.RequestDispatcher;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
+import jakarta.servlet.http.HttpSession;
 import model.Employee;
 
 import java.io.IOException;
@@ -32,9 +28,9 @@ public class LoginController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Show the login page (adjust path to where your JSP actually lives)
-        RequestDispatcher rd = request.getRequestDispatcher("/views/common/login.jsp");
-        rd.forward(request, response);
+        
+        // Show login page
+        request.getRequestDispatcher("/views/common/login.jsp").forward(request, response);
     }
 
     @Override

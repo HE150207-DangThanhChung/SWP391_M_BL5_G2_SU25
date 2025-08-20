@@ -29,15 +29,18 @@ public class Employee {
     private String gender;
     private int roleId;
     private int storeId;
+    
+    private Integer wardId; 
 
     // Thuộc tính để hiện thị tốt hơn
     private String roleName;
     private String storeName;
+    private String wardName;
 
     public Employee() {
     }
 
-    public Employee(int employeeId, String userName, String password, String firstName, String middleName, String lastName, String phone, String email, String cccd, String status, String avatar, Date dob, String address, Date startAt, String gender, int roleId, int storeId, String roleName, String storeName) {
+    public Employee(int employeeId, String userName, String password, String firstName, String middleName, String lastName, String phone, String email, String cccd, String status, String avatar, Date dob, String address, Date startAt, String gender, int roleId, int storeId, int wardId, String roleName, String storeName, String wardName) {
         this.employeeId = employeeId;
         this.userName = userName;
         this.password = password;
@@ -55,8 +58,10 @@ public class Employee {
         this.gender = gender;
         this.roleId = roleId;
         this.storeId = storeId;
+        this.wardId = wardId;
         this.roleName = roleName;
         this.storeName = storeName;
+        this.wardName = wardName;
     }
 
     public int getEmployeeId() {
@@ -225,6 +230,23 @@ public class Employee {
     public void setStoreName(String storeName) {
         this.storeName = storeName;
     }
+
+    public Integer getWardId() {
+        return wardId;
+    }
+
+    public void setWardId(Integer wardId) {
+        this.wardId = wardId;
+    }
+
+    public String getWardName() {
+        return wardName;
+    }
+
+    public void setWardName(String wardName) {
+        this.wardName = wardName;
+    }
+    
 
     @Override
     public String toString() {
