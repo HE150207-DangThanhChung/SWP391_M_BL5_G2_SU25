@@ -48,7 +48,7 @@
             .main-panel > footer.footer {
                 margin-top: auto;
             }
-            
+
             a {
                 text-decoration: none;
             }
@@ -119,16 +119,6 @@
                                                        class="text-blue-600 hover:text-blue-900"><i class="fa-solid fa-pen-to-square text-yellow-500 hover:text-yellow-900"></i></a>
                                                     <a href="${pageContext.request.contextPath}/management/category/detail?id=${c.categoryId}">
                                                         <i class="fa-solid fa-eye text-blue-600 hover:text-blue-900"></i></a>
-                                                        <c:choose>
-                                                            <c:when test="${c.status == 'Active'}">
-                                                            <a href="#"
-                                                               class=""><i class="fa-solid fa-trash text-red-600 hover:text-red-900"></i></a>
-                                                            </c:when>
-                                                            <c:otherwise>
-                                                            <a href="#"
-                                                               class=""><i class="fa-solid fa-circle-check text-green-600 hover:text-green-900"></i></a>
-                                                            </c:otherwise>
-                                                        </c:choose>
                                                 </td>
                                             </tr>
                                         </c:forEach>
