@@ -55,6 +55,11 @@ public class EmployeeDAO {
                 e.setGender(rs.getString("Gender"));
                 e.setRoleId(rs.getInt("RoleId"));
                 e.setStoreId(rs.getInt("StoreId"));
+
+
+                e.setMiddleName(rs.getString("MiddleName"));
+                e.setWardId(rs.getInt("WardId"));
+
             }
         } catch (SQLException ex) {
             ex.printStackTrace();
@@ -415,7 +420,83 @@ public class EmployeeDAO {
         
         return false;
     }
-    
+
+
+    public boolean editProfile(int employeeId, String username, String firstName, String middleName, String lastName, String phone, String email, String gender, String status, String cccd, java.sql.Date dob, String address, String avatar, int wardId) {
+        StringBuilder sql = new StringBuilder("""
+            UPDATE Employee
+            SET UserName = ?, 
+                FirstName = ?, 
+                MiddleName = ?,
+                LastName = ?, 
+                Phone = ?, 
+                Email = ?, 
+                Gender = ?, 
+                Status = ?,
+                WardId = ?
+            """);
+
+        // Add optional fields if they are provided
+        if (cccd != null) {
+            sql.append(", CCCD = ?");
+        }
+        if (dob != null) {
+            sql.append(", DoB = ?");
+        }
+        if (address != null) {
+            sql.append(", Address = ?");
+        }
+        if (avatar != null) {
+            sql.append(", Avatar = ?");
+        }
+
+        sql.append(" WHERE EmployeeId = ?");
+
+        try {
+            con = DBContext.getConnection();
+            ps = con.prepareStatement(sql.toString());
+
+            int paramIndex = 1;
+            ps.setString(paramIndex++, username);
+            ps.setString(paramIndex++, firstName);
+            ps.setString(paramIndex++, middleName);
+            ps.setString(paramIndex++, lastName);
+            ps.setString(paramIndex++, phone);
+            ps.setString(paramIndex++, email);
+            ps.setString(paramIndex++, gender);
+            ps.setString(paramIndex++, status);
+            ps.setInt(paramIndex++, wardId);
+
+            // Set optional parameters if provided
+            if (cccd != null) {
+                ps.setString(paramIndex++, cccd);
+            }
+            if (dob != null) {
+                ps.setDate(paramIndex++, dob);
+            }
+            if (address != null) {
+                ps.setString(paramIndex++, address);
+            }
+            if (avatar != null) {
+                ps.setString(paramIndex++, avatar);
+            }
+
+            ps.setInt(paramIndex, employeeId);
+
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBContext.closeConnection(ps);
+            DBContext.closeConnection(con);
+        }
+
+        return false;
+    }
+
+
     // For backward compatibility
     public boolean editEmployee(int employeeId, String username, String firstName, String lastName, String phone, String email, String gender, String status, String cccd, java.sql.Date dob, String address) {
         return editEmployee(employeeId, username, firstName, null, lastName, phone, email, gender, status, cccd, dob, address, null);
@@ -506,39 +587,7 @@ public class EmployeeDAO {
         
         return false;
     }
-    public static void main(String[] args) {
-        EmployeeDAO eDao = new EmployeeDAO();
 
-        // Thông tin nhân viên test
-        String username = "zoo_user";
-        String firstName = "Zoo";
-        String middleName = "Middle";
-        String lastName = "Test";
-        String phone = "0987654321";
-        String email = "zoo.test@example.com";
-        String gender = "Male";
-        String status = "Active";
-        int roleId = 1; // Default role (assuming 1 is a valid role ID)
-        int storeId = 1; // Default store (assuming 1 is a valid store ID)
-        String password = "123456"; // Default password
-        String cccd = "123456789012"; // Default CCCD (citizen ID)
-        java.sql.Date dob = java.sql.Date.valueOf("2000-01-01"); // Default DoB
-        java.sql.Date startAt = new java.sql.Date(System.currentTimeMillis()); // Today's date
-        String address = "123 Test St"; // Default address
-        String avatar = null; // Default avatar is null
-
-        boolean added = eDao.addEmployee(username, firstName, middleName, lastName, phone, email, gender, status, roleId, storeId, password, cccd, dob, startAt, address, avatar);
-
-        if (added) {
-            System.out.println("✅ Thêm nhân viên thành công!");
-            Employee emp = eDao.getEmployeeByUsername(username);
-            System.out.println("ID: " + emp.getEmployeeId());
-            System.out.println("Tên: " + emp.getFullName());
-            System.out.println("Email: " + emp.getEmail());
-            System.out.println("Phone: " + emp.getPhone());
-            System.out.println("Address: " + emp.getAddress());
-        } else {
-            System.out.println("❌ Thêm nhân viên thất bại!");
-        }
-    }
+   
+    
 }
