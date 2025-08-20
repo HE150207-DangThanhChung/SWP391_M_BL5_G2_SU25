@@ -398,6 +398,80 @@ public class EmployeeDAO {
         return false;
     }
 
+    public boolean editProfile(int employeeId, String username, String firstName, String middleName, String lastName, String phone, String email, String gender, String status, String cccd, java.sql.Date dob, String address, String avatar, int wardId) {
+        StringBuilder sql = new StringBuilder("""
+            UPDATE Employee
+            SET UserName = ?, 
+                FirstName = ?, 
+                MiddleName = ?,
+                LastName = ?, 
+                Phone = ?, 
+                Email = ?, 
+                Gender = ?, 
+                Status = ?,
+                WardId = ?
+            """);
+
+        // Add optional fields if they are provided
+        if (cccd != null) {
+            sql.append(", CCCD = ?");
+        }
+        if (dob != null) {
+            sql.append(", DoB = ?");
+        }
+        if (address != null) {
+            sql.append(", Address = ?");
+        }
+        if (avatar != null) {
+            sql.append(", Avatar = ?");
+        }
+
+        sql.append(" WHERE EmployeeId = ?");
+
+        try {
+            con = DBContext.getConnection();
+            ps = con.prepareStatement(sql.toString());
+
+            int paramIndex = 1;
+            ps.setString(paramIndex++, username);
+            ps.setString(paramIndex++, firstName);
+            ps.setString(paramIndex++, middleName);
+            ps.setString(paramIndex++, lastName);
+            ps.setString(paramIndex++, phone);
+            ps.setString(paramIndex++, email);
+            ps.setString(paramIndex++, gender);
+            ps.setString(paramIndex++, status);
+            ps.setInt(paramIndex++, wardId);
+
+            // Set optional parameters if provided
+            if (cccd != null) {
+                ps.setString(paramIndex++, cccd);
+            }
+            if (dob != null) {
+                ps.setDate(paramIndex++, dob);
+            }
+            if (address != null) {
+                ps.setString(paramIndex++, address);
+            }
+            if (avatar != null) {
+                ps.setString(paramIndex++, avatar);
+            }
+
+            ps.setInt(paramIndex, employeeId);
+
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBContext.closeConnection(ps);
+            DBContext.closeConnection(con);
+        }
+
+        return false;
+    }
+
     // For backward compatibility
     public boolean editEmployee(int employeeId, String username, String firstName, String lastName, String phone, String email, String gender, String status, String cccd, java.sql.Date dob, String address) {
         return editEmployee(employeeId, username, firstName, null, lastName, phone, email, gender, status, cccd, dob, address, null);
@@ -489,8 +563,6 @@ public class EmployeeDAO {
         return false;
     }
 
-    
-    
     public static void main(String[] args) {
         EmployeeDAO eDao = new EmployeeDAO();
 

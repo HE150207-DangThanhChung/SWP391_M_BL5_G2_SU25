@@ -62,8 +62,8 @@
                             <h1 class="text-3xl font-bold">Chỉnh sửa hồ sơ</h1>
                             <p class="text-gray-600">Cập nhật thông tin cá nhân và công việc</p>
                         </div>
-                        <button onclick="history.back()" 
-                                class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg">
+                        <button onclick="location.href = '${pageContext.request.contextPath}/profile'" 
+                                class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded">
                             Quay lại
                         </button>
                     </div>
@@ -137,6 +137,24 @@
                                 </div>
 
                                 <div>
+                                    <label class="block text-sm font-medium">Thành Phố</label>
+                                    <select name="city" class="w-full px-4 py-2 border rounded-lg">
+                                        <c:forEach items="${cList}" var="c">
+                                            <option value="${c.cityId}" ${c.cityId == w.cityId ? 'selected' : ''}>
+                                                ${c.cityName}
+                                            </option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium">Phường</label>
+                                    <select name="ward" class="w-full px-4 py-2 border rounded-lg">
+
+                                    </select>
+                                </div>
+
+                                <div>
                                     <label class="block text-sm font-medium">Giới tính</label>
                                     <select name="gender" class="w-full px-4 py-2 border rounded-lg">
                                         <option value="Male" ${e.gender=="Male"?"selected":""}>Nam</option>
@@ -147,7 +165,7 @@
 
                             <div class="mt-8 flex justify-end">
                                 <button type="submit" 
-                                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg">
+                                        class="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded">
                                     Lưu thay đổi
                                 </button>
                             </div>
@@ -162,6 +180,57 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
         <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
+                            $(document).ready(function () {
+                                const selectedCityId = $('select[name="city"]').val();
+                                const selectedWardId = "${w.wardId != null ? w.wardId : ""}"; // safely inject
+
+                                if (selectedCityId) {
+                                    loadWards(selectedCityId, selectedWardId);
+                                }
+                            });
+
+                            $('select[name="city"]').on('change', function () {
+                                const cityId = $(this).val();
+                                const wardSelect = $('select[name="ward"]');
+
+                                if (cityId) {
+                                    wardSelect.prop('disabled', true).html('<option>Đang tải...</option>');
+
+                                    loadWards(cityId);
+                                } else {
+                                    wardSelect.prop('disabled', true).html('<option>Chọn phường</option>');
+                                }
+                            });
+
+                            function loadWards(cityId, selectedWardId = null) {
+                                $.ajax({
+                                    url: "${pageContext.request.contextPath}/profile/get/ward",
+                                    type: "GET",
+                                    data: {cityId: cityId},
+                                    dataType: "json",
+                                    success: function (response) {
+                                        const wardSelect = $('select[name="ward"]');
+                                        wardSelect.empty();
+                                        wardSelect.append('<option value="">Chọn phường</option>');
+
+                                        if (response.ok === true) {
+                                            $.each(response.wards, function (index, ward) {
+                                                const isSelected = selectedWardId && ward.wardId.toString() === selectedWardId.toString() ? 'selected' : '';
+                                                wardSelect.append(`<option value="` + ward.wardId + `"` + isSelected + `>` + ward.wardName + `</option>`);
+                                            });
+                                            wardSelect.prop('disabled', false);
+                                        } else {
+                                            wardSelect.append('<option>Không có phường nào</option>');
+                                        }
+                                    },
+                                    error: function () {
+                                        const wardSelect = $('select[name="ward"]');
+                                        wardSelect.html('<option>Lỗi tải dữ liệu</option>');
+                                        showToast("Không thể tải danh sách phường", "error");
+                                    }
+                                });
+                            }
+
                             $("#avatar").on("change", function () {
                                 const file = this.files[0];
                                 if (file) {
@@ -171,9 +240,88 @@
                                 }
                             });
 
+// Form validation
+                            function validateForm() {
+                                let valid = true;
+                                let errors = [];
+
+                                function isBlank(value) {
+                                    return !value || value.trim().length === 0;
+                                }
+
+                                // Get values
+                                let firstName = $("input[name='firstName']").val();
+                                let middleName = $("input[name='middleName']").val();
+                                let lastName = $("input[name='lastName']").val();
+                                let phone = $("input[name='phone']").val();
+                                let email = $("input[name='email']").val();
+                                let dob = $("input[name='dob']").val();
+                                let address = $("input[name='address']").val();
+                                let city = $("select[name='city']").val();
+                                let ward = $("select[name='ward']").val();
+                                let gender = $("select[name='gender']").val();
+
+                                // Validate names
+                                if (isBlank(firstName)) {
+                                    errors.push("Họ không được để trống.");
+                                }
+                                if (isBlank(middleName)) {
+                                    errors.push("Tên đệm không được để trống.");
+                                }
+                                if (isBlank(lastName)) {
+                                    errors.push("Tên không được để trống.");
+                                }
+
+                                // Validate phone (Vietnam)
+                                let vnPhoneRegex = /^(0[3|5|7|8|9])[0-9]{8}$/;
+                                if (isBlank(phone) || !vnPhoneRegex.test(phone)) {
+                                    errors.push("Số điện thoại không hợp lệ (phải là số Việt Nam).");
+                                }
+
+                                // Validate email
+                                let emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                                if (isBlank(email) || !emailRegex.test(email)) {
+                                    errors.push("Email không hợp lệ.");
+                                }
+
+                                // Validate dob
+                                if (isBlank(dob)) {
+                                    errors.push("Ngày sinh là bắt buộc.");
+                                }
+
+                                // Validate address
+                                if (isBlank(address)) {
+                                    errors.push("Địa chỉ là bắt buộc.");
+                                }
+
+                                // Validate selects
+                                if (isBlank(city)) {
+                                    errors.push("Vui lòng chọn thành phố.");
+                                }
+                                if (isBlank(ward)) {
+                                    errors.push("Vui lòng chọn phường.");
+                                }
+                                if (isBlank(gender)) {
+                                    errors.push("Vui lòng chọn giới tính.");
+                                }
+
+                                // Show errors
+                                if (errors.length > 0) {
+                                    valid = false;
+                                    errors.forEach(err => showToast(err, "error"));
+                                }
+
+                                return valid;
+                            }
+
+
                             // AJAX submit form
                             $("#editProfileForm").on("submit", function (e) {
                                 e.preventDefault();
+
+                                if (!validateForm()) {
+                                    return; // Stop if validation fails
+                                }
 
                                 let formData = new FormData(this);
 

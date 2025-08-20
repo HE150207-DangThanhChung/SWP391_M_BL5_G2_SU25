@@ -81,14 +81,14 @@
                     <!-- Search & Filter -->
                     <form method="get" action="${pageContext.request.contextPath}/management/suppliers" class="flex items-center gap-3 mb-4">
                         <input type="text" name="search" value="${param.search}" placeholder="Search..."
-                               class="border border-gray-300 rounded-md px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
-                        <select name="status" class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                               class="border border-gray-300 rounded-md px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"/>
+                        <select name="status" class="border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
                             <option value="">Tất cả</option>
                             <option value="Active" ${param.status == 'Active' ? 'selected' : ''}>Active</option>
                             <option value="Deactive" ${param.status == 'Deactive' ? 'selected' : ''}>Deactive</option>
                         </select>
-                        <button type="submit" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md">Lọc</button>
-                        <a href="${pageContext.request.contextPath}/management/suppliers"><button type="button" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md">Xoá bộ lọc</button></a>
+                        <button type="submit" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded">Lọc</button>
+                        <a href="${pageContext.request.contextPath}/management/suppliers"><button type="button" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded">Xoá bộ lọc</button></a>
                     </form>
 
                     <!-- Table -->

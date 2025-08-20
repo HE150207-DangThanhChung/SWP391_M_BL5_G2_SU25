@@ -29,6 +29,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.sql.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 import model.City;
@@ -46,7 +47,8 @@ import model.Ward;
  */
 @WebServlet(name = "ProfileController", urlPatterns = {
     "/profile",
-    "/profile/edit"
+    "/profile/edit",
+    "/profile/get/ward"
 })
 @MultipartConfig(
         fileSizeThreshold = 512 * 1024, // 512 KB (in-memory threshold)
@@ -71,6 +73,8 @@ public class ProfileController extends HttpServlet {
                 doGetDetail(request, response);
             case BASE_PATH + "/edit" ->
                 doGetEdit(request, response);
+            case BASE_PATH + "/get/ward" ->
+                doGetWard(request, response);
         }
     }
 
@@ -82,6 +86,30 @@ public class ProfileController extends HttpServlet {
         switch (path) {
             case BASE_PATH + "/edit" ->
                 doPostEdit(request, response);
+        }
+    }
+
+    private void doGetWard(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+
+        WardDAO wDao = new WardDAO();
+        HashMap<String, Object> jsonMap = new HashMap<>();
+
+        try {
+
+            String cityIdStr = request.getParameter("cityId");
+            int cityId = Integer.parseInt(cityIdStr);
+
+            List<Ward> wList = wDao.getByCityId(cityId);
+
+            jsonMap.put("ok", true);
+            jsonMap.put("wards", wList);
+            sendJson(response, jsonMap);
+
+        } catch (IOException | NumberFormatException e) {
+            jsonMap.put("ok", false);
+            jsonMap.put("message", "Có lỗi xảy ra trong quá trình lấy thông tin Phường!");
+            sendJson(response, jsonMap);
         }
     }
 
@@ -128,15 +156,21 @@ public class ProfileController extends HttpServlet {
 
         String username = (String) session.getAttribute("tendangnhap");
         EmployeeDAO eDao = new EmployeeDAO();
-        StoreDAO sDao = new StoreDAO();
-        RoleDAO rDao = new RoleDAO();
+        WardDAO wDao = new WardDAO();
+        CityDAO cDao = new CityDAO();
 
         if (username == null || username.isEmpty()) {
             response.sendError(404);
         }
 
         Employee e = eDao.getEmployeeByUsername(username);
+        Ward w = wDao.getById(e.getWardId());
+        City c = cDao.getById(w.getCityId());
+        List<City> cList = cDao.getAll();
 
+        request.setAttribute("cList", cList);
+        request.setAttribute("c", c);
+        request.setAttribute("w", w);
         request.setAttribute("e", e);
         request.getRequestDispatcher("/views/profile/editProfile.jsp").forward(request, response);
     }
@@ -175,6 +209,7 @@ public class ProfileController extends HttpServlet {
             String dobStr = trimOrNull(request.getParameter("dob"));
             String address = trimOrNull(request.getParameter("address"));
             String gender = trimOrNull(request.getParameter("gender"));
+            String wardStr = trimOrNull(request.getParameter("ward"));
 
             if (firstName == null || lastName == null || middleName == null) {
                 jsonMap.put("ok", false);
@@ -205,6 +240,11 @@ public class ProfileController extends HttpServlet {
                     sendJson(response, jsonMap);
                     return;
                 }
+            }
+
+            int ward = 0;
+            if (wardStr != null && !wardStr.isEmpty()) {
+                ward = Integer.parseInt(wardStr);
             }
 
             LocalDate dob = null;
@@ -281,7 +321,7 @@ public class ProfileController extends HttpServlet {
             String ava = newAvatarUrl != null ? newAvatarUrl : current.getAvatar();
             Date dobMain = Date.valueOf(dob);
 
-            boolean ok = dao.editEmployee(current.getEmployeeId(), current.getUserName(), firstName, middleName, lastName, phone, email, gender, current.getStatus(), current.getCccd(), dobMain, address, ava);
+            boolean ok = dao.editProfile(current.getEmployeeId(), current.getUserName(), firstName, middleName, lastName, phone, email, gender, current.getStatus(), current.getCccd(), dobMain, address, ava, ward);
 
             if (!ok) {
                 jsonMap.put("ok", false);
