@@ -149,7 +149,10 @@
                     <i class="fas fa-file-alt"></i>
                     Quản lí yêu cầu
                 </a>
-
+                <a href="${pageContext.request.contextPath}/attribute">
+                    <i class="fas fa-tags"></i>
+                    Quản lí Thông số kỹ thuật
+                </a>
         </aside>
     </body>
 </html>

@@ -1300,4 +1300,47 @@ public class ProductDAO {
             }
         }
     }
+    
+    public int addAttribute(Attribute attribute) throws SQLException {
+        String insertAttribute = "INSERT INTO Attribute (AttributeName) VALUES (?)";
+        try (Connection conn = new DBContext().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(insertAttribute, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            stmt.setString(1, attribute.getAttributeName());
+            stmt.executeUpdate();
+            try (ResultSet rs = stmt.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                } else {
+                    throw new SQLException("Failed to retrieve generated AttributeId");
+                }
+            }
+        }
+    }
+
+    public void addAttributeOption(int attributeId, AttributeOption option) throws SQLException {
+        String insertOption = "INSERT INTO AttributeOption (AttributeId, Value) VALUES (?, ?)";
+        try (Connection conn = new DBContext().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(insertOption)) {
+            stmt.setInt(1, attributeId);
+            stmt.setString(2, option.getValue());
+            stmt.executeUpdate();
+        }
+    }
+
+    public Attribute getAttributeById(int attributeId) throws SQLException {
+        String sql = "SELECT AttributeId, AttributeName FROM Attribute WHERE AttributeId = ?";
+        try (Connection conn = new DBContext().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, attributeId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Attribute attribute = new Attribute();
+                    attribute.setAttributeId(rs.getInt("AttributeId"));
+                    attribute.setAttributeName(rs.getString("AttributeName"));
+                    return attribute;
+                }
+            }
+        }
+        return null;
+    }
 }
