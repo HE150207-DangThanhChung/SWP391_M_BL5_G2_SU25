@@ -74,6 +74,9 @@ public class OrderController extends HttpServlet {
                 + ", Customer: " + (order.getCustomer() != null ? order.getCustomer().getFullName() : "null")
                 + ", Status: " + order.getStatus());
         }
+         StoreDAO storeDAO = new StoreDAO();
+        List<Store> stores = storeDAO.getAllStores();
+        request.setAttribute("stores", stores);
         request.setAttribute("orders", orders);
         request.getRequestDispatcher("/views/order/listOrder.jsp").forward(request, response);
     }

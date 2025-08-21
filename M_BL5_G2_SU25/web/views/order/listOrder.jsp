@@ -287,10 +287,96 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- (Optional) JS mẫu: bắt sự kiện tìm kiếm / lọc -->
+
+<!-- JS filter & pagination client-side -->
 <script>
-    // TODO: gắn handler thật khi có backend
-    // document.querySelector('input[placeholder*="Tìm"]').addEventListener('input', (e) => { ... });
+const PAGE_SIZE = 10;
+let currentPage = 1;
+let allRows = Array.from(document.querySelectorAll('tbody > tr')).filter(row => row.querySelector('td') && !row.querySelector('td[colspan]'));
+
+function getFilterValues() {
+    return {
+        search: document.querySelector('input[placeholder*="Tìm"]').value.trim().toLowerCase(),
+        status: document.querySelector('input[name="status"]:checked')?.nextElementSibling?.textContent.trim(),
+        branch: document.querySelector('.form-select').value,
+        priceFrom: document.querySelectorAll('.form-control-sm')[0].value,
+        priceTo: document.querySelectorAll('.form-control-sm')[1].value
+    };
+}
+
+function filterRows() {
+    const {search, status, branch, priceFrom, priceTo} = getFilterValues();
+    return allRows.filter(row => {
+        const cells = row.querySelectorAll('td');
+        let match = true;
+        // Search by customer name or order code
+        if (search) {
+            const text = row.textContent.toLowerCase();
+            match = match && text.includes(search);
+        }
+        // Status
+        if (status) {
+            match = match && row.querySelector('.badge-status')?.textContent.includes(status);
+        }
+        // Branch
+        if (branch) {
+            match = match && cells[4]?.textContent.includes(branch);
+        }
+        // Price range
+        if (priceFrom || priceTo) {
+            let price = 0;
+            const priceCell = cells[7]?.textContent.replace(/[^\d.]/g, '');
+            if (priceCell) price = parseFloat(priceCell);
+            if (priceFrom && price < parseFloat(priceFrom)) match = false;
+            if (priceTo && price > parseFloat(priceTo)) match = false;
+        }
+        return match;
+    });
+}
+
+function renderTable(page = 1) {
+    currentPage = page;
+    const filtered = filterRows();
+    const tbody = document.querySelector('tbody');
+    // Hide all rows
+    allRows.forEach(row => row.style.display = 'none');
+    // Show only rows for current page
+    const start = (page - 1) * PAGE_SIZE;
+    const end = start + PAGE_SIZE;
+    filtered.slice(start, end).forEach(row => row.style.display = '');
+    renderPagination(filtered.length);
+}
+
+function renderPagination(total) {
+    const nav = document.querySelector('nav[aria-label="Pagination"] ul');
+    if (!nav) return;
+    nav.innerHTML = '';
+    const pageCount = Math.ceil(total / PAGE_SIZE);
+    function pageBtn(page, label, active = false, disabled = false) {
+        return `<li class="page-item${active ? ' active' : ''}${disabled ? ' disabled' : ''}"><button class="page-link" onclick="goToPage(${page})">${label}</button></li>`;
+    }
+    nav.innerHTML += pageBtn(1, '<i class="bi bi-chevron-double-left"></i>', false, currentPage === 1);
+    nav.innerHTML += pageBtn(currentPage - 1, '<i class="bi bi-chevron-left"></i>', false, currentPage === 1);
+    for (let i = 1; i <= pageCount; i++) {
+        nav.innerHTML += pageBtn(i, i, currentPage === i);
+    }
+    nav.innerHTML += pageBtn(currentPage + 1, '<i class="bi bi-chevron-right"></i>', false, currentPage === pageCount);
+    nav.innerHTML += pageBtn(pageCount, '<i class="bi bi-chevron-double-right"></i>', false, currentPage === pageCount);
+}
+
+window.goToPage = function(page) {
+    renderTable(page);
+}
+
+// Event listeners
+document.querySelector('input[placeholder*="Tìm"]').addEventListener('input', () => renderTable(1));
+document.querySelectorAll('input[name="status"]').forEach(r => r.addEventListener('change', () => renderTable(1)));
+document.querySelector('.form-select').addEventListener('change', () => renderTable(1));
+document.querySelectorAll('.form-control-sm').forEach(inp => inp.addEventListener('input', () => renderTable(1)));
+document.querySelector('.btn-dark.btn-sm').addEventListener('click', e => { e.preventDefault(); renderTable(1); });
+
+// Initial render
+renderTable(1);
 </script>
 
 </body>
