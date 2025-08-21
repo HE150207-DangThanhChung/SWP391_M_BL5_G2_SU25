@@ -578,12 +578,18 @@ public class ProductDAO {
 
     public List<Product> getAllProducts() {
         List<Product> products = new ArrayList<>();
-        String sql = "SELECT p.ProductId, p.ProductName, p.Status, p.CategoryId, c.CategoryName, "
-                + "p.BrandId, b.BrandName, p.SupplierId, s.SupplierName "
-                + "FROM Product p "
-                + "JOIN Category c ON p.CategoryId = c.CategoryId "
-                + "JOIN Brand b ON p.BrandId = b.BrandId "
-                + "JOIN Supplier s ON p.SupplierId = s.SupplierId";
+        String sql = """
+            SELECT p.ProductId, p.ProductName, p.Status, p.CategoryId, c.CategoryName,
+                   p.BrandId, b.BrandName, p.SupplierId, s.SupplierName,
+                   pv.ProductVariantId, pv.ProductCode, pv.Price
+            FROM Product p 
+            JOIN Category c ON p.CategoryId = c.CategoryId 
+            JOIN Brand b ON p.BrandId = b.BrandId 
+            JOIN Supplier s ON p.SupplierId = s.SupplierId
+            JOIN ProductVariant pv ON p.ProductId = pv.ProductId
+            WHERE p.Status = 'Active'
+            ORDER BY p.ProductId, pv.ProductVariantId
+            """;
         try (Connection conn = new DBContext().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 Product product = new Product();
