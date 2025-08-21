@@ -102,7 +102,7 @@
                                     <c:forEach var="attribute" items="${allAttributes}">
                                         <div class="form-group">
                                             <label>${attribute.attributeName}</label>
-                                            <select class="form-control" name="attributeOptionId[]" required>
+                                            <select class="form-control" name="attributeOptionId[]" required data-attribute-id="${attribute.attributeId}">
                                                 <option value="">Chọn ${attribute.attributeName}</option>
                                                 <c:forEach var="option" items="${attributeOptions[attribute.attributeId]}">
                                                     <c:set var="selected" value="" />
@@ -194,7 +194,6 @@
     // Add new serial input group
     function addSerial() {
         const serialContainer = document.querySelector('.serial-container');
-        const serialGroups = serialContainer.querySelectorAll('.serial-group');
         const newSerial = document.createElement('div');
         newSerial.className = 'form-group serial-group';
         newSerial.innerHTML = `
@@ -215,7 +214,6 @@
     // Add new image input group
     function addImage() {
         const imageContainer = document.querySelector('.image-container');
-        const imageGroups = imageContainer.querySelectorAll('.image-group');
         const newImage = document.createElement('div');
         newImage.className = 'form-group image-group';
         newImage.innerHTML = `
@@ -256,9 +254,12 @@
     function validateForm(event) {
         event.preventDefault();
         const form = event.target;
+        const allFields = form.querySelectorAll("input[required], select[required]");
+        const optionIds = new Set();
+        let firstInvalid = null;
+        let valid = true;
 
         // Reset all previous error states
-        const allFields = form.querySelectorAll("input[required], select[required]");
         allFields.forEach(field => {
             field.classList.remove("error-border");
             const errorMessage = field.nextElementSibling;
@@ -268,9 +269,6 @@
         });
 
         // Validate all required fields and negative values
-        let firstInvalid = null;
-        let valid = true;
-
         allFields.forEach(field => {
             let isInvalid = false;
             let errorMessageText = field.nextElementSibling?.textContent || "Vui lòng nhập giá trị hợp lệ";
@@ -298,6 +296,23 @@
                 if (!firstInvalid) {
                     firstInvalid = field;
                 }
+            }
+        });
+
+        // Validate attribute options (prevent duplicate AttributeOptionId)
+        const selects = form.querySelectorAll('select[name="attributeOptionId[]"]');
+        selects.forEach(select => {
+            if (select.value && optionIds.has(select.value)) {
+                valid = false;
+                select.classList.add('error-border');
+                const errorMessage = select.nextElementSibling;
+                errorMessage.textContent = 'Không thể chọn cùng giá trị cho nhiều thông số';
+                errorMessage.style.display = 'block';
+                if (!firstInvalid) {
+                    firstInvalid = select;
+                }
+            } else if (select.value) {
+                optionIds.add(select.value);
             }
         });
 
