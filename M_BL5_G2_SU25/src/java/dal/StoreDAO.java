@@ -182,5 +182,27 @@ public class StoreDAO {
         }
     }
 
+    public List<Store> getAllStores() {
+        List<Store> stores = new ArrayList<>();
+        String sql = "SELECT StoreId, StoreName, Address, Phone, Status FROM Store WHERE Status = 'Active' ORDER BY StoreId";
+        
+        try (Connection con = new DBContext().getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            
+            while (rs.next()) {
+                Store s = new Store();
+                s.setStoreId(rs.getInt("StoreId"));
+                s.setStoreName(rs.getString("StoreName"));
+                s.setAddress(rs.getString("Address"));
+                s.setPhone(rs.getString("Phone"));
+                s.setStatus(rs.getString("Status"));
+                stores.add(s);
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("getAllStores() failed", e);
+        }
+        return stores;
+    }
 }
 

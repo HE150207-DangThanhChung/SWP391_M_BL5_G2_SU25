@@ -285,6 +285,31 @@ public class CustomerDAO {
         }
     }
 
+    // Lấy danh sách tất cả khách hàng đang active
+    public List<Customer> getAllCustomers() {
+        List<Customer> customers = new ArrayList<>();
+        String sql = """
+            SELECT c.CustomerId, c.FirstName, c.MiddleName, c.LastName, c.Phone, c.Email,
+                   c.Gender, c.Address, c.Status, c.TaxCode, c.WardId, c.DoB,
+                   w.WardName, ci.CityName
+            FROM dbo.Customer c
+            LEFT JOIN dbo.Ward w  ON c.WardId = w.WardId
+            LEFT JOIN dbo.City ci ON w.CityId = ci.CityId
+            WHERE c.Status = 'Active'
+            ORDER BY c.CustomerId
+            """;
+        try (Connection cn = DBContext.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                customers.add(mapRow(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return customers;
+    }
+
     public int count(String search, String status) {
         StringBuilder sql = new StringBuilder("""
             SELECT COUNT(*)
@@ -329,4 +354,5 @@ public class CustomerDAO {
             return 0;
         }
     }
+   
 }
