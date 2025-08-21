@@ -5,6 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -135,7 +136,7 @@
                         <i class="bi bi-arrow-clockwise me-1"></i>Tải lại
                     </button>
                     <div class="btn-group">
-                        <button class="btn btn-primary"><i class="bi bi-plus-lg me-1"></i>Tạo đơn</button>
+                        <button class="btn btn-primary" onclick="window.location.href='${pageContext.request.contextPath}/order/create'"><i class="bi bi-plus-lg me-1"></i>Tạo đơn</button>
                         <button class="btn btn-outline-primary"><i class="bi bi-upload me-1"></i>Nhập</button>
                         <button class="btn btn-outline-primary"><i class="bi bi-download me-1"></i>Xuất</button>
                     </div>
@@ -150,6 +151,9 @@
                         <tr class="text-nowrap">
                             <th style="width: 110px;">Mã đơn</th>
                             <th>Tên khách</th>
+                            <th>Người tạo</th>
+                            <th>Nhân viên bán</th>
+                            <th>Chi nhánh</th>
                             <th style="width: 140px;">Trạng thái</th>
                             <th class="text-end" style="width: 100px;">Số lượng</th>
                             <th class="text-end" style="width: 140px;">Tổng tiền</th>
@@ -158,82 +162,99 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <%-- Row mẫu: thay bằng forEach JSTL khi đổ dữ liệu --%>
-                        <tr>
-                            <td>#ORD-0001</td>
-                            <td>Nam</td>
-                            <td>
-                                <span class="badge rounded-pill text-bg-success badge-status">
-                                    <i class="bi bi-check2-circle me-1"></i>Đã thanh toán
-                                </span>
-                            </td>
-                            <td class="text-end">3</td>
-                            <td class="text-end">1.250.000&nbsp;₫</td>
-                            <td class="text-truncate" style="max-width: 260px;">Giao trong ngày, thanh toán VNPay.</td>
-                            <td class="text-center">
-                                <div class="btn-group btn-group-sm">
-                                    <button class="btn btn-outline-primary"
-                                            onclick="window.location.href='viewOrder.jsp?id=1'">
-                                        <i class="bi bi-eye me-1"></i>Chi tiết
-                                    </button>
-                                    <button class="btn btn-outline-secondary"
-                                            onclick="window.location.href='editOrder.jsp?id=1'">
-                                        <i class="bi bi-pencil-square me-1"></i>Sửa
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>#ORD-0002</td>
-                            <td>Lan</td>
-                            <td>
-                                <span class="badge rounded-pill text-bg-warning badge-status">
-                                    <i class="bi bi-hourglass-split me-1"></i>Đang xử lý
-                                </span>
-                            </td>
-                            <td class="text-end">1</td>
-                            <td class="text-end">350.000&nbsp;₫</td>
-                            <td class="text-truncate" style="max-width: 260px;">Giao tiết kiệm, COD.</td>
-                            <td class="text-center">
-                                <div class="btn-group btn-group-sm">
-                                    <button class="btn btn-outline-primary"
-                                            onclick="window.location.href='orderDetail.jsp?id=2'">
-                                        <i class="bi bi-eye me-1"></i>Chi tiết
-                                    </button>
-                                    <button class="btn btn-outline-secondary"
-                                            onclick="window.location.href='editOrder.jsp?id=2'">
-                                        <i class="bi bi-pencil-square me-1"></i>Sửa
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-
-                        <tr>
-                            <td>#ORD-0003</td>
-                            <td>Bình</td>
-                            <td>
-                                <span class="badge rounded-pill text-bg-secondary badge-status">
-                                    <i class="bi bi-x-circle me-1"></i>Đã huỷ
-                                </span>
-                            </td>
-                            <td class="text-end">2</td>
-                            <td class="text-end">0&nbsp;₫</td>
-                            <td class="text-truncate" style="max-width: 260px;">Khách huỷ do đổi lịch.</td>
-                            <td class="text-center">
-                                <div class="btn-group btn-group-sm">
-                                    <button class="btn btn-outline-primary"
-                                            onclick="window.location.href='orderDetail.jsp?id=3'">
-                                        <i class="bi bi-eye me-1"></i>Chi tiết
-                                    </button>
-                                    <button class="btn btn-outline-secondary"
-                                            onclick="window.location.href='editOrder.jsp?id=3'">
-                                        <i class="bi bi-pencil-square me-1"></i>Sửa
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                        <%-- /Row mẫu --%>
+                        <!-- Debug output -->
+                        <c:if test="${not empty orders}">
+                            <tr>
+                                <td colspan="10">
+                                    Total orders: ${orders.size()}
+                                </td>
+                            </tr>
+                        </c:if>
+                        <c:if test="${empty orders}">
+                            <tr>
+                                <td colspan="10">
+                                    No orders found in the request attribute
+                                </td>
+                            </tr>
+                        </c:if>
+                        <c:forEach var="order" items="${orders}">
+                            <tr>
+                                <td>#ORD-${order.orderId}</td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${order.customer != null}">
+                                            ${order.customer.fullName}
+                                        </c:when>
+                                        <c:otherwise>
+                                            ${order.customerId}
+                                        </c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${order.createdBy != null}">
+                                            ${order.createdBy.fullName}
+                                        </c:when>
+                                        <c:otherwise>-</c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${order.saleBy != null}">
+                                            ${order.saleBy.fullName}
+                                        </c:when>
+                                        <c:otherwise>-</c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td>
+                                    <c:choose>
+                                        <c:when test="${order.store != null}">
+                                            ${order.store.storeName}
+                                        </c:when>
+                                        <c:otherwise>-</c:otherwise>
+                                    </c:choose>
+                                </td>
+                                <td>
+                                    <span class="badge rounded-pill badge-status
+                                        <c:choose>
+                                            <c:when test="${order.status eq 'Completed'}">text-bg-success</c:when>
+                                            <c:when test="${order.status eq 'Pending'}">text-bg-warning</c:when>
+                                            <c:when test="${order.status eq 'Cancelled'}">text-bg-secondary</c:when>
+                                            <c:otherwise>text-bg-light</c:otherwise>
+                                        </c:choose>">
+                                        <c:choose>
+                                            <c:when test="${order.status eq 'Completed'}"><i class="bi bi-check2-circle me-1"></i>Đã thanh toán</c:when>
+                                            <c:when test="${order.status eq 'Pending'}"><i class="bi bi-hourglass-split me-1"></i>Đang xử lý</c:when>
+                                            <c:when test="${order.status eq 'Cancelled'}"><i class="bi bi-x-circle me-1"></i>Đã huỷ</c:when>
+                                            <c:otherwise>${order.status}</c:otherwise>
+                                        </c:choose>
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <c:out value="${order.orderDetails != null ? order.orderDetails.size() : 0}" />
+                                </td>
+                                <td class="text-end">
+                                    <c:set var="total" value="0" />
+                                    <c:forEach var="detail" items="${order.orderDetails}">
+                                        <c:set var="total" value="${total + detail.totalAmount}" />
+                                    </c:forEach>
+                                    <c:out value="${total}" />&nbsp;₫
+                                </td>
+                             
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-primary"
+                                                onclick="window.location.href='${pageContext.request.contextPath}/order/view?id=${order.orderId}'">
+                                            <i class="bi bi-eye me-1"></i>Chi tiết
+                                        </button>
+                                        <button class="btn btn-outline-secondary"
+                                                onclick="window.location.href='${pageContext.request.contextPath}/order/edit?id=${order.orderId}'">
+                                            <i class="bi bi-pencil-square me-1"></i>Sửa
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </c:forEach>
                         </tbody>
                     </table>
                 </div>
