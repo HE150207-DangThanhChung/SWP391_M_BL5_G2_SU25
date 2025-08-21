@@ -113,7 +113,7 @@
                     <i class="fas fa-user-friends"></i> 
                     Quản lí nhân viên
                 </a>
-                <a href="">
+                <a href="${pageContext.request.contextPath}/customer">
                     <i class="fas fa-tags"></i> 
                     Quản lí khách hàng
                 </a>

@@ -22,7 +22,7 @@
                 --stroke:#2b6777;
                 --head:#bcd9ff;
                 --shadow:0 8px 20px rgba(0,0,0,.06);
-                --radius:12px;
+                /*--radius:12px;*/
             }
             *{
                 box-sizing:border-box
@@ -38,7 +38,7 @@
             .toolbar{
                 background:var(--panel);
                 border:2px solid #b9d6ff;
-                border-radius:16px;
+                /*border-radius:16px;*/
                 padding:12px;
                 display:flex;
                 flex-wrap:wrap;
@@ -51,14 +51,14 @@
                 min-width:240px;
                 padding:10px 14px;
                 border:2px solid var(--stroke);
-                border-radius:12px;
+                /*border-radius:12px;*/
                 background:var(--chip);
                 font-weight:600
             }
             .btn{
                 background:var(--chip);
                 border:2px solid var(--stroke);
-                border-radius:12px;
+                /*border-radius:12px;*/
                 padding:10px 16px;
                 font-weight:700;
                 cursor:pointer
@@ -74,7 +74,7 @@
                 margin-top:14px;
                 background:#fff;
                 border:2px solid #c9d7e3;
-                border-radius:10px;
+                /*border-radius:10px;*/
                 overflow:hidden
             }
             table{
@@ -116,7 +116,7 @@
                 gap:14px;
                 background:var(--panel);
                 border:2px solid #b9d6ff;
-                border-radius:12px;
+                /*border-radius:12px;*/
                 padding:12px 16px;
                 margin-top:18px
             }
@@ -135,7 +135,7 @@
                 text-align:center;
                 padding:6px 10px;
                 border:2px solid var(--stroke);
-                border-radius:8px;
+                /*border-radius:8px;*/
                 background:#fff;
                 text-decoration:none;
                 color:inherit
@@ -220,7 +220,7 @@
             .badge{
                 display:inline-block;
                 padding:4px 10px;
-                border-radius:999px;
+                /*border-radius:999px;*/
                 font-weight:700;
                 font-size:12px;
                 line-height:1;
@@ -247,6 +247,11 @@
                 gap: .5rem;
                 flex-wrap: nowrap;
             }
+            .filter {
+                background-color: #9b5cf1;
+                color: white;
+                border-radius: 15px;
+            }
         </style>
     </head>
     <body>
@@ -265,13 +270,13 @@
                             <input type="text" name="search" value="${fn:escapeXml(search)}"
                                    placeholder="Tìm kiếm theo mã hoặc mô tả yêu cầu" />
 
-                            <select name="status">
+                            <select name="status" class="filter">
                                 <option value="" ${empty status ? 'selected' : ''}>Tất cả trạng thái</option>
                                 <option value="Active" ${status == 'Active' ? 'selected' : ''}>Hoạt động</option>
                                 <option value="Deactivate" ${status == 'Deactivate' ? 'selected' : ''}>Ngừng hoạt động</option>
                             </select>
 
-                            <select name="size">
+                            <select name="size" class="filter">
                                 <c:forEach var="s" items="${fn:split('5,10,20,50', ',')}">
                                     <option value="${s}" ${size == s ? 'selected' : ''}>${s}/trang</option>
                                 </c:forEach>
