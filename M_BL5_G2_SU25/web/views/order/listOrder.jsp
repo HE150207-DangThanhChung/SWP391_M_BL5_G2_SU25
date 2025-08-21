@@ -82,6 +82,10 @@
                 <div class="sidebar-title">Trạng thái đơn hàng</div>
                 <div class="d-flex flex-column gap-2">
                     <div class="form-check">
+                        <input class="form-check-input" name="status" type="radio" id="statusAll" checked>
+                        <label class="form-check-label" for="statusAll">Tất cả</label>
+                    </div>
+                    <div class="form-check">
                         <input class="form-check-input" name="status" type="radio" id="statusPending">
                         <label class="form-check-label" for="statusPending">Đang xử lý</label>
                     </div>
@@ -98,11 +102,12 @@
                 <hr class="my-4">
 
                 <div class="sidebar-title">Chi nhánh</div>
-                <select class="form-select">
-                    <option value="">Tất cả</option>
-                    <option value="1">Chi nhánh 1</option>
-                    <option value="2">Chi nhánh 2</option>
-                </select>
+                <select class="form-select" id="branchSelect">
+    <option value="">Tất cả</option>
+    <c:forEach var="s" items="${stores}">
+        <option value="${s.storeName}">${s.storeName} (${s.storeId})</option>
+    </c:forEach>
+</select>
 
                 <hr class="my-4">
 
@@ -315,7 +320,7 @@ function filterRows() {
             match = match && text.includes(search);
         }
         // Status
-        if (status) {
+        if (status && status !== 'Tất cả') {
             match = match && row.querySelector('.badge-status')?.textContent.includes(status);
         }
         // Branch
