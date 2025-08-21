@@ -103,33 +103,26 @@
                                                 <!-- Specifications -->
                                                 <p><strong>Thông số kỹ thuật:</strong></p>
                                                 <ul class="spec-list">
-                                                    <c:forEach var="spec" items="${variant.specifications}">
-                                                        <c:set var="specName" value="" />
-                                                        <c:forEach var="specDef" items="${specifications}">
-                                                            <c:if test="${specDef.specificationId == spec.specificationId}">
-                                                                <c:set var="specName" value="${specDef.attributeName}" />
-                                                            </c:if>
-                                                        </c:forEach>
-                                                        <li>${specName}: ${spec.value}</li>
-                                                        </c:forEach>
-                                                        <c:if test="${empty variant.specifications}">
+                                                    <c:forEach var="attrOption" items="${variant.attributes}">
+                                                        <li>${attrOption.attribute.attributeName}: ${attrOption.value}</li>
+                                                    </c:forEach>
+                                                    <c:if test="${empty variant.attributes}">
                                                         <li class="text-muted">No specifications</li>
-                                                        </c:if>
+                                                    </c:if>
                                                 </ul>
                                                 <!-- Serials -->
                                                 <p><strong>Serials:</strong></p>
                                                 <ul class="serial-list">
                                                     <c:forEach var="serial" items="${variant.serials}">
                                                         <li>Số serial: ${serial.serialNumber}, Cửa hàng: ${serial.storeName}, Tạo: ${serial.createdAt}, Cập nhật: ${serial.updatedAt}</li>
-                                                        </c:forEach>
-                                                        <c:if test="${empty variant.serials}">
+                                                    </c:forEach>
+                                                    <c:if test="${empty variant.serials}">
                                                         <li class="text-muted">No serials</li>
-                                                        </c:if>
+                                                    </c:if>
                                                 </ul>
                                                 <!-- Edit Button -->
                                                 <a href="${pageContext.request.contextPath}/editVariant?productId=${product.productId}&productVariantId=${variant.productVariantId}" 
                                                    class="btn btn-primary mt-2">Chỉnh sửa biến thể</a>
-
                                             </div>
                                         </div>
                                     </c:forEach>

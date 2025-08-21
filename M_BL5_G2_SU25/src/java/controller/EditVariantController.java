@@ -3,9 +3,9 @@ package controller;
 import dal.ProductDAO;
 import model.ProductVariant;
 import model.ProductSerial;
-import model.VariantSpecification;
+import model.AttributeOption;
 import model.ProductImage;
-import model.Specification;
+import model.Attribute;
 import model.Store;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -17,32 +17,49 @@ import jakarta.servlet.http.Part;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet(name = "EditVariantController", urlPatterns = {"/editVariant"})
-@MultipartConfig
+@MultipartConfig(maxFileSize = 1024 * 1024 * 5) // 5MB max file size
 public class EditVariantController extends HttpServlet {
-    private ProductDAO productDAO = new ProductDAO();
+    private ProductDAO productDAO;
+
+    @Override
+    public void init() throws ServletException {
+        productDAO = new ProductDAO();
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        int productVariantId = Integer.parseInt(request.getParameter("productVariantId"));
-        int productId = Integer.parseInt(request.getParameter("productId"));
-        ProductVariant variant = productDAO.getVariantById(productVariantId);
-        List<Specification> allSpecifications = productDAO.getAllSpecifications();
-        List<Store> stores = productDAO.getAllStores();
+        try {
+            int productVariantId = Integer.parseInt(request.getParameter("productVariantId"));
+            int productId = Integer.parseInt(request.getParameter("productId"));
+            ProductVariant variant = productDAO.getVariantById(productVariantId);
+            List<Attribute> allAttributes = productDAO.getAllAttributes();
+            Map<Integer, List<AttributeOption>> attributeOptions = new HashMap<>();
+            for (Attribute attribute : allAttributes) {
+                attributeOptions.put(attribute.getAttributeId(), productDAO.getAttributeOptionsByAttributeId(attribute.getAttributeId()));
+            }
+            List<Store> stores = productDAO.getAllStores();
 
-        if (variant == null) {
-            request.setAttribute("error", "Không tìm thấy biến thể.");
+            if (variant == null) {
+                request.setAttribute("error", "Không tìm thấy biến thể.");
+                request.getRequestDispatcher("views/product/productDetail.jsp").forward(request, response);
+                return;
+            }
+
+            request.setAttribute("variant", variant);
+            request.setAttribute("productId", productId);
+            request.setAttribute("allAttributes", allAttributes);
+            request.setAttribute("attributeOptions", attributeOptions);
+            request.setAttribute("stores", stores);
+            request.getRequestDispatcher("views/product/editProductVariant.jsp").forward(request, response);
+        } catch (NumberFormatException e) {
+            request.setAttribute("error", "ID biến thể hoặc sản phẩm không hợp lệ.");
             request.getRequestDispatcher("views/product/productDetail.jsp").forward(request, response);
-            return;
         }
-
-        request.setAttribute("variant", variant);
-        request.setAttribute("productId", productId);
-        request.setAttribute("allSpecifications", allSpecifications);
-        request.setAttribute("stores", stores);
-        request.getRequestDispatcher("views/product/editProductVariant.jsp").forward(request, response);
     }
 
     @Override
@@ -61,20 +78,33 @@ public class EditVariantController extends HttpServlet {
             variant.setPrice(price);
             variant.setWarrantyDurationMonth(warrantyDurationMonth);
 
-            // Process specifications
-            List<VariantSpecification> specifications = new ArrayList<>();
-            List<Specification> allSpecifications = productDAO.getAllSpecifications();
-            for (Specification spec : allSpecifications) {
-                String value = request.getParameter("spec_" + spec.getSpecificationId());
-                if (value != null && !value.trim().isEmpty()) {
-                    VariantSpecification variantSpec = new VariantSpecification();
-                    variantSpec.setProductVariantId(productVariantId);
-                    variantSpec.setSpecificationId(spec.getSpecificationId());
-                    variantSpec.setValue(value);
-                    specifications.add(variantSpec);
+            // Process attributes
+            List<AttributeOption> attributes = new ArrayList<>();
+            String[] attributeOptionIds = request.getParameterValues("attributeOptionId[]");
+            if (attributeOptionIds != null) {
+                for (String optionIdStr : attributeOptionIds) {
+                    if (optionIdStr != null && !optionIdStr.isEmpty()) {
+                        AttributeOption attrOption = new AttributeOption();
+                        attrOption.setAttributeOptionId(Integer.parseInt(optionIdStr));
+                        // Fetch AttributeOption details
+                        List<AttributeOption> options = productDAO.getAttributeOptionsByAttributeId(
+                            productDAO.getAllAttributes().stream()
+                                .filter(attr -> productDAO.getAttributeOptionsByAttributeId(attr.getAttributeId())
+                                    .stream().anyMatch(opt -> opt.getAttributeOptionId() == Integer.parseInt(optionIdStr)))
+                                .findFirst().map(Attribute::getAttributeId).orElse(0)
+                        );
+                        options.stream()
+                            .filter(opt -> opt.getAttributeOptionId() == Integer.parseInt(optionIdStr))
+                            .findFirst()
+                            .ifPresent(opt -> {
+                                attrOption.setValue(opt.getValue());
+                                attrOption.setAttribute(opt.getAttribute());
+                            });
+                        attributes.add(attrOption);
+                    }
                 }
             }
-            variant.setSpecifications(specifications);
+            variant.setAttributes(attributes);
 
             // Process images
             List<Part> imageParts = new ArrayList<>();
@@ -97,7 +127,7 @@ public class EditVariantController extends HttpServlet {
                     image.setProductImageId(existingImage.getProductImageId());
                     image.setProductVariantId(productVariantId);
                     image.setSrc(imageUrl != null && !imageUrl.trim().isEmpty() ? imageUrl : existingImage.getSrc());
-                    image.setAlt(variant.getProductName() + " Image");
+                    image.setAlt(variant.getProductName() != null ? variant.getProductName() + " Image" : existingImage.getAlt());
                     images.add(image);
                 }
             }
@@ -117,18 +147,22 @@ public class EditVariantController extends HttpServlet {
                 String serialIdParam = request.getParameter("serialId_" + existingSerial.getProductSerialId());
                 if (serialIdParam != null) {
                     String serialNumber = request.getParameter("serialNumber_" + existingSerial.getProductSerialId());
-                    int storeId = Integer.parseInt(request.getParameter("storeId_" + existingSerial.getProductSerialId()));
-                    ProductSerial serial = new ProductSerial();
-                    serial.setProductSerialId(existingSerial.getProductSerialId());
-                    serial.setSerialNumber(serialNumber);
-                    serial.setStoreId(storeId);
-                    serial.setProductVariantId(productVariantId);
-                    serials.add(serial);
+                    String storeIdStr = request.getParameter("storeId_" + existingSerial.getProductSerialId());
+                    String serialStatus = request.getParameter("serialStatus_" + existingSerial.getProductSerialId());
+                    if (serialNumber != null && !serialNumber.isEmpty() && storeIdStr != null && !storeIdStr.isEmpty()) {
+                        ProductSerial serial = new ProductSerial();
+                        serial.setProductSerialId(existingSerial.getProductSerialId());
+                        serial.setSerialNumber(serialNumber);
+                        serial.setStoreId(Integer.parseInt(storeIdStr));
+                        serial.setProductVariantId(productVariantId);
+                        serials.add(serial);
+                    }
                 }
             }
             // Handle new serial
             String newSerialNumber = request.getParameter("newSerialNumber");
             String newStoreId = request.getParameter("newStoreId");
+            String newSerialStatus = request.getParameter("newSerialStatus");
             if (newSerialNumber != null && !newSerialNumber.trim().isEmpty() && newStoreId != null && !newStoreId.trim().isEmpty()) {
                 ProductSerial serial = new ProductSerial();
                 serial.setSerialNumber(newSerialNumber);
@@ -147,5 +181,10 @@ public class EditVariantController extends HttpServlet {
             request.setAttribute("error", "Lỗi khi cập nhật biến thể: " + e.getMessage());
             request.getRequestDispatcher("views/product/editProductVariant.jsp").forward(request, response);
         }
+    }
+
+    @Override
+    public String getServletInfo() {
+        return "Edit Variant Controller Servlet";
     }
 }
