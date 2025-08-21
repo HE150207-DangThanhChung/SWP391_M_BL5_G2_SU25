@@ -270,6 +270,20 @@ public class CustomerDAO {
         }
         return list;
     }
+    
+
+    // Soft-status helper (e.g., "Active" / "Banned")
+    public boolean updateStatus(int customerId, String status) {
+        String sql = "UPDATE dbo.Customer SET Status = ? WHERE CustomerId = ?";
+        try (Connection cn = DBContext.getConnection(); PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, customerId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     public int count(String search, String status) {
         StringBuilder sql = new StringBuilder("""

@@ -34,6 +34,11 @@
                 color:var(--ink);
                 font-family:system-ui,-apple-system,Segoe UI,Roboto,Inter,Arial,sans-serif
             }
+            body a{
+                
+                text-decoration: none;
+            
+            }
 
             .toolbar{
                 background:var(--panel);
@@ -236,10 +241,10 @@
                 border:1px solid #cbd5e1;
             }
 
-            /* Do NOT force a color here; let the badge variants decide. */
+            
             .status{
                 color: inherit !important;
-                border: none;                    /* or border-color: inherit; if you want */
+                border: none;                    
             }
 
             .btn-group {
@@ -252,6 +257,7 @@
                 color: white;
                 border-radius: 15px;
             }
+            
         </style>
     </head>
     <body>

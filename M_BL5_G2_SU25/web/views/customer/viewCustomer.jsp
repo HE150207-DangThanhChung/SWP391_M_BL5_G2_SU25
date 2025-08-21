@@ -166,7 +166,19 @@
 
                         <div class="row">
                             <label>Giới tính</label>
-                            <div class="value">${customer.gender}</div>
+                            <div class="value">
+                                <c:choose>
+                                    <c:when test="${customer.gender eq 'Male'}">
+                                        <span class="badge badge--success status">Nam</span>
+                                    </c:when>
+                                    <c:when test="${customer.gender eq 'Female'}">
+                                        <span class="badge badge--muted status">Nữ</span>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <span class="badge badge--muted status">Khác</span>
+                                    </c:otherwise>
+                                </c:choose>
+                            </div>
                         </div>
 
                         <div class="row">

@@ -31,7 +31,7 @@ public class CustomerController extends HttpServlet {
     // View paths
     private static final String VIEW_LIST = "/views/customer/listCustomer.jsp";
     private static final String VIEW_ADD = "/views/customer/addCustomer.jsp";
-    private static final String VIEW_EDIT = "/views/customer/editCustomer.jsp";
+    private static final String VIEW_EDIT = "/views/customer/editDetailCustomer.jsp";
     private static final String VIEW_DETAIL = "/views/customer/viewCustomer.jsp";
 
     private final CustomerDAO customerDAO = new CustomerDAO();
@@ -51,8 +51,8 @@ public class CustomerController extends HttpServlet {
                 handleEditForm(request, response);
             case "view" ->
                 handleView(request, response);
-            case "list" ->
-                handleList(request, response);
+            case "updateStatus" ->
+                handleUpdateStatus(request, response);
             default ->
                 handleList(request, response);
         }
@@ -70,6 +70,8 @@ public class CustomerController extends HttpServlet {
                 handleAdd(request, response);
             case "edit" ->
                 handleEdit(request, response);
+            case "updateStatus" ->
+                handleUpdateStatus(request, response); // NEW
             default ->
                 handleList(request, response);
         }
@@ -80,6 +82,16 @@ public class CustomerController extends HttpServlet {
             throws ServletException, IOException {
         req.setAttribute("cities", cityDAO.getAll());
         req.getRequestDispatcher(VIEW_ADD).forward(req, resp);
+    }
+
+    private void handleUpdateStatus(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+        int id = parseInt(req.getParameter("customerId"), -1);
+        String status = nvl(req.getParameter("status"), "Active"); // "Active" | "Banned"
+        if (id > 0) {
+            customerDAO.updateStatus(id, status);
+        }
+        resp.sendRedirect(req.getContextPath() + "/customer?action=list&msg=status");
     }
 
     private void handleEditForm(HttpServletRequest req, HttpServletResponse resp)
@@ -140,7 +152,7 @@ public class CustomerController extends HttpServlet {
 
         List<Customer> list = customerDAO.list(pageIndex, pageSize, search, status, sortBy, sortDir);
 
-        req.setAttribute("list", list);
+        req.setAttribute("listCustomers", list);
         req.setAttribute("page", pageIndex);
         req.setAttribute("size", pageSize);
         req.setAttribute("totalPages", totalPages);

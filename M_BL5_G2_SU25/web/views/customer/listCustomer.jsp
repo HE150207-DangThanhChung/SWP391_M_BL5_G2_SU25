@@ -160,6 +160,40 @@
                     padding:10px
                 }
             }
+            .badge{
+                display:inline-block;
+                padding:4px 10px;
+                /*border-radius:999px;*/
+                font-weight:700;
+                font-size:12px;
+                line-height:1;
+            }
+            .badge--success{
+                background:#dcfce7;             /* light green */
+                color:#166534 !important;        /* dark green text */
+                border:1px solid #86efac;
+            }
+            .badge--muted{
+                background:#e2e8f0;             /* light gray */
+                color:#334155 !important;        /* slate text */
+                border:1px solid #cbd5e1;
+            }
+
+
+            .status{
+                color: inherit !important;
+                border: none;
+            }
+            .filter {
+                background-color: #9b5cf1;
+                color: white;
+                border-radius: 15px;
+            }
+            body a{
+
+                text-decoration: none;
+
+            }
         </style>
     </head>
     <body>
@@ -178,13 +212,13 @@
                             <input type="text" name="search" value="${fn:escapeXml(search)}"
                                    placeholder="Tìm theo tên, email hoặc điện thoại"/>
 
-                            <select name="status">
+                            <select name="status" class="filter">
                                 <option value="" ${empty status ? 'selected' : ''}>Tất cả trạng thái</option>
                                 <option value="Active" ${status == 'Active' ? 'selected' : ''}>Hoạt động</option>
                                 <option value="Banned" ${status == 'Banned' ? 'selected' : ''}>Bị khóa</option>
                             </select>
 
-                            <select name="size">
+                            <select name="size" class="filter">
                                 <c:forEach var="s" items="${fn:split('5,10,20,50', ',')}">
                                     <option value="${s}" ${size == s ? 'selected' : ''}>${s}/trang</option>
                                 </c:forEach>
@@ -213,93 +247,120 @@
                             <thead>
                                 <tr>
                                     <th>
-                            <c:set var="dirId" value="${(sortBy eq 'id' and sortDir eq 'ASC') ? 'DESC' : 'ASC'}"/>
-                            <a href="${ctx}/customer?action=list&search=${fn:escapeXml(search)}&status=${status}
-                               &sortBy=id&sortDir=${dirId}&page=1&size=${size}">
-                                Mã KH
-                            </a>
-                            </th>
-                            <th>
-                            <c:set var="dirName" value="${(sortBy eq 'name' and sortDir eq 'ASC') ? 'DESC' : 'ASC'}"/>
-                            <a href="${ctx}/customer?action=list&search=${fn:escapeXml(search)}&status=${status}
-                               &sortBy=name&sortDir=${dirName}&page=1&size=${size}">
-                                Họ tên
-                            </a>
-                            </th>
-                            <th>
-                            <c:set var="dirEmail" value="${(sortBy eq 'email' and sortDir eq 'ASC') ? 'DESC' : 'ASC'}"/>
-                            <a href="${ctx}/customer?action=list&search=${fn:escapeXml(search)}&status=${status}
-                               &sortBy=email&sortDir=${dirEmail}&page=1&size=${size}">
-                                Email
-                            </a>
-                            </th>
-                            <th>
-                            <c:set var="dirPhone" value="${(sortBy eq 'phone' and sortDir eq 'ASC') ? 'DESC' : 'ASC'}"/>
-                            <a href="${ctx}/customer?action=list&search=${fn:escapeXml(search)}&status=${status}
-                               &sortBy=phone&sortDir=${dirPhone}&page=1&size=${size}">
-                                Điện thoại
-                            </a>
-                            </th>
-                            <th>Giới tính</th>
-                            <th class="col-hide-sm">Địa chỉ</th>
-                            <th class="col-hide-md">Phường/Xã</th>
-                            <th class="col-hide-md">Tỉnh/Thành</th>
-                            <th>
-                            <c:set var="dirDob" value="${(sortBy eq 'dob' and sortDir eq 'ASC') ? 'DESC' : 'ASC'}"/>
-                            <a href="${ctx}/customer?action=list&search=${fn:escapeXml(search)}&status=${status}
-                               &sortBy=dob&sortDir=${dirDob}&page=1&size=${size}">
-                                Ngày sinh
-                            </a>
-                            </th>
-                            <th>
-                            <c:set var="dirStatus" value="${(sortBy eq 'status' and sortDir eq 'ASC') ? 'DESC' : 'ASC'}"/>
-                            <a href="${ctx}/customer?action=list&search=${fn:escapeXml(search)}&status=${status}
-                               &sortBy=status&sortDir=${dirStatus}&page=1&size=${size}">
-                                Trạng thái
-                            </a>
-                            </th>
-                            <th class="col-actions">Hành động</th>
-                            </tr>
+                                        <c:set var="dirId" value="${(sortBy eq 'id' and sortDir eq 'ASC') ? 'DESC' : 'ASC'}"/>
+                                        <a href="${ctx}/customer?action=list&search=${fn:escapeXml(search)}&status=${status}
+                                           &sortBy=id&sortDir=${dirId}&page=1&size=${size}">
+                                            Mã KH
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <c:set var="dirName" value="${(sortBy eq 'name' and sortDir eq 'ASC') ? 'DESC' : 'ASC'}"/>
+                                        <a href="${ctx}/customer?action=list&search=${fn:escapeXml(search)}&status=${status}
+                                           &sortBy=name&sortDir=${dirName}&page=1&size=${size}">
+                                            Họ tên
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <c:set var="dirEmail" value="${(sortBy eq 'email' and sortDir eq 'ASC') ? 'DESC' : 'ASC'}"/>
+                                        <a href="${ctx}/customer?action=list&search=${fn:escapeXml(search)}&status=${status}
+                                           &sortBy=email&sortDir=${dirEmail}&page=1&size=${size}">
+                                            Email
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <c:set var="dirPhone" value="${(sortBy eq 'phone' and sortDir eq 'ASC') ? 'DESC' : 'ASC'}"/>
+                                        <a href="${ctx}/customer?action=list&search=${fn:escapeXml(search)}&status=${status}
+                                           &sortBy=phone&sortDir=${dirPhone}&page=1&size=${size}">
+                                            Điện thoại
+                                        </a>
+                                    </th>
+                                    <th>Giới tính</th>
+                                    <th class="col-hide-sm">Địa chỉ</th>
+                                    <th class="col-hide-md">Phường/Xã</th>
+                                    <th class="col-hide-md">Tỉnh/Thành</th>
+                                    <th>
+                                        <c:set var="dirDob" value="${(sortBy eq 'dob' and sortDir eq 'ASC') ? 'DESC' : 'ASC'}"/>
+                                        <a href="${ctx}/customer?action=list&search=${fn:escapeXml(search)}&status=${status}
+                                           &sortBy=dob&sortDir=${dirDob}&page=1&size=${size}">
+                                            Ngày sinh
+                                        </a>
+                                    </th>
+                                    <th>
+                                        <c:set var="dirStatus" value="${(sortBy eq 'status' and sortDir eq 'ASC') ? 'DESC' : 'ASC'}"/>
+                                        <a href="${ctx}/customer?action=list&search=${fn:escapeXml(search)}&status=${status}
+                                           &sortBy=status&sortDir=${dirStatus}&page=1&size=${size}">
+                                            Trạng thái
+                                        </a>
+                                    </th>
+                                    <th class="col-actions">Hành động</th>
+                                </tr>
                             </thead>
 
                             <tbody>
-                            <c:if test="${empty listCustomers}">
-                                <tr>
-                                    <td colspan="12" style="text-align:center;">Không có dữ liệu.</td>
-                                </tr>
-                            </c:if>
+                                <c:if test="${empty listCustomers}">
+                                    <tr>
+                                        <td colspan="12" style="text-align:center;">Không có dữ liệu.</td>
+                                    </tr>
+                                </c:if>
 
-                            <c:forEach items="${listCustomers}" var="c">
-                                <tr>
-                                    <td>${c.customerId}</td>
-                                    <td>
-                                        <a class="link" href="${ctx}/customer?action=view&customerId=${c.customerId}">
-                                            ${c.fullName}
-                                        </a>
-                                    </td>
-                                    <td>${c.email}</td>
-                                    <td>${c.phone}</td>
-                                    <td>${c.gender}</td>
-                                    <td class="col-hide-sm">${c.address}</td>
-                                    <td class="col-hide-md">${empty c.wardName ? '-' : c.wardName}</td>
-                                    <td class="col-hide-md">${empty c.cityName ? '-' : c.cityName}</td>
-                                    <td><fmt:formatDate value="${c.dob}" pattern="yyyy-MM-dd"/></td>
-                                <td>
-                                <c:choose>
-                                    <c:when test="${c.status eq 'Active'}">
-                                        <span class="badge badge--success status">Đang hoạt động</span>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <span class="badge badge--muted status">Bị khóa</span>
-                                    </c:otherwise>
-                                </c:choose>
-                                </td>
-                                <td>
-                                    <a class="act" href="${ctx}/customer?action=editForm&customerId=${c.customerId}">Sửa</a>
-                                    <a class="act" href="${ctx}/customer?action=view&customerId=${c.customerId}">Xem</a>
-                                </td>
-                                </tr>
-                            </c:forEach>
+                                <c:forEach items="${listCustomers}" var="c">
+                                    <tr>
+                                        <td>${c.customerId}</td>
+                                        <td>
+                                            <a class="link" href="${ctx}/customer?action=view&customerId=${c.customerId}">
+                                                ${c.fullName}
+                                            </a>
+                                        </td>
+                                        <td>${c.email}</td>
+                                        <td>${c.phone}</td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${c.gender eq 'Male'}">
+                                                    <span class="badge badge--success status">Nam</span>
+                                                </c:when>
+                                                <c:when test="${c.gender eq 'Female'}">
+                                                    <span class="badge badge--muted status">Nữ</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="badge badge--muted status">Khác</span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <td class="col-hide-sm">${c.address}</td>
+                                        <td class="col-hide-md">${empty c.wardName ? '-' : c.wardName}</td>
+                                        <td class="col-hide-md">${empty c.cityName ? '-' : c.cityName}</td>
+                                        <td><fmt:formatDate value="${c.dob}" pattern="yyyy-MM-dd"/></td>
+                                        <td>
+                                            <c:choose>
+                                                <c:when test="${c.status eq 'Active'}">
+                                                    <span class="badge badge--success status">Đang hoạt động</span>
+                                                </c:when>
+                                                <c:otherwise>
+                                                    <span class="badge badge--muted status">Bị khóa</span>
+                                                </c:otherwise>
+                                            </c:choose>
+                                        </td>
+                                        <td>
+                                            <!-- Edit (GET), same as Coupon -->
+                                            <form method="get" action="${ctx}/customer" style="display:inline;">
+                                                <input type="hidden" name="action" value="editForm"/>
+                                                <input type="hidden" name="customerId" value="${c.customerId}"/>
+                                                <button type="submit" class="act">Sửa</button>
+                                            </form>
+
+                                            <!-- Toggle status (POST), same pattern as Coupon -->
+                                            <form method="post" action="${ctx}/customer" style="display:inline;"
+                                                  onsubmit="return confirm('Xác nhận cập nhật trạng thái?');">
+                                                <input type="hidden" name="action" value="updateStatus"/>
+                                                <input type="hidden" name="customerId" value="${c.customerId}"/>
+                                                <input type="hidden" name="status" value="${c.status eq 'Active' ? 'Banned' : 'Active'}"/>
+                                                <button type="submit" class="act act--danger">
+                                                    ${c.status eq 'Active' ? 'Khóa' : 'Kích hoạt'}
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                </c:forEach>
                             </tbody>
                         </table>
                     </div>
@@ -319,8 +380,8 @@
                         <c:if test="${end > totalPages}"><c:set var="end" value="${totalPages}"/></c:if>
                         <c:if test="${start > end}"><c:set var="start" value="${end}"/></c:if>
 
-                        <nav class="pager" aria-label="Pagination">
-                            <a class="page" href="${ctx}/customer?action=list&search=${fn:escapeXml(search)}&status=${status}
+                            <nav class="pager" aria-label="Pagination">
+                                <a class="page" href="${ctx}/customer?action=list&search=${fn:escapeXml(search)}&status=${status}
                                &sortBy=${sortBy}&sortDir=${sortDir}&page=1&size=${size}" aria-label="Trang đầu">≪</a>
 
                             <a class="page" href="${ctx}/customer?action=list&search=${fn:escapeXml(search)}&status=${status}
