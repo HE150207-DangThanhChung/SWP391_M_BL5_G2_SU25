@@ -4,13 +4,13 @@ import com.google.gson.Gson;
 import dal.ProductDAO;
 import model.Product;
 import model.ProductVariant;
-import model.VariantSpecification;
+import model.AttributeOption;
 import model.ProductImage;
 import model.ProductSerial;
 import model.Brand;
 import model.Category;
 import model.Supplier;
-import model.Specification;
+import model.Attribute;
 import model.Store;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -22,7 +22,9 @@ import jakarta.servlet.http.Part;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @WebServlet("/product/*")
 @MultipartConfig(maxFileSize = 1024 * 1024 * 5) // 5MB max file size
@@ -60,12 +62,17 @@ public class ProductController extends HttpServlet {
             List<Category> categories = productDAO.getAllCategories();
             List<Brand> brands = productDAO.getAllBrands();
             List<Supplier> suppliers = productDAO.getAllSuppliers();
-            List<Specification> specifications = productDAO.getAllSpecifications();
+            List<Attribute> attributes = productDAO.getAllAttributes();
+            Map<Integer, List<AttributeOption>> attributeOptions = new HashMap<>();
+            for (Attribute attribute : attributes) {
+                attributeOptions.put(attribute.getAttributeId(), productDAO.getAttributeOptionsByAttributeId(attribute.getAttributeId()));
+            }
             List<Store> stores = productDAO.getAllStores();
             request.setAttribute("categories", categories);
             request.setAttribute("brands", brands);
             request.setAttribute("suppliers", suppliers);
-            request.setAttribute("specifications", specifications);
+            request.setAttribute("attributes", attributes);
+            request.setAttribute("attributeOptions", attributeOptions);
             request.setAttribute("stores", stores);
             request.getRequestDispatcher("/views/product/addProduct.jsp").forward(request, response);
         } else if (pathInfo.equals("/edit")) {
@@ -76,13 +83,13 @@ public class ProductController extends HttpServlet {
                 List<Category> categories = productDAO.getAllCategories();
                 List<Brand> brands = productDAO.getAllBrands();
                 List<Supplier> suppliers = productDAO.getAllSuppliers();
-                List<Specification> specifications = productDAO.getAllSpecifications();
+                List<Attribute> attributes = productDAO.getAllAttributes();
                 List<Store> stores = productDAO.getAllStores();
                 request.setAttribute("product", product);
                 request.setAttribute("categories", categories);
                 request.setAttribute("brands", brands);
                 request.setAttribute("suppliers", suppliers);
-                request.setAttribute("specifications", specifications);
+                request.setAttribute("attributes", attributes);
                 request.setAttribute("stores", stores);
                 request.getRequestDispatcher("/views/product/editProduct.jsp").forward(request, response);
             } else {
@@ -93,9 +100,9 @@ public class ProductController extends HttpServlet {
             if (productIdStr != null) {
                 int productId = Integer.parseInt(productIdStr);
                 Product product = productDAO.getProductById(productId);
-                List<Specification> specifications = productDAO.getAllSpecifications();
+                List<Attribute> attributes = productDAO.getAllAttributes();
                 request.setAttribute("product", product);
-                request.setAttribute("specifications", specifications);
+                request.setAttribute("attributes", attributes);
                 request.getRequestDispatcher("/views/product/productDetail.jsp").forward(request, response);
             } else {
                 response.sendRedirect("/product");
@@ -145,7 +152,7 @@ public class ProductController extends HttpServlet {
                 product.setSupplierId(supplierId);
                 product.setStatus(status);
 
-                // Parse variants using indexed loop (fix for your issue)
+                // Parse variants
                 List<ProductVariant> variants = new ArrayList<>();
                 List<List<Part>> variantImageParts = new ArrayList<>();
                 List<List<String>> variantImageUrls = new ArrayList<>();
@@ -156,19 +163,33 @@ public class ProductController extends HttpServlet {
                     variant.setPrice(Double.parseDouble(request.getParameter("variantPrice[" + variantIndex + "]")));
                     variant.setWarrantyDurationMonth(Integer.parseInt(request.getParameter("variantWarranty[" + variantIndex + "]")));
 
-                    // Parse specifications for this variant
-                    List<VariantSpecification> specs = new ArrayList<>();
-                    List<Specification> allSpecs = productDAO.getAllSpecifications();
-                    for (Specification specDef : allSpecs) {
-                        String specValue = request.getParameter("specValue[" + specDef.getSpecificationId() + "][" + variantIndex + "]");
-                        if (specValue != null && !specValue.trim().isEmpty()) {
-                            VariantSpecification spec = new VariantSpecification();
-                            spec.setSpecificationId(specDef.getSpecificationId());
-                            spec.setValue(specValue);
-                            specs.add(spec);
+                    // Parse attributes for this variant
+                    List<AttributeOption> attributes = new ArrayList<>();
+                    String[] attributeOptionIds = request.getParameterValues("attributeOptionId[" + variantIndex + "][]");
+                    if (attributeOptionIds != null) {
+                        for (String optionIdStr : attributeOptionIds) {
+                            if (optionIdStr != null && !optionIdStr.isEmpty()) {
+                                AttributeOption attrOption = new AttributeOption();
+                                attrOption.setAttributeOptionId(Integer.parseInt(optionIdStr));
+                                // Fetch AttributeOption details to set Attribute
+                                List<AttributeOption> options = productDAO.getAttributeOptionsByAttributeId(
+                                        productDAO.getAllAttributes().stream()
+                                                .filter(attr -> productDAO.getAttributeOptionsByAttributeId(attr.getAttributeId())
+                                                .stream().anyMatch(opt -> opt.getAttributeOptionId() == Integer.parseInt(optionIdStr)))
+                                                .findFirst().map(Attribute::getAttributeId).orElse(0)
+                                );
+                                options.stream()
+                                        .filter(opt -> opt.getAttributeOptionId() == Integer.parseInt(optionIdStr))
+                                        .findFirst()
+                                        .ifPresent(opt -> {
+                                            attrOption.setValue(opt.getValue());
+                                            attrOption.setAttribute(opt.getAttribute());
+                                        });
+                                attributes.add(attrOption);
+                            }
                         }
                     }
-                    variant.setSpecifications(specs);
+                    variant.setAttributes(attributes);
 
                     // Parse serials for this variant
                     List<ProductSerial> serials = new ArrayList<>();
@@ -176,6 +197,7 @@ public class ProductController extends HttpServlet {
                     while (request.getParameter("variantSerial[" + variantIndex + "][" + serialIndex + "]") != null) {
                         String serialNumber = request.getParameter("variantSerial[" + variantIndex + "][" + serialIndex + "]");
                         String storeIdStr = request.getParameter("variantStoreId[" + variantIndex + "][" + serialIndex + "]");
+                        String serialStatus = request.getParameter("variantSerialStatus[" + variantIndex + "][" + serialIndex + "]");
                         if (serialNumber != null && !serialNumber.isEmpty() && storeIdStr != null && !storeIdStr.isEmpty()) {
                             ProductSerial serial = new ProductSerial();
                             serial.setSerialNumber(serialNumber);
@@ -247,26 +269,42 @@ public class ProductController extends HttpServlet {
                         variant.setPrice(Double.parseDouble(variantPrices[i]));
                         variant.setWarrantyDurationMonth(Integer.parseInt(variantWarranties[i]));
 
-                        List<VariantSpecification> specs = new ArrayList<>();
-                        List<Specification> allSpecs = productDAO.getAllSpecifications();
-                        for (Specification specDef : allSpecs) {
-                            String specValue = request.getParameter("specValue[" + specDef.getSpecificationId() + "][" + i + "]");
-                            if (specValue != null && !specValue.trim().isEmpty()) {
-                                VariantSpecification spec = new VariantSpecification();
-                                spec.setProductVariantId(variantId);
-                                spec.setSpecificationId(specDef.getSpecificationId());
-                                spec.setValue(specValue);
-                                specs.add(spec);
+                        // Parse attributes for this variant
+                        List<AttributeOption> attributes = new ArrayList<>();
+                        String[] attributeOptionIds = request.getParameterValues("attributeOptionId[" + i + "][]");
+                        if (attributeOptionIds != null) {
+                            for (String optionIdStr : attributeOptionIds) {
+                                if (optionIdStr != null && !optionIdStr.isEmpty()) {
+                                    AttributeOption attrOption = new AttributeOption();
+                                    attrOption.setAttributeOptionId(Integer.parseInt(optionIdStr));
+                                    // Fetch AttributeOption details
+                                    List<AttributeOption> options = productDAO.getAttributeOptionsByAttributeId(
+                                            productDAO.getAllAttributes().stream()
+                                                    .filter(attr -> productDAO.getAttributeOptionsByAttributeId(attr.getAttributeId())
+                                                    .stream().anyMatch(opt -> opt.getAttributeOptionId() == Integer.parseInt(optionIdStr)))
+                                                    .findFirst().map(Attribute::getAttributeId).orElse(0)
+                                    );
+                                    options.stream()
+                                            .filter(opt -> opt.getAttributeOptionId() == Integer.parseInt(optionIdStr))
+                                            .findFirst()
+                                            .ifPresent(opt -> {
+                                                attrOption.setValue(opt.getValue());
+                                                attrOption.setAttribute(opt.getAttribute());
+                                            });
+                                    attributes.add(attrOption);
+                                }
                             }
                         }
-                        variant.setSpecifications(specs);
+                        variant.setAttributes(attributes);
 
+                        // Parse serials for this variant
                         List<ProductSerial> serials = new ArrayList<>();
                         int serialIndex = 0;
                         while (request.getParameter("variantSerial[" + i + "][" + serialIndex + "]") != null) {
                             String serialIdStr = request.getParameter("variantSerialId[" + i + "][" + serialIndex + "]");
                             String serialNumber = request.getParameter("variantSerial[" + i + "][" + serialIndex + "]");
                             String storeIdStr = request.getParameter("variantStoreId[" + i + "][" + serialIndex + "]");
+                            String serialStatus = request.getParameter("variantSerialStatus[" + i + "][" + serialIndex + "]");
                             if (serialNumber != null && !serialNumber.isEmpty() && storeIdStr != null && !storeIdStr.isEmpty()) {
                                 ProductSerial serial = new ProductSerial();
                                 serial.setProductSerialId(serialIdStr != null && !serialIdStr.isEmpty() ? Integer.parseInt(serialIdStr) : 0);
@@ -278,6 +316,7 @@ public class ProductController extends HttpServlet {
                         }
                         variant.setSerials(serials);
 
+                        // Parse images for this variant
                         List<Part> parts = new ArrayList<>();
                         for (Part part : request.getParts()) {
                             if (part.getName().equals("variantImage[" + i + "][]") && part.getSize() > 0) {
@@ -300,9 +339,11 @@ public class ProductController extends HttpServlet {
                         String[] imageIds = request.getParameterValues("variantImageId[" + i + "][]");
                         if (imageIds != null) {
                             for (int j = 0; j < imageIds.length; j++) {
-                                ProductImage image = new ProductImage();
-                                image.setProductImageId(Integer.parseInt(imageIds[j]));
-                                images.add(image);
+                                if (imageIds[j] != null && !imageIds[j].isEmpty()) {
+                                    ProductImage image = new ProductImage();
+                                    image.setProductImageId(Integer.parseInt(imageIds[j]));
+                                    images.add(image);
+                                }
                             }
                         }
                         variant.setImages(images);

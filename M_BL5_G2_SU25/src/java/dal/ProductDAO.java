@@ -11,22 +11,21 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-
 public class ProductDAO {
 
     private static final String UPLOAD_DIR = "uploads";
+    String checkSerialNumber = "SELECT COUNT(*) FROM ProductSerial WHERE SerialNumber = ?";
 
     public void addProduct(Product product, List<List<Part>> variantImageParts, List<List<String>> variantImageUrls, HttpServletRequest request) throws IOException {
         String checkProductName = "SELECT COUNT(*) FROM Product WHERE ProductName = ? AND Status = 'Active'";
         String insertProduct = "INSERT INTO Product (ProductName, Status, CategoryId, BrandId, SupplierId) VALUES (?, ?, ?, ?, ?)";
         String checkProductCode = "SELECT COUNT(*) FROM ProductVariant WHERE ProductCode = ?";
         String insertVariant = "INSERT INTO ProductVariant (ProductCode, Price, WarrantyDurationMonth, ProductId) VALUES (?, ?, ?, ?)";
-        String insertSpec = "INSERT INTO VariantSpecification (ProductVariantId, SpecificationId, Value) VALUES (?, ?, ?)";
+        String insertVariantOption = "INSERT INTO VariantOption (ProductVariantId, AttributeOptionId) VALUES (?, ?)";
         String insertImage = "INSERT INTO ProductImage (src, alt, ProductVariantId) VALUES (?, ?, ?)";
         String checkSerialNumber = "SELECT COUNT(*) FROM ProductSerial WHERE SerialNumber = ?";
         String insertSerial = "INSERT INTO ProductSerial (SerialNumber, ProductVariantId, StoreId, CreatedAt, UpdatedAt) VALUES (?, ?, ?, ?, ?)";
@@ -102,11 +101,10 @@ public class ProductDAO {
                         }
                     }
 
-                    for (VariantSpecification spec : variant.getSpecifications()) {
-                        try (PreparedStatement stmt = conn.prepareStatement(insertSpec)) {
+                    for (AttributeOption attrOption : variant.getAttributes()) {
+                        try (PreparedStatement stmt = conn.prepareStatement(insertVariantOption)) {
                             stmt.setInt(1, productVariantId);
-                            stmt.setInt(2, spec.getSpecificationId());
-                            stmt.setString(3, spec.getValue());
+                            stmt.setInt(2, attrOption.getAttributeOptionId());
                             stmt.executeUpdate();
                         }
                     }
@@ -212,9 +210,9 @@ public class ProductDAO {
         String insertVariant = "INSERT INTO ProductVariant (ProductCode, Price, WarrantyDurationMonth, ProductId) VALUES (?, ?, ?, ?)";
         String updateVariant = "UPDATE ProductVariant SET ProductCode = ?, Price = ?, WarrantyDurationMonth = ? WHERE ProductVariantId = ?";
         String deleteVariant = "DELETE FROM ProductVariant WHERE ProductVariantId = ? AND ProductId = ?";
-        String insertSpec = "INSERT INTO VariantSpecification (ProductVariantId, SpecificationId, Value) VALUES (?, ?, ?)";
-        String updateSpec = "UPDATE VariantSpecification SET Value = ? WHERE ProductVariantId = ? AND SpecificationId = ?";
-        String deleteSpec = "DELETE FROM VariantSpecification WHERE ProductVariantId = ? AND SpecificationId = ?";
+        String insertVariantOption = "INSERT INTO VariantOption (ProductVariantId, AttributeOptionId) VALUES (?, ?)";
+        String updateVariantOption = "UPDATE VariantOption SET AttributeOptionId = ? WHERE ProductVariantId = ? AND AttributeOptionId = ?";
+        String deleteVariantOption = "DELETE FROM VariantOption WHERE ProductVariantId = ? AND AttributeOptionId = ?";
         String insertImage = "INSERT INTO ProductImage (src, alt, ProductVariantId) VALUES (?, ?, ?)";
         String updateImage = "UPDATE ProductImage SET src = ?, alt = ? WHERE ProductImageId = ?";
         String deleteImage = "DELETE FROM ProductImage WHERE ProductImageId = ? AND ProductVariantId = ?";
@@ -318,33 +316,33 @@ public class ProductDAO {
                         }
                     }
 
-                    // Process specifications
-                    List<Integer> existingSpecIds = new ArrayList<>();
-                    String selectSpecs = "SELECT SpecificationId FROM VariantSpecification WHERE ProductVariantId = ?";
-                    try (PreparedStatement stmt = conn.prepareStatement(selectSpecs)) {
+                    // Process variant options
+                    List<Integer> existingOptionIds = new ArrayList<>();
+                    String selectOptions = "SELECT AttributeOptionId FROM VariantOption WHERE ProductVariantId = ?";
+                    try (PreparedStatement stmt = conn.prepareStatement(selectOptions)) {
                         stmt.setInt(1, productVariantId);
                         ResultSet rs = stmt.executeQuery();
                         while (rs.next()) {
-                            existingSpecIds.add(rs.getInt("SpecificationId"));
+                            existingOptionIds.add(rs.getInt("AttributeOptionId"));
                         }
                     }
-                    List<Integer> submittedSpecIds = new ArrayList<>();
-                    for (VariantSpecification spec : variant.getSpecifications()) {
-                        int specId = spec.getSpecificationId();
-                        try (PreparedStatement stmt = conn.prepareStatement(existingSpecIds.contains(specId) ? updateSpec : insertSpec)) {
-                            stmt.setString(1, spec.getValue());
+                    List<Integer> submittedOptionIds = new ArrayList<>();
+                    for (AttributeOption attrOption : variant.getAttributes()) {
+                        int optionId = attrOption.getAttributeOptionId();
+                        try (PreparedStatement stmt = conn.prepareStatement(existingOptionIds.contains(optionId) ? updateVariantOption : insertVariantOption)) {
+                            stmt.setInt(1, optionId);
                             stmt.setInt(2, productVariantId);
-                            stmt.setInt(3, specId);
+                            stmt.setInt(3, optionId);
                             stmt.executeUpdate();
                         }
-                        submittedSpecIds.add(specId);
+                        submittedOptionIds.add(optionId);
                     }
-                    // Delete removed specifications
-                    for (int specId : existingSpecIds) {
-                        if (!submittedSpecIds.contains(specId)) {
-                            try (PreparedStatement stmt = conn.prepareStatement(deleteSpec)) {
+                    // Delete removed variant options
+                    for (int optionId : existingOptionIds) {
+                        if (!submittedOptionIds.contains(optionId)) {
+                            try (PreparedStatement stmt = conn.prepareStatement(deleteVariantOption)) {
                                 stmt.setInt(1, productVariantId);
-                                stmt.setInt(2, specId);
+                                stmt.setInt(2, optionId);
                                 stmt.executeUpdate();
                             }
                         }
@@ -508,7 +506,7 @@ public class ProductDAO {
                 // Delete removed variants
                 for (int variantId : existingVariantIds) {
                     if (!submittedVariantIds.contains(variantId)) {
-                        try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM VariantSpecification WHERE ProductVariantId = ?")) {
+                        try (PreparedStatement stmt = conn.prepareStatement("DELETE FROM VariantOption WHERE ProductVariantId = ?")) {
                             stmt.setInt(1, variantId);
                             stmt.executeUpdate();
                         }
@@ -607,7 +605,7 @@ public class ProductDAO {
 
     private List<ProductVariant> getVariantsByProductId(int productId, Connection conn) throws SQLException {
         List<ProductVariant> variants = new ArrayList<>();
-        String sql = "SELECT pv.ProductVariantId, pv.ProductCode, pv.Price, pv.WarrantyDurationMonth, pv.ProductId "
+        String sql = "SELECT pv.ProductVariantId, pv.ProductCode, pv.Price, pv.WarrantyDurationMonth "
                 + "FROM ProductVariant pv WHERE pv.ProductId = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setInt(1, productId);
@@ -618,9 +616,8 @@ public class ProductDAO {
                     variant.setProductCode(rs.getString("ProductCode"));
                     variant.setPrice(rs.getDouble("Price"));
                     variant.setWarrantyDurationMonth(rs.getInt("WarrantyDurationMonth"));
-                    variant.setProductId(rs.getInt("ProductId"));
-                    variant.setSpecifications(getSpecificationsByVariantId(variant.getProductVariantId(), conn));
                     variant.setImages(getImagesByVariantId(variant.getProductVariantId(), conn));
+                    variant.setAttributes(getAttributesByVariantId(variant.getProductVariantId(), conn));
                     variant.setSerials(getSerialsByVariantId(variant.getProductVariantId(), conn));
                     variants.add(variant);
                 }
@@ -629,43 +626,48 @@ public class ProductDAO {
         return variants;
     }
 
-    private List<VariantSpecification> getSpecificationsByVariantId(int productVariantId, Connection conn) throws SQLException {
-        List<VariantSpecification> specs = new ArrayList<>();
-        String sql = "SELECT vs.ProductVariantId, vs.SpecificationId, vs.Value "
-                + "FROM VariantSpecification vs WHERE vs.ProductVariantId = ?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, productVariantId);
-            try (ResultSet rs = stmt.executeQuery()) {
-                while (rs.next()) {
-                    VariantSpecification spec = new VariantSpecification();
-                    spec.setProductVariantId(rs.getInt("ProductVariantId"));
-                    spec.setSpecificationId(rs.getInt("SpecificationId"));
-                    spec.setValue(rs.getString("Value"));
-                    specs.add(spec);
-                }
-            }
-        }
-        return specs;
-    }
-
-    private List<ProductImage> getImagesByVariantId(int productVariantId, Connection conn) throws SQLException {
+    private List<ProductImage> getImagesByVariantId(int variantId, Connection conn) throws SQLException {
         List<ProductImage> images = new ArrayList<>();
-        String sql = "SELECT pi.ProductImageId, pi.src, pi.alt, pi.ProductVariantId "
+        String sql = "SELECT pi.ProductImageId, pi.Src, pi.Alt "
                 + "FROM ProductImage pi WHERE pi.ProductVariantId = ?";
         try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setInt(1, productVariantId);
+            stmt.setInt(1, variantId);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     ProductImage image = new ProductImage();
                     image.setProductImageId(rs.getInt("ProductImageId"));
-                    image.setSrc(rs.getString("src"));
-                    image.setAlt(rs.getString("alt"));
-                    image.setProductVariantId(rs.getInt("ProductVariantId"));
+                    image.setSrc(rs.getString("Src"));
+                    image.setAlt(rs.getString("Alt"));
                     images.add(image);
                 }
             }
         }
         return images;
+    }
+
+    private List<AttributeOption> getAttributesByVariantId(int variantId, Connection conn) throws SQLException {
+        List<AttributeOption> attributes = new ArrayList<>();
+        String sql = "SELECT a.AttributeId, a.AttributeName, ao.AttributeOptionId, ao.Value "
+                + "FROM VariantOption vo "
+                + "JOIN AttributeOption ao ON vo.AttributeOptionId = ao.AttributeOptionId "
+                + "JOIN Attribute a ON ao.AttributeId = a.AttributeId "
+                + "WHERE vo.ProductVariantId = ?";
+        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, variantId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    AttributeOption attrOption = new AttributeOption();
+                    attrOption.setAttributeOptionId(rs.getInt("AttributeOptionId"));
+                    attrOption.setValue(rs.getString("Value"));
+                    Attribute attribute = new Attribute();
+                    attribute.setAttributeId(rs.getInt("AttributeId"));
+                    attribute.setAttributeName(rs.getString("AttributeName"));
+                    attrOption.setAttribute(attribute);
+                    attributes.add(attrOption);
+                }
+            }
+        }
+        return attributes;
     }
 
     private List<ProductSerial> getSerialsByVariantId(int productVariantId, Connection conn) throws SQLException {
@@ -725,10 +727,10 @@ public class ProductDAO {
 
     public List<Brand> getAllBrands() {
         List<Brand> brands = new ArrayList<>();
-        String sql = "SELECT brandId, brandName FROM Brand WHERE status = 'ACTIVE'";
+        String sql = "SELECT BrandId, BrandName FROM Brand WHERE Status = 'Active'";
         try (Connection conn = new DBContext().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                brands.add(new Brand(rs.getInt("brandId"), rs.getString("brandName")));
+                brands.add(new Brand(rs.getInt("BrandId"), rs.getString("BrandName")));
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error retrieving brands: " + e.getMessage(), e);
@@ -738,10 +740,10 @@ public class ProductDAO {
 
     public List<Category> getAllCategories() {
         List<Category> categories = new ArrayList<>();
-        String sql = "SELECT categoryId, categoryName FROM Category WHERE status = 'ACTIVE'";
+        String sql = "SELECT CategoryId, CategoryName FROM Category WHERE Status = 'Active'";
         try (Connection conn = new DBContext().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                categories.add(new Category(rs.getInt("categoryId"), rs.getString("categoryName")));
+                categories.add(new Category(rs.getInt("CategoryId"), rs.getString("CategoryName")));
             }
         } catch (SQLException e) {
             throw new RuntimeException("Error retrieving categories: " + e.getMessage(), e);
@@ -771,20 +773,45 @@ public class ProductDAO {
         return suppliers;
     }
 
-    public List<Specification> getAllSpecifications() {
-        List<Specification> specifications = new ArrayList<>();
-        String sql = "SELECT SpecificationId, AttributeName FROM Specification";
+    public List<Attribute> getAllAttributes() {
+        List<Attribute> attributes = new ArrayList<>();
+        String sql = "SELECT AttributeId, AttributeName FROM Attribute";
         try (Connection conn = new DBContext().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql); ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
-                Specification spec = new Specification();
-                spec.setSpecificationId(rs.getInt("SpecificationId"));
-                spec.setAttributeName(rs.getString("AttributeName"));
-                specifications.add(spec);
+                Attribute attr = new Attribute();
+                attr.setAttributeId(rs.getInt("AttributeId"));
+                attr.setAttributeName(rs.getString("AttributeName"));
+                attributes.add(attr);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error retrieving specifications: " + e.getMessage(), e);
+            throw new RuntimeException("Error retrieving attributes: " + e.getMessage(), e);
         }
-        return specifications;
+        return attributes;
+    }
+
+    public List<AttributeOption> getAttributeOptionsByAttributeId(int attributeId) {
+        List<AttributeOption> options = new ArrayList<>();
+        String sql = "SELECT ao.AttributeOptionId, ao.Value, a.AttributeId, a.AttributeName "
+                + "FROM AttributeOption ao JOIN Attribute a ON ao.AttributeId = a.AttributeId "
+                + "WHERE ao.AttributeId = ?";
+        try (Connection conn = new DBContext().getConnection(); PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, attributeId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                while (rs.next()) {
+                    AttributeOption option = new AttributeOption();
+                    option.setAttributeOptionId(rs.getInt("AttributeOptionId"));
+                    option.setValue(rs.getString("Value"));
+                    Attribute attribute = new Attribute();
+                    attribute.setAttributeId(rs.getInt("AttributeId"));
+                    attribute.setAttributeName(rs.getString("AttributeName"));
+                    option.setAttribute(attribute);
+                    options.add(option);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("Error retrieving attribute options: " + e.getMessage(), e);
+        }
+        return options;
     }
 
     public List<Store> getAllStores() {
@@ -896,7 +923,7 @@ public class ProductDAO {
                 variant.setCategoryName(rs.getString("CategoryName"));
                 variant.setBrandName(rs.getString("BrandName"));
                 variant.setSupplierName(rs.getString("SupplierName"));
-                variant.setSpecifications(getSpecificationsByVariantId(productVariantId, conn));
+                variant.setAttributes(getAttributesByVariantId(productVariantId, conn));
                 variant.setImages(getImagesByVariantId(productVariantId, conn));
                 variant.setSerials(getSerialsByVariantId(productVariantId, conn));
             }
@@ -908,9 +935,9 @@ public class ProductDAO {
 
     public void updateProductVariant(ProductVariant variant, List<Part> imageParts, List<String> imageUrls, HttpServletRequest request) throws IOException, SQLException {
         String updateVariant = "UPDATE ProductVariant SET ProductCode = ?, Price = ?, WarrantyDurationMonth = ? WHERE ProductVariantId = ?";
-        String insertSpec = "INSERT INTO VariantSpecification (ProductVariantId, SpecificationId, Value) VALUES (?, ?, ?)";
-        String updateSpec = "UPDATE VariantSpecification SET Value = ? WHERE ProductVariantId = ? AND SpecificationId = ?";
-        String deleteSpec = "DELETE FROM VariantSpecification WHERE ProductVariantId = ? AND SpecificationId = ?";
+        String insertVariantOption = "INSERT INTO VariantOption (ProductVariantId, AttributeOptionId) VALUES (?, ?)";
+        String updateVariantOption = "UPDATE VariantOption SET AttributeOptionId = ? WHERE ProductVariantId = ? AND AttributeOptionId = ?";
+        String deleteVariantOption = "DELETE FROM VariantOption WHERE ProductVariantId = ? AND AttributeOptionId = ?";
         String insertImage = "INSERT INTO ProductImage (src, alt, ProductVariantId) VALUES (?, ?, ?)";
         String updateImage = "UPDATE ProductImage SET src = ?, alt = ? WHERE ProductImageId = ?";
         String deleteImage = "DELETE FROM ProductImage WHERE ProductImageId = ? AND ProductVariantId = ?";
@@ -936,38 +963,37 @@ public class ProductDAO {
                     stmt.executeUpdate();
                 }
 
-                // Process specifications
-                List<Integer> existingSpecIds = new ArrayList<>();
-                String selectSpecs = "SELECT SpecificationId FROM VariantSpecification WHERE ProductVariantId = ?";
-                try (PreparedStatement stmt = conn.prepareStatement(selectSpecs)) {
+                // Process variant options
+                List<Integer> existingOptionIds = new ArrayList<>();
+                String selectOptions = "SELECT AttributeOptionId FROM VariantOption WHERE ProductVariantId = ?";
+                try (PreparedStatement stmt = conn.prepareStatement(selectOptions)) {
                     stmt.setInt(1, variant.getProductVariantId());
                     ResultSet rs = stmt.executeQuery();
                     while (rs.next()) {
-                        existingSpecIds.add(rs.getInt("SpecificationId"));
+                        existingOptionIds.add(rs.getInt("AttributeOptionId"));
                     }
                 }
 
-                List<Integer> submittedSpecIds = new ArrayList<>();
-                for (VariantSpecification spec : variant.getSpecifications()) {
-                    int specId = spec.getSpecificationId();
-                    String value = spec.getValue();
-                    if (value != null && !value.trim().isEmpty()) {
-                        try (PreparedStatement stmt = conn.prepareStatement(existingSpecIds.contains(specId) ? updateSpec : insertSpec)) {
-                            stmt.setString(1, value);
+                List<Integer> submittedOptionIds = new ArrayList<>();
+                for (AttributeOption attrOption : variant.getAttributes()) {
+                    int optionId = attrOption.getAttributeOptionId();
+                    if (optionId > 0) {
+                        try (PreparedStatement stmt = conn.prepareStatement(existingOptionIds.contains(optionId) ? updateVariantOption : insertVariantOption)) {
+                            stmt.setInt(1, optionId);
                             stmt.setInt(2, variant.getProductVariantId());
-                            stmt.setInt(3, specId);
+                            stmt.setInt(3, optionId);
                             stmt.executeUpdate();
                         }
-                        submittedSpecIds.add(specId);
+                        submittedOptionIds.add(optionId);
                     }
                 }
 
-                // Delete removed specifications
-                for (int specId : existingSpecIds) {
-                    if (!submittedSpecIds.contains(specId)) {
-                        try (PreparedStatement stmt = conn.prepareStatement(deleteSpec)) {
+                // Delete removed variant options
+                for (int optionId : existingOptionIds) {
+                    if (!submittedOptionIds.contains(optionId)) {
+                        try (PreparedStatement stmt = conn.prepareStatement(deleteVariantOption)) {
                             stmt.setInt(1, variant.getProductVariantId());
-                            stmt.setInt(2, specId);
+                            stmt.setInt(2, optionId);
                             stmt.executeUpdate();
                         }
                     }
@@ -1063,6 +1089,16 @@ public class ProductDAO {
                 for (ProductSerial serial : variant.getSerials()) {
                     int serialId = serial.getProductSerialId();
                     if (serial.getSerialNumber() != null && !serial.getSerialNumber().trim().isEmpty() && serial.getStoreId() > 0) {
+                        // Check for duplicate SerialNumber
+                        try (PreparedStatement stmt = conn.prepareStatement(checkSerialNumber)) {
+                            stmt.setString(1, serial.getSerialNumber());
+                            stmt.setInt(2, serialId);
+                            ResultSet rs = stmt.executeQuery();
+                            if (rs.next() && rs.getInt(1) > 0) {
+                                throw new SQLException("Serial number '" + serial.getSerialNumber() + "' already exists.");
+                            }
+                        }
+
                         if (serialId > 0) {
                             try (PreparedStatement stmt = conn.prepareStatement(updateSerial)) {
                                 stmt.setString(1, serial.getSerialNumber());
