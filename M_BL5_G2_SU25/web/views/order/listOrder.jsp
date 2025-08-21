@@ -137,9 +137,10 @@
                         <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
                         <input type="text" class="form-control" placeholder="Tìm theo tên khách / mã đơn...">
                     </div>
-                    <button class="btn btn-outline-secondary">
-                        <i class="bi bi-arrow-clockwise me-1"></i>Tải lại
-                    </button>
+                   <button class="btn btn-outline-secondary" onclick="window.location.href=window.location.href;">
+    <i class="bi bi-arrow-clockwise me-1"></i>Tải lại
+</button>
+
                     <div class="btn-group">
                         <button class="btn btn-primary" onclick="window.location.href='${pageContext.request.contextPath}/order/create'"><i class="bi bi-plus-lg me-1"></i>Tạo đơn</button>
                         <button class="btn btn-outline-primary"><i class="bi bi-upload me-1"></i>Nhập</button>
