@@ -118,14 +118,14 @@
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
                                                           ${s.status == 'Active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                                                        ${s.status}
+                                                        ${s.status == 'Active' ? 'Đang hoạt động' : 'Ngừng hoạt động'}
                                                     </span>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
                                                     <a href="${pageContext.request.contextPath}/management/suppliers/edit?id=${s.supplierId}"
-                                                       class="text-blue-600 hover:text-blue-900"><i class="fa-solid fa-pen-to-square text-yellow-500 hover:text-yellow-900"></i></a>
+                                                       class="text-blue-600 hover:text-blue-900"><i class="fa-solid fa-pen-to-square text-yellow-500 hover:text-yellow-900"></i> Chỉnh sửa</a>
                                                     <a href="${pageContext.request.contextPath}/management/suppliers/detail?id=${s.supplierId}"
-                                                       class=""><i class="fa-solid fa-eye text-blue-600 hover:text-blue-900"></i></a>
+                                                       class=""><i class="fa-solid fa-eye text-blue-600 hover:text-blue-900"></i> Chi tiết</a>
                                                 </td>
                                             </tr>
                                         </c:forEach>
