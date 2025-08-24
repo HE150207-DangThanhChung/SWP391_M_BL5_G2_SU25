@@ -39,7 +39,7 @@ public class AttributeController extends HttpServlet {
         } else if (pathInfo.equals("/detail")) {
             try {
                 int attributeId = Integer.parseInt(request.getParameter("attributeId"));
-                Attribute attribute = productDAO.getAttributeById(attributeId); // Assume this method is added to ProductDAO
+                Attribute attribute = productDAO.getAttributeById(attributeId);
                 List<AttributeOption> options = productDAO.getAttributeOptionsByAttributeId(attributeId);
                 request.setAttribute("attribute", attribute);
                 request.setAttribute("options", options);
@@ -49,6 +49,21 @@ public class AttributeController extends HttpServlet {
                 request.getRequestDispatcher("/views/attribute/ListAttributes.jsp").forward(request, response);
             } catch (SQLException e) {
                 request.setAttribute("error", "Lỗi khi tải chi tiết thuộc tính: " + e.getMessage());
+                request.getRequestDispatcher("/views/attribute/ListAttributes.jsp").forward(request, response);
+            }
+        } else if (pathInfo.equals("/edit")) { // New: Handle GET for edit form
+            try {
+                int attributeId = Integer.parseInt(request.getParameter("attributeId"));
+                Attribute attribute = productDAO.getAttributeById(attributeId);
+                List<AttributeOption> options = productDAO.getAttributeOptionsByAttributeId(attributeId);
+                request.setAttribute("attribute", attribute);
+                request.setAttribute("options", options);
+                request.getRequestDispatcher("/views/attribute/EditAttribute.jsp").forward(request, response); // NEW JSP
+            } catch (NumberFormatException e) {
+                request.setAttribute("error", "ID thuộc tính không hợp lệ.");
+                request.getRequestDispatcher("/views/attribute/ListAttributes.jsp").forward(request, response);
+            } catch (SQLException e) {
+                request.setAttribute("error", "Lỗi khi tải thông tin thuộc tính để chỉnh sửa: " + e.getMessage());
                 request.getRequestDispatcher("/views/attribute/ListAttributes.jsp").forward(request, response);
             }
         }
@@ -62,15 +77,14 @@ public class AttributeController extends HttpServlet {
                 String attributeName = request.getParameter("attributeName");
                 Attribute attribute = new Attribute();
                 attribute.setAttributeName(attributeName);
-                int attributeId = productDAO.addAttribute(attribute); // Assume this method is added to ProductDAO
+                int attributeId = productDAO.addAttribute(attribute);
                 String[] optionValues = request.getParameterValues("optionValue[]");
                 if (optionValues != null) {
                     for (String value : optionValues) {
                         if (value != null && !value.trim().isEmpty()) {
                             AttributeOption option = new AttributeOption();
                             option.setValue(value);
-                            option.setAttribute(attribute);
-                            productDAO.addAttributeOption(attributeId, option); // Assume this method is added to ProductDAO
+                            productDAO.addAttributeOption(attributeId, option);
                         }
                     }
                 }
@@ -96,6 +110,50 @@ public class AttributeController extends HttpServlet {
             } catch (SQLException e) {
                 request.setAttribute("error", "Lỗi khi thêm giá trị: " + e.getMessage());
                 request.getRequestDispatcher("/views/attribute/AttributeDetails.jsp").forward(request, response);
+            }
+        } else if (pathInfo.equals("/edit")) { // NEW: Handle POST for editing an existing attribute
+            try {
+                int attributeId = Integer.parseInt(request.getParameter("attributeId"));
+                String attributeName = request.getParameter("attributeName");
+                Attribute attribute = new Attribute();
+                attribute.setAttributeId(attributeId);
+                attribute.setAttributeName(attributeName);
+                productDAO.updateAttribute(attribute); // Assume this method is added to ProductDAO
+
+                // Handle existing options
+                String[] existingOptionIds = request.getParameterValues("existingOptionId[]");
+                String[] existingOptionValues = request.getParameterValues("existingOptionValue[]");
+                if (existingOptionIds != null && existingOptionValues != null) {
+                    for (int i = 0; i < existingOptionIds.length; i++) {
+                        int optionId = Integer.parseInt(existingOptionIds[i]);
+                        String value = existingOptionValues[i];
+                        if (value != null && !value.trim().isEmpty()) {
+                            AttributeOption option = new AttributeOption();
+                            option.setAttributeOptionId(optionId);
+                            option.setValue(value);
+                            productDAO.updateAttributeOption(option); // Assume this method is added
+                        }
+                    }
+                }
+
+                // Handle new options
+                String[] newOptionValues = request.getParameterValues("newOptionValue[]");
+                if (newOptionValues != null) {
+                    for (String value : newOptionValues) {
+                        if (value != null && !value.trim().isEmpty()) {
+                            AttributeOption option = new AttributeOption();
+                            option.setValue(value);
+                            productDAO.addAttributeOption(attributeId, option);
+                        }
+                    }
+                }
+                response.sendRedirect(request.getContextPath() + "/attribute/detail?attributeId=" + attributeId);
+            } catch (NumberFormatException e) {
+                request.setAttribute("error", "Dữ liệu ID không hợp lệ.");
+                request.getRequestDispatcher("/views/attribute/EditAttribute.jsp").forward(request, response);
+            } catch (SQLException e) {
+                request.setAttribute("error", "Lỗi khi cập nhật thuộc tính: " + e.getMessage());
+                request.getRequestDispatcher("/views/attribute/EditAttribute.jsp").forward(request, response);
             }
         }
     }

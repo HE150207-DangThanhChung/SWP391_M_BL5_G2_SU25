@@ -1,7 +1,11 @@
 package model;
 
+import com.google.gson.annotations.Expose;
+
 public class AttributeOption {
+    @Expose
     private int attributeOptionId;
+    @Expose
     private String value;
     private Attribute attribute;
 

@@ -1,8 +1,12 @@
 package model;
 
+import java.util.List;
+
 public class Attribute {
+
     private int attributeId;
     private String attributeName;
+    private List<AttributeOption> options;
 
     // Constructors
     public Attribute() {
@@ -28,5 +32,13 @@ public class Attribute {
 
     public void setAttributeName(String attributeName) {
         this.attributeName = attributeName;
+    }
+
+    public List<AttributeOption> getOptions() {
+        return options;
+    }
+
+    public void setOptions(List<AttributeOption> options) {
+        this.options = options;
     }
 }

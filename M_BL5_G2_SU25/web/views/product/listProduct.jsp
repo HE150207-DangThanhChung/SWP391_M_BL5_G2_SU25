@@ -85,6 +85,14 @@
         .alert {
             margin-top: 1rem;
         }
+        .pagination {
+            justify-content: flex-end;
+        }
+        .footer-info {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
     </style>
 </head>
 <body>
@@ -140,6 +148,12 @@
                         <option value="asc">Tăng</option>
                         <option value="desc">Giảm</option>
                     </select>
+                    <select class="form-select form-select-sm" id="pageSize">
+                        <option value="10">10</option>
+                        <option value="20">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
                     <button class="btn btn-primary btn-sm" id="applyFilters">Áp dụng</button>
                     <button class="btn btn-secondary btn-sm" id="resetFilters">Đặt lại</button>
                 </div>
@@ -162,79 +176,20 @@
                             </tr>
                         </thead>
                         <tbody id="productTableBody">
-                            <c:forEach var="product" items="${products}">
-                                <tr>
-                                    <td>${product.productId}</td>
-                                    <td>
-                                        <c:choose>
-                                            <c:when test="${not empty product.variants and not empty product.variants[0].images and not empty product.variants[0].images[0].src}">
-                                                <img src="${pageContext.request.contextPath}/${product.variants[0].images[0].src}" alt="${product.productName}" class="product-img">
-                                            </c:when>
-                                            <c:otherwise>
-                                                <span class="text-muted">No image</span>
-                                            </c:otherwise>
-                                        </c:choose>
-                                    </td>
-                                    <td>
-                                        <a href="${pageContext.request.contextPath}/product/detail?productId=${product.productId}">
-                                            ${product.productName}
-                                        </a>
-                                    </td>
-                                    <td>${product.brandName}</td>
-                                    <td>${product.categoryName}</td>
-                                    <td>${product.supplierName}</td>
-                                    <td>${product.variants != null ? product.variants.size() : 0}</td>
-                                    <td>
-                                        <c:if test="${not empty product.variants}">
-                                            <c:set var="minPrice" value="${product.variants[0].price}" />
-                                            <c:set var="maxPrice" value="${product.variants[0].price}" />
-                                            <c:forEach var="variant" items="${product.variants}">
-                                                <c:if test="${variant.price < minPrice}"><c:set var="minPrice" value="${variant.price}" /></c:if>
-                                                <c:if test="${variant.price > maxPrice}"><c:set var="maxPrice" value="${variant.price}" /></c:if>
-                                            </c:forEach>
-                                            <fmt:setLocale value="vi_VN" />
-                                            <fmt:formatNumber value="${minPrice}" type="number" groupingUsed="true" minFractionDigits="0" maxFractionDigits="2" /> - 
-                                            <fmt:formatNumber value="${maxPrice}" type="number" groupingUsed="true" minFractionDigits="0" maxFractionDigits="2" />
-                                        </c:if>
-                                    </td>
-                                    <td>
-                                        <span class="badge ${product.status == 'Active' ? 'bg-success' : 'bg-danger'}">
-                                            ${product.status}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <a href="${pageContext.request.contextPath}/product/edit?productId=${product.productId}" 
-                                           class="btn btn-sm btn-warning">Sửa</a>
-                                    </td>
-                                </tr>
-                            </c:forEach>
+                            <!-- Data will be populated via JS -->
                         </tbody>
                     </table>
                 </div>
 
                 <!-- Footer & Pagination -->
                 <div class="d-flex justify-content-between align-items-center mt-3 flex-wrap gap-2">
-                    <div>Tổng có <strong id="totalCount">${fn:length(products)}</strong> dữ liệu</div>
-                    <div>Hiển thị <strong>${pageSize}</strong> mỗi trang</div>
-                    <nav>
+                    <div class="footer-info">
+                        <div>Tổng có <strong id="totalCount">0</strong> dữ liệu</div>
+                        <div>Hiển thị <strong id="pageSizeDisplay">10</strong> mỗi trang</div>
+                    </div>
+                    <nav id="paginationNav">
                         <ul class="pagination pagination-sm mb-0">
-                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                <a class="page-link" href="?page=1">&laquo;</a>
-                            </li>
-                            <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
-                                <a class="page-link" href="?page=${currentPage - 1}">&lt;</a>
-                            </li>
-                            <c:forEach begin="1" end="${totalPages}" var="page">
-                                <li class="page-item ${page == currentPage ? 'active' : ''}">
-                                    <a class="page-link" href="?page=${page}">${page}</a>
-                                </li>
-                            </c:forEach>
-                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                <a class="page-link" href="?page=${currentPage + 1}">&gt;</a>
-                            </li>
-                            <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
-                                <a class="page-link" href="?page=${totalPages}">&raquo;</a>
-                            </li>
+                            <!-- Pagination links will be generated here -->
                         </ul>
                     </nav>
                 </div>
@@ -247,218 +202,279 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
-    $(document).ready(function() {
-        // Validate price inputs on input
-        $("#minPrice, #maxPrice").on("input blur", function() {
-            const input = $(this);
-            const value = parseFloat(input.val());
-            const errorMessage = input.next(".error-message");
-            if (value < 0) {
-                input.addClass("error-border");
-                errorMessage.show();
-            } else {
-                input.removeClass("error-border");
-                errorMessage.hide();
+$(document).ready(function() {
+    let currentData = [];
+    let currentPage = 1;
+    let pageSize = parseInt($("#pageSize").val()) || 10;
+
+    // Update page size display
+    function updatePageSizeDisplay() {
+        $("#pageSizeDisplay").text(pageSize);
+    }
+
+    // Load initial data
+    fetchData();
+
+    // Validate price inputs
+    $("#minPrice, #maxPrice").on("input blur", function() {
+        const input = $(this);
+        const value = parseFloat(input.val());
+        const errorMessage = input.next(".error-message");
+        if (value < 0 || isNaN(value)) {
+            input.addClass("error-border");
+            errorMessage.show();
+        } else {
+            input.removeClass("error-border");
+            errorMessage.hide();
+        }
+    });
+
+    // Page size change handler
+    $("#pageSize").on("change", function() {
+        pageSize = parseInt($(this).val()) || 10;
+        currentPage = 1;
+        updatePageSizeDisplay();
+        renderPage(currentData, currentPage);
+        generatePagination(currentData.length, currentPage);
+    });
+
+    // Search functionality (server-side)
+    $("#searchInput").on("keyup", function() {
+        let searchTerm = $(this).val().trim();
+        let categoryId = $("#categoryFilter").val();
+        let brandId = $("#brandFilter").val();
+        let status = $("#statusFilter").val();
+        let minPrice = $("#minPrice").val() ? parseFloat($("#minPrice").val()) : "";
+        let maxPrice = $("#maxPrice").val() ? parseFloat($("#maxPrice").val()) : "";
+        let sortBy = $("#sortBy").val();
+        let sortOrder = $("#sortOrder").val();
+        fetchData(categoryId, brandId, status, minPrice, maxPrice, sortBy, sortOrder, searchTerm);
+    });
+
+    // Apply filters
+    $("#applyFilters").on("click", function() {
+        let minPriceInput = $("#minPrice");
+        let maxPriceInput = $("#maxPrice");
+        let minPrice = minPriceInput.val() ? parseFloat(minPriceInput.val()) : "";
+        let maxPrice = maxPriceInput.val() ? parseFloat(maxPriceInput.val()) : "";
+
+        if ((minPrice < 0 || isNaN(minPrice)) || (maxPrice < 0 || isNaN(maxPrice))) {
+            alert("Giá tối thiểu và tối đa phải là số không âm!");
+            if (minPrice < 0 || isNaN(minPrice)) {
+                minPriceInput.addClass("error-border").next(".error-message").show();
             }
-        });
-
-        // Search functionality (client-side)
-        $("#searchInput").on("keyup", function() {
-            let searchTerm = $(this).val().toLowerCase();
-            $("#productTableBody tr").filter(function() {
-                $(this).toggle($(this).text().toLowerCase().indexOf(searchTerm) > -1);
-            });
-        });
-
-        // Apply filters with AJAX
-        $("#applyFilters").on("click", function() {
-            // Validate price inputs
-            let minPriceInput = $("#minPrice");
-            let maxPriceInput = $("#maxPrice");
-            let minPrice = minPriceInput.val() ? parseFloat(minPriceInput.val()) : "";
-            let maxPrice = maxPriceInput.val() ? parseFloat(maxPriceInput.val()) : "";
-
-            if (minPrice < 0 || maxPrice < 0) {
-                alert("Giá tối thiểu và tối đa không được âm!");
-                if (minPrice < 0) {
-                    minPriceInput.addClass("error-border").next(".error-message").show();
-                }
-                if (maxPrice < 0) {
-                    maxPriceInput.addClass("error-border").next(".error-message").show();
-                }
-                return;
+            if (maxPrice < 0 || isNaN(maxPrice)) {
+                maxPriceInput.addClass("error-border").next(".error-message").show();
             }
+            return;
+        }
 
-            let categoryId = $("#categoryFilter").val();
-            let brandId = $("#brandFilter").val();
-            let status = $("#statusFilter").val();
-            let sortBy = $("#sortBy").val();
-            let sortOrder = $("#sortOrder").val();
+        let categoryId = $("#categoryFilter").val();
+        let brandId = $("#brandFilter").val();
+        let status = $("#statusFilter").val();
+        let sortBy = $("#sortBy").val();
+        let sortOrder = $("#sortOrder").val();
+        let searchTerm = $("#searchInput").val().trim();
 
-            $.ajax({
-                url: "${pageContext.request.contextPath}/product/filter",
-                type: "GET",
-                dataType: "json",
-                data: {
-                    categoryId: categoryId,
-                    brandId: brandId,
-                    status: status,
-                    minPrice: minPrice,
-                    maxPrice: maxPrice,
-                    sortBy: sortBy,
-                    sortOrder: sortOrder
-                },
-                success: function(data) {
-                    console.log("AJAX Success - Raw Data:", data);
-                    let tableBody = $("#productTableBody");
-                    tableBody.empty();
-                    if (data.error) {
-                        alert(data.error);
-                        tableBody.append('<tr><td colspan="10">' + data.error + '</td></tr>');
-                    } else if (!data || !Array.isArray(data) || data.length === 0) {
-                        tableBody.append('<tr><td colspan="10">Không có sản phẩm nào phù hợp</td></tr>');
-                    } else {
-                        data.forEach(product => {
-                            let minPrice = product.variants && product.variants.length > 0 ? product.variants[0].price : 0;
-                            let maxPrice = product.variants && product.variants.length > 0 ? product.variants[0].price : 0;
-                            if (product.variants) {
-                                product.variants.forEach(variant => {
-                                    if (variant.price < minPrice) minPrice = variant.price;
-                                    if (variant.price > maxPrice) maxPrice = variant.price;
-                                });
-                            }
-                            let imageSrc = product.variants && product.variants.length > 0 && product.variants[0].images && product.variants[0].images.length > 0 
-                                ? "${pageContext.request.contextPath}/" + product.variants[0].images[0].src 
-                                : "";
-                            let formattedMinPrice = minPrice.toLocaleString('vi-VN');
-                            let formattedMaxPrice = maxPrice.toLocaleString('vi-VN');
-                            tableBody.append(`
-                                <tr>
-                                    <td>\${product.productId != undefined ? product.productId : 'N/A'}</td>
-                                    <td>
-                                        <img src="${imageSrc}" alt="\${product.productName || 'No Name'}" class="product-img" ${imageSrc ? '' : 'style="display:none;"'}>
-                                        <span class="text-muted" ${imageSrc ? 'style="display:none;"' : ''}>No image</span>
-                                    </td>
-                                    <td><a href="${pageContext.request.contextPath}/product/detail?productId=\${product.productId != undefined ? product.productId : ''}">\${product.productName || 'No Name'}</a></td>
-                                    <td>\${product.brandName != undefined ? product.brandName : 'N/A'}</td>
-                                    <td>\${product.categoryName != undefined ? product.categoryName : 'N/A'}</td>
-                                    <td>\${product.supplierName != undefined ? product.supplierName : 'N/A'}</td>
-                                    <td>\${product.variants ? product.variants.length : 0}</td>
-                                    <td>\${formattedMinPrice} - \${formattedMaxPrice}</td>
-                                    <td><span class="badge \${product.status == 'Active' ? 'bg-success' : 'bg-danger'}">\${product.status || 'N/A'}</span></td>
-                                    <td>
-                                        <a href="${pageContext.request.contextPath}/product/edit?productId=\${product.productId != undefined ? product.productId : ''}" class="btn btn-sm btn-warning">Sửa</a>
-                                        <a href="${pageContext.request.contextPath}/product/delete?productId=\${product.productId != undefined ? product.productId : ''}" class="btn btn-sm btn-danger">Xóa</a>
-                                    </td>
-                                </tr>
-                            `);
-                        });
-                        $("#totalCount").text(data.length);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error("AJAX Error", status, error, xhr.responseText);
-                    let errorMessage = "Lỗi khi tải dữ liệu";
-                    try {
-                        let responseJson = JSON.parse(xhr.responseText);
-                        if (responseJson.error) {
-                            errorMessage = responseJson.error;
-                        }
-                    } catch (e) {
-                        // Not JSON, use default message
-                    }
-                    $("#productTableBody").html(`<tr><td colspan="10">${errorMessage}</td></tr>`);
-                    alert(errorMessage);
-                }
-            });
-        });
+        fetchData(categoryId, brandId, status, minPrice, maxPrice, sortBy, sortOrder, searchTerm);
+    });
 
-        // Reset filters
-        $("#resetFilters").on("click", function() {
-            console.log("Reset Filters clicked");
-            $("#categoryFilter").val("");
-            $("#brandFilter").val("");
-            $("#statusFilter").val("");
-            $("#minPrice").val("").removeClass("error-border").next(".error-message").hide();
-            $("#maxPrice").val("").removeClass("error-border").next(".error-message").hide();
-            $("#sortBy").val("");
-            $("#sortOrder").val("asc");
+    // Reset filters
+    $("#resetFilters").on("click", function() {
+        $("#categoryFilter").val("");
+        $("#brandFilter").val("");
+        $("#statusFilter").val("");
+        $("#minPrice").val("").removeClass("error-border").next(".error-message").hide();
+        $("#maxPrice").val("").removeClass("error-border").next(".error-message").hide();
+        $("#sortBy").val("");
+        $("#sortOrder").val("asc");
+        $("#pageSize").val("10");
+        $("#searchInput").val("");
+        pageSize = 10;
+        currentPage = 1;
+        updatePageSizeDisplay();
+        fetchData();
+    });
 
-            $.ajax({
-                url: "${pageContext.request.contextPath}/product/",
-                type: "GET",
-                dataType: "json",
-                success: function(data) {
-                    console.log("Reset AJAX Success", data);
-                    let tableBody = $("#productTableBody");
-                    tableBody.empty();
-                    if (data.error) {
-                        alert(data.error);
-                        tableBody.append('<tr><td colspan="10">' + data.error + '</td></tr>');
-                    } else if (!data || !Array.isArray(data) || data.length === 0) {
-                        tableBody.append('<tr><td colspan="10">Không có sản phẩm nào</td></tr>');
-                    } else {
-                        data.forEach(product => {
-                            let minPrice = product.variants && product.variants.length > 0 ? product.variants[0].price : 0;
-                            let maxPrice = product.variants && product.variants.length > 0 ? product.variants[0].price : 0;
-                            if (product.variants) {
-                                product.variants.forEach(variant => {
-                                    if (variant.price < minPrice) minPrice = variant.price;
-                                    if (variant.price > maxPrice) maxPrice = variant.price;
-                                });
-                            }
-                            let imageSrc = product.variants && product.variants.length > 0 && product.variants[0].images && product.variants[0].images.length > 0 
-                                ? "${pageContext.request.contextPath}/" + product.variants[0].images[0].src 
-                                : "";
-                            let formattedMinPrice = minPrice.toLocaleString('vi-VN');
-                            let formattedMaxPrice = maxPrice.toLocaleString('vi-VN');
-                            tableBody.append(`
-                                <tr>
-                                    <td>\${product.productId != undefined ? product.productId : 'N/A'}</td>
-                                    <td>
-                                        <img src="${imageSrc}" alt="\${product.productName || 'No Name'}" class="product-img" ${imageSrc ? '' : 'style="display:none;"'}>
-                                        <span class="text-muted" ${imageSrc ? 'style="display:none;"' : ''}>No image</span>
-                                    </td>
-                                    <td><a href="\${pageContext.request.contextPath}/product/detail?productId=\${product.productId != undefined ? product.productId : ''}">\${product.productName || 'No Name'}</a></td>
-                                    <td>\${product.brandName != undefined ? product.brandName : 'N/A'}</td>
-                                    <td>\${product.categoryName != undefined ? product.categoryName : 'N/A'}</td>
-                                    <td>\${product.supplierName != undefined ? product.supplierName : 'N/A'}</td>
-                                    <td>\${product.variants ? product.variants.length : 0}</td>
-                                    <td>\${formattedMinPrice} - \${formattedMaxPrice}</td>
-                                    <td><span class="badge \${product.status == 'Active' ? 'bg-success' : 'bg-danger'}">\${product.status || 'N/A'}</span></td>
-                                    <td>
-                                        <a href="${pageContext.request.contextPath}/product/edit?productId=\${product.productId != undefined ? product.productId : ''}" class="btn btn-sm btn-warning">Sửa</a>
-                                        <a href="${pageContext.request.contextPath}/product/delete?productId=\${product.productId != undefined ? product.productId : ''}" class="btn btn-sm btn-danger">Xóa</a>
-                                    </td>
-                                </tr>
-                            `);
-                        });
-                        $("#totalCount").text(data.length);
-                    }
-                },
-                error: function(xhr, status, error) {
-                    console.error("Reset AJAX Error", status, error, xhr.responseText);
-                    let errorMessage = "Lỗi khi tải dữ liệu";
-                    try {
-                        let responseJson = JSON.parse(xhr.responseText);
-                        if (responseJson.error) {
-                            errorMessage = responseJson.error;
-                        }
-                    } catch (e) {
-                        // Not JSON, use default message
-                    }
-                    $("#productTableBody").html(`<tr><td colspan="10">${errorMessage}</td></tr>`);
-                    alert(errorMessage);
-                }
-            });
-        });
-
-        // Add delete confirmation
-        $("#productTableBody").on("click", ".btn-danger", function(e) {
-            if (!confirm("Bạn có chắc muốn xóa sản phẩm này?")) {
-                e.preventDefault();
+    // Delete confirmation and refresh
+    $("#productTableBody").on("click", ".btn-danger", function(e) {
+        e.preventDefault();
+        if (!confirm("Bạn có chắc muốn xóa sản phẩm này?")) {
+            return;
+        }
+        let href = $(this).attr("href");
+        $.ajax({
+            url: href,
+            type: "GET",
+            success: function(response) {
+                fetchData(); // Refresh data after deletion
+            },
+            error: function(xhr) {
+                alert("Lỗi khi xóa sản phẩm: " + (xhr.responseJSON ? xhr.responseJSON.error : "Unknown error"));
             }
         });
     });
+
+    // Pagination click handler
+    $("#paginationNav").on("click", ".page-link", function(e) {
+        e.preventDefault();
+        if ($(this).parent().hasClass('disabled')) return;
+        let page = parseInt($(this).data('page'));
+        if (isNaN(page)) {
+            let totalPages = Math.ceil(currentData.length / pageSize);
+            if ($(this).text() === '«') {
+                page = 1;
+            } else if ($(this).text() === '»') {
+                page = totalPages;
+            } else if ($(this).text() === '<') {
+                page = currentPage - 1;
+            } else if ($(this).text() === '>') {
+                page = currentPage + 1;
+            }
+        }
+        currentPage = page;
+        renderPage(currentData, currentPage);
+        generatePagination(currentData.length, currentPage);
+    });
+
+    function fetchData(categoryId = '', brandId = '', status = '', minPrice = '', maxPrice = '', sortBy = '', sortOrder = '', searchTerm = '') {
+        $.ajax({
+            url: "${pageContext.request.contextPath}/product/filter",
+            type: "GET",
+            dataType: "json",
+            data: {
+                categoryId: categoryId,
+                brandId: brandId,
+                status: status,
+                minPrice: minPrice,
+                maxPrice: maxPrice,
+                sortBy: sortBy,
+                sortOrder: sortOrder,
+                searchTerm: searchTerm
+            },
+            success: function(data) {
+                console.log("AJAX Success - Raw Data:", data);
+                if (data.error) {
+                    alert(data.error);
+                    $("#productTableBody").html('<tr><td colspan="10">' + data.error + '</td></tr>');
+                    $("#totalCount").text(0);
+                    $("#paginationNav ul").empty();
+                } else if (!data || !Array.isArray(data) || data.length === 0) {
+                    $("#productTableBody").html('<tr><td colspan="10">Không có sản phẩm nào phù hợp</td></tr>');
+                    $("#totalCount").text(0);
+                    $("#paginationNav ul").empty();
+                } else {
+                    currentData = data;
+                    currentPage = 1;
+                    renderPage(currentData, currentPage);
+                    generatePagination(currentData.length, currentPage);
+                    $("#totalCount").text(currentData.length);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error("AJAX Error", status, error, xhr.responseText);
+                let errorMessage = "Lỗi khi tải dữ liệu";
+                try {
+                    let responseJson = JSON.parse(xhr.responseText);
+                    if (responseJson.error) {
+                        errorMessage = responseJson.error;
+                    }
+                } catch (e) {
+                    // Not JSON, use default message
+                }
+                $("#productTableBody").html(`<tr><td colspan="10">\${errorMessage}</td></tr>`);
+                $("#totalCount").text(0);
+                $("#paginationNav ul").empty();
+                alert(errorMessage);
+            }
+        });
+    }
+
+    function renderPage(data, page) {
+        let tableBody = $("#productTableBody");
+        tableBody.empty();
+        if (!data || data.length === 0) {
+            tableBody.html('<tr><td colspan="10">Không có sản phẩm nào phù hợp</td></tr>');
+            return;
+        }
+        let start = (page - 1) * pageSize;
+        let end = Math.min(start + pageSize, data.length);
+        let pageData = data.slice(start, end);
+        pageData.forEach(product => {
+            let minPrice = product.variants && product.variants.length > 0 ? product.variants[0].price : 0;
+            let maxPrice = product.variants && product.variants.length > 0 ? product.variants[0].price : 0;
+            if (product.variants) {
+                product.variants.forEach(variant => {
+                    if (variant.price < minPrice) minPrice = variant.price;
+                    if (variant.price > maxPrice) maxPrice = variant.price;
+                });
+            }
+            let imageSrc = product.variants && product.variants.length > 0 && product.variants[0].images && product.variants[0].images.length > 0 
+                ? "${pageContext.request.contextPath}/" + product.variants[0].images[0].src 
+                : "";
+            let formattedMinPrice = minPrice.toLocaleString('vi-VN');
+            let formattedMaxPrice = maxPrice.toLocaleString('vi-VN');
+            tableBody.append(`
+                <tr>
+                    <td>\${product.productId != undefined ? product.productId : 'N/A'}</td>
+                    <td>
+                        <img src="\${imageSrc}" alt="\${product.productName || 'No Name'}" class="product-img" \${imageSrc ? '' : 'style="display:none;"'}>
+                        <span class="text-muted" \${imageSrc ? 'style="display:none;"' : ''}>No image</span>
+                    </td>
+                    <td><a href="${pageContext.request.contextPath}/product/detail?productId=\${product.productId != undefined ? product.productId : ''}">\${product.productName || 'No Name'}</a></td>
+                    <td>\${product.brandName != undefined ? product.brandName : 'N/A'}</td>
+                    <td>\${product.categoryName != undefined ? product.categoryName : 'N/A'}</td>
+                    <td>\${product.supplierName != undefined ? product.supplierName : 'N/A'}</td>
+                    <td>\${product.variants ? product.variants.length : 0}</td>
+                    <td>\${formattedMinPrice} - \${formattedMaxPrice}</td>
+                    <td><span class="badge \${product.status == 'Active' ? 'bg-success' : 'bg-danger'}">\${product.status || 'N/A'}</span></td>
+                    <td>
+                        <a href="${pageContext.request.contextPath}/product/edit?productId=\${product.productId != undefined ? product.productId : ''}" class="btn btn-sm btn-warning">Sửa</a>
+                    </td>
+                </tr>
+            `);
+        });
+    }
+
+    function generatePagination(totalItems, currentPage) {
+        let totalPages = Math.ceil(totalItems / pageSize);
+        let pagination = $("#paginationNav ul");
+        pagination.empty();
+        if (totalItems === 0) return;
+        pagination.append(`
+            <li class="page-item \${currentPage == 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="1">&laquo;</a>
+            </li>
+            <li class="page-item \${currentPage == 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="\${currentPage - 1}">&lt;</a>
+            </li>
+        `);
+        let startPage = Math.max(1, currentPage - 2);
+        let endPage = Math.min(totalPages, currentPage + 2);
+        if (endPage - startPage < 4) {
+            if (startPage === 1) {
+                endPage = Math.min(totalPages, startPage + 4);
+            } else if (endPage === totalPages) {
+                startPage = Math.max(1, endPage - 4);
+            }
+        }
+        for (let i = startPage; i <= endPage; i++) {
+            pagination.append(`
+                <li class="page-item \${i == currentPage ? 'active' : ''}">
+                    <a class="page-link" href="#" data-page="\${i}">\${i}</a>
+                </li>
+            `);
+        }
+        pagination.append(`
+            <li class="page-item \${currentPage == totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="\${currentPage + 1}">&gt;</a>
+            </li>
+            <li class="page-item \${currentPage == totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="\${totalPages}">&raquo;</a>
+            </li>
+        `);
+    }
+});
 </script>
-</body></html>
+</body>
+</html>

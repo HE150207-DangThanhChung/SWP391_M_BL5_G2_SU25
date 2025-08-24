@@ -34,6 +34,7 @@
                                 <td>${attribute.attributeName}</td>
                                 <td>
                                     <a href="${pageContext.request.contextPath}/attribute/detail?attributeId=${attribute.attributeId}" class="btn btn-info btn-sm">Chi tiết</a>
+                                    <a href="${pageContext.request.contextPath}/attribute/edit?attributeId=${attribute.attributeId}" class="btn btn-warning btn-sm">Chỉnh sửa</a>
                                 </td>
                             </tr>
                         </c:forEach>
