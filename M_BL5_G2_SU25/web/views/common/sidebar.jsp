@@ -153,6 +153,10 @@
                     <i class="fas fa-tags"></i>
                     Quản lí Thông số kỹ thuật
                 </a>
+                <a href="${pageContext.request.contextPath}/receipt">
+                    <i class="fas fa-tags"></i>
+                    Quản lí Hoá Đơn
+                </a>
         </aside>
     </body>
 </html>
