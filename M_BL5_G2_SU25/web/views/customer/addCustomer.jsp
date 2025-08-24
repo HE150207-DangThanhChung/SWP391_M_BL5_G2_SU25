@@ -132,7 +132,6 @@
         <section class="card">
             <div class="card__header">Thêm Khách Hàng</div>
 
-            <!-- Validation errors from controller (optional) -->
             <c:if test="${not empty errors}">
                 <ul class="errors">
                     <c:forEach items="${errors}" var="e"><li>${e}</li></c:forEach>
@@ -233,7 +232,6 @@
             </form>
         </section>
 
-        <!-- City -> Ward cascading (read-only lookup endpoint) -->
         <script>
             (function () {
                 const ctx = '${ctx}';

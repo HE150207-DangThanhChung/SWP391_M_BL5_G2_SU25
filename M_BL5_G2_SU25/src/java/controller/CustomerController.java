@@ -77,7 +77,6 @@ public class CustomerController extends HttpServlet {
         }
     }
 
-    // =================== GET handlers ===================
     private void handleAddForm(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         req.setAttribute("cities", cityDAO.getAll());
@@ -165,7 +164,6 @@ public class CustomerController extends HttpServlet {
         req.getRequestDispatcher(VIEW_LIST).forward(req, resp);
     }
 
-    // =================== POST handlers ===================
     private void handleAdd(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         List<String> errors = new ArrayList<>();
@@ -253,10 +251,7 @@ public class CustomerController extends HttpServlet {
         }
     }
 
-    // =================== Binding & Utils ===================
-    /**
-     * Bind request params into a Customer and collect validation errors.
-     */
+    
     private Customer bindFromRequest(HttpServletRequest req, List<String> errors, Integer idForUpdate) {
         Customer c = new Customer();
 
@@ -297,7 +292,7 @@ public class CustomerController extends HttpServlet {
         c.setStatus(status);
         c.setTaxCode(trimToNull(req.getParameter("taxCode")));
 
-        // Ward is optional (nullable)
+        // nullable)
         Integer wardId = null;
         String wardRaw = req.getParameter("wardId");
         if (wardRaw != null && !wardRaw.isBlank()) {
@@ -308,7 +303,6 @@ public class CustomerController extends HttpServlet {
         }
         c.setWardId(wardId);
 
-        // DoB is optional
         c.setDob(parseSqlDate(req.getParameter("dob"), null));
 
         return c;

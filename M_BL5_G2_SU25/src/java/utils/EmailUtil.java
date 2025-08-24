@@ -4,10 +4,26 @@
  */
 package utils;
 
-import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.Properties;
-import javax.mail.*;
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import java.util.Date;
+import java.util.Properties;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import javax.mail.Authenticator;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.PasswordAuthentication;
+import javax.mail.Session;
+import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
@@ -17,87 +33,102 @@ import javax.mail.internet.MimeMessage;
  */
 public class EmailUtil {
 
-    // ==== YOUR ACCOUNT (must match the Google account that created the app password) ====
-    private static final String FROM_EMAIL = "chungdthe150207@fpt.edu.vn";
-    private static final String APP_PASSWORD = "pqdcvhjupaiqflum"; // 16 chars, NO SPACES
-    private static final String FROM_NAME = "HappySale";        // shown to recipients
+//    public static final String FROM = "chungdthe150207@fpt.edu.vn";   
+//    static final String APP_PASSWORD = "pqdcvhjupaiqflum";            
+    static final String FROM_NAME = "HappySale";
 
-    // Turn off after you confirm it works (reduces log noise)
-    private static final boolean DEBUG = true;
+    public static final String FROM = "he180616nguyentuandung@gmail.com";
+    static final String APP_PASSWORD = "qrll vkzp xfxl ldrv";
 
     /**
-     * Send a plain-text email using Gmail SMTP. Tries STARTTLS(587) first; if
-     * that fails (e.g., firewall), falls back to SSL(465).
+     * Gửi email HTML đơn giản qua Gmail SMTP (STARTTLS 587).
      *
-     * @return true if sent successfully, false otherwise (details printed to
-     * server log when DEBUG=true)
+     * @param to địa chỉ người nhận
+     * @param tieuDe tiêu đề
+     * @param noiDung nội dung (HTML hoặc text)
+     * @return true nếu gửi thành công, ngược lại false
      */
-    public static boolean sendMail(String toEmail, String subject, String body) {
-        // Try STARTTLS 587 first
-        if (trySend(toEmail, subject, body, false)) {
-            return true;
-        }
-        // Fallback to SSL 465
-        return trySend(toEmail, subject, body, true);
-    }
+    public static boolean sendMail(String to, String tieuDe, String noiDung) {
+        long startTime = System.currentTimeMillis();
+        // Properties : khai báo thuộc tính
+        Properties pros = new Properties();
+        pros.put("mail.smtp.host", "smtp.gmail.com"); // SMTP HOST
+        pros.put("mail.smtp.port", "587"); // TLS 587 SSL 465
+        pros.put("mail.smtp.auth", "true");
+        pros.put("mail.smtp.starttls.enable", "true");
 
-    /**
-     * Fire-and-forget async sender (non-blocking). Useful from servlets.
-     */
-    public static void sendMailAsync(String toEmail, String subject, String body) {
-        Thread t = new Thread(() -> sendMail(toEmail, subject, body));
-        t.setDaemon(true);
-        t.start();
-    }
+        // create Authenticator
+        Authenticator auth = new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(FROM, APP_PASSWORD);
+            }
+        };
 
-    // -------------------- internals --------------------
-    private static boolean trySend(String toEmail, String subject, String body, boolean ssl) {
+        // Phiên làm việc
+        Session session = Session.getInstance(pros, auth);
+        System.out.println("Khởi tạo Session: " + (System.currentTimeMillis() - startTime) + "ms");
+        // Gửi email
+//        final String to = "ntd28082003@gmail.com";
+        // tạo một tin nhắn
+        MimeMessage msg = new MimeMessage(session);
+
         try {
-            Properties props = new Properties();
-            props.put("mail.smtp.host", "smtp.gmail.com");
-            if (ssl) {
-                props.put("mail.smtp.port", "465");
-                props.put("mail.smtp.auth", "true");
-                props.put("mail.smtp.ssl.enable", "true");
-            } else {
-                props.put("mail.smtp.port", "587");
-                props.put("mail.smtp.auth", "true");
-                props.put("mail.smtp.starttls.enable", "true");
-            }
-
-            Session session = Session.getInstance(props, new Authenticator() {
-                @Override
-                protected PasswordAuthentication getPasswordAuthentication() {
-                    return new PasswordAuthentication(FROM_EMAIL, APP_PASSWORD);
-                }
-            });
-            session.setDebug(DEBUG);
-
-            MimeMessage msg = new MimeMessage(session);
-            msg.setFrom(new InternetAddress(FROM_EMAIL, FROM_NAME, StandardCharsets.UTF_8.name()));
-            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(toEmail, false));
-            msg.setSubject(subject, StandardCharsets.UTF_8.name());
-            msg.setText(body, StandardCharsets.UTF_8.name());
+            // kiểu nội dung
+            msg.addHeader("Conten-type", "text/html; charset=UTF-8");
+            // người gửi
+            msg.setFrom(FROM);
+            // người  nhận
+            msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to, false));
+            // Tiêu đề email
+            msg.setSubject(tieuDe, "UTF-8");
+            //Quy định ngày gửi
             msg.setSentDate(new Date());
-
+            // Quy định email phản hồi
+            msg.setReplyTo(null); // InternetAddress.parse(to, false)
+            //Nội dung
+            msg.setContent(noiDung, "text/HTML; charset=UTF-8");
+            // Gửi email
+            long sendStart = System.currentTimeMillis();
             Transport.send(msg);
+            System.out.println("Gửi email: " + (System.currentTimeMillis() - sendStart) + "ms");
+            System.out.println("Tổng thời gian: " + (System.currentTimeMillis() - startTime) + "ms");
             return true;
-
-        } catch (Exception ex) {
-            if (DEBUG) {
-                ex.printStackTrace();
-            }
+        } catch (MessagingException ex) {
+            System.out.println("Gửi không Thành Công");
+            System.out.println(ex.getMessage());
             return false;
         }
     }
 
-    // Optional quick test
+    /**
+     * Gửi email bất đồng bộ (không chặn luồng hiện tại).
+     */
+    public static void sendMailAsync(String to, String tieuDe, String noiDung) {
+        if (to == null || to.trim().isEmpty()) {
+
+        }
+        Thread thread = new Thread(() -> {
+            try {
+                sendMail(to, tieuDe, noiDung);
+            } catch (Exception e) {
+                // Đăng ký log hoặc xử lý lỗi gửi mail tại đây
+                System.err.println("Lỗi khi gửi mail: " + e.getMessage());
+                e.printStackTrace();
+            }
+        });
+
+        // Nếu bạn không muốn thread này ngăn JVM tắt, đặt nó thành daemon
+        thread.setDaemon(true);
+
+        // Bắt đầu thực thi bất đồng bộ
+        thread.start();
+    }
+
+    // Test nhanh (chạy độc lập)
     public static void main(String[] args) {
-        boolean ok = sendMail(
-                "chungdthe150207@fpt.edu.vn",
-                "SMTP test",
-                "This is a test email from HappySale."
-        );
-        System.out.println("MAIL SENT? " + ok);
+    //            sendMailAsync("chungdthe150207@fpt.edu.vn", "Test async " + System.currentTimeMillis(), "Chào 1");
+        // Đóng thread pool sau khi thử nghiệm
+     //   shutdown();
     }
 }
