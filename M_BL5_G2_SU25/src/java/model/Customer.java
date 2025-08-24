@@ -22,7 +22,8 @@ public class Customer {
     private String status;
     private String taxCode;      
     private Integer wardId;      
-    private Date dob;            
+    private Date dob;          
+    private String fullName;
 
     // Convenience fields for display (joined from Ward & City)
     private String wardName;
