@@ -4,6 +4,8 @@
  */
 package model;
 
+import java.util.List;
+
 /**
  *
  * @author tayho
@@ -17,7 +19,7 @@ public class Order {
     private Employee createdBy;
     private Employee saleBy;
     private Store store;
-    private java.util.List<OrderDetail> orderDetails;
+    private List<OrderDetail> orderDetails;
 
     public Order() {
     }
