@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +32,7 @@ import java.util.Map;
 public class ProductController extends HttpServlet {
 
     private ProductDAO productDAO;
+    private final Gson gson = new Gson();
 
     @Override
     public void init() throws ServletException {
@@ -62,20 +64,18 @@ public class ProductController extends HttpServlet {
             List<Category> categories = productDAO.getAllCategories();
             List<Brand> brands = productDAO.getAllBrands();
             List<Supplier> suppliers = productDAO.getAllSuppliers();
-            List<Attribute> attributes = productDAO.getAllAttributes();
-            Map<Integer, List<AttributeOption>> attributeOptions = new HashMap<>();
-            for (Attribute attribute : attributes) {
-                attributeOptions.put(attribute.getAttributeId(), productDAO.getAttributeOptionsByAttributeId(attribute.getAttributeId()));
-            }
             List<Store> stores = productDAO.getAllStores();
             request.setAttribute("categories", categories);
             request.setAttribute("brands", brands);
             request.setAttribute("suppliers", suppliers);
-            request.setAttribute("attributes", attributes);
-            request.setAttribute("attributeOptions", attributeOptions);
             request.setAttribute("stores", stores);
+            // We no longer load attributes here. The JSP will fetch them dynamically.
+            
             request.getRequestDispatcher("/views/product/addProduct.jsp").forward(request, response);
-        } else if (pathInfo.equals("/edit")) {
+        } else if (pathInfo.equals("/attributes")) {
+            // NEW ENDPOINT FOR AJAX
+            handleGetAttributes(request, response);
+        }  else if (pathInfo.equals("/edit")) {
             String productIdStr = request.getParameter("productId");
             if (productIdStr != null) {
                 int productId = Integer.parseInt(productIdStr);
@@ -115,15 +115,52 @@ public class ProductController extends HttpServlet {
             Double maxPrice = request.getParameter("maxPrice") != null && !request.getParameter("maxPrice").isEmpty() ? Double.parseDouble(request.getParameter("maxPrice")) : null;
             String sortBy = request.getParameter("sortBy");
             String sortOrder = request.getParameter("sortOrder");
+            String searchTerm = request.getParameter("searchTerm"); // Add searchTerm
 
-            List<Product> products = productDAO.getFilteredAndSortedProducts(categoryId, brandId, status, minPrice, maxPrice, sortBy, sortOrder);
-            Gson gson = new Gson();
-            response.setContentType("application/json");
-            PrintWriter out = response.getWriter();
-            out.print(gson.toJson(products));
-            out.flush();
+            try {
+                List<Product> products = productDAO.getFilteredAndSortedProducts(categoryId, brandId, status, minPrice, maxPrice, sortBy, sortOrder, searchTerm);
+                Gson gson = new Gson();
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                PrintWriter out = response.getWriter();
+                out.print(gson.toJson(products));
+                out.flush();
+            } catch (Exception e) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.getWriter().write("{\"error\": \"Lỗi khi lọc sản phẩm: " + e.getMessage() + "\"}");
+            }
         } else {
             response.sendRedirect("/product");
+        }
+    }
+    
+    private void handleGetAttributes(HttpServletRequest request, HttpServletResponse response) 
+            throws IOException {
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+
+        String categoryIdStr = request.getParameter("categoryId");
+        if (categoryIdStr == null || categoryIdStr.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.print("{\"error\":\"Missing categoryId\"}");
+            out.flush();
+            return;
+        }
+
+        try {
+            int categoryId = Integer.parseInt(categoryIdStr);
+            List<Attribute> attributes = productDAO.getAttributesWithOptionsByCategoryId(categoryId);
+            String jsonResponse = gson.toJson(attributes);
+            out.print(jsonResponse);
+        } catch (NumberFormatException e) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.print("{\"error\":\"Invalid categoryId format\"}");
+        } catch (SQLException e) {
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            out.print("{\"error\":\"Database error: " + e.getMessage() + "\"}");
+        } finally {
+            out.flush();
         }
     }
 

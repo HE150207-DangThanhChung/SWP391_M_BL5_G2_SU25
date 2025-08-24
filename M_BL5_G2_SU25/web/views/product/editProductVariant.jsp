@@ -96,7 +96,6 @@
                                     <input type="number" class="form-control" id="warrantyDurationMonth" name="warrantyDurationMonth" value="${variant.warrantyDurationMonth}" required>
                                     <div class="error-message">Thời gian bảo hành không được âm</div>
                                 </div>
-                                <!-- Attributes -->
                                 <h6 class="mt-4">Thông số kỹ thuật</h6>
                                 <div class="spec-container">
                                     <c:forEach var="attribute" items="${allAttributes}">
@@ -118,7 +117,6 @@
                                         </div>
                                     </c:forEach>
                                 </div>
-                                <!-- Images -->
                                 <h6 class="mt-4">Hình ảnh</h6>
                                 <div class="image-container">
                                     <c:forEach var="image" items="${variant.images}">
@@ -140,7 +138,6 @@
                                     </div>
                                     <button type="button" class="btn btn-outline-secondary btn-add-image">Thêm hình ảnh</button>
                                 </div>
-                                <!-- Serials -->
                                 <h6 class="mt-4">Serials</h6>
                                 <div class="serial-container">
                                     <c:forEach var="serial" items="${variant.serials}">

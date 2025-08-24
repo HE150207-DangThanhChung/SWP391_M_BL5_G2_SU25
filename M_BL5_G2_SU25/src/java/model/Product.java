@@ -1,19 +1,30 @@
 package model;
 
+import com.google.gson.annotations.Expose;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Product {
+    @Expose
     private int productId;
+    @Expose
     private String productName;
-    private String status;
+    @Expose
     private int categoryId;
+    @Expose
     private String categoryName;
+    @Expose
     private int brandId;
+    @Expose
     private String brandName;
+    @Expose
     private int supplierId;
+    @Expose
     private String supplierName;
-    private List<ProductVariant> variants = new ArrayList<>();
+    @Expose
+    private String status;
+    @Expose
+    private List<ProductVariant> variants;
 
     // Constructors
     public Product() {
