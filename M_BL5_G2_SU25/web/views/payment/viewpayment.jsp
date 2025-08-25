@@ -176,16 +176,7 @@
                             <form action="viewpayments" method="get" class="col-lg-4 d-flex align-items-center filter-group">
                                 <input type="hidden" name="action" value="displayName">
                                 <input type="hidden" name="sid" value="${sessionScope.user.getUserID()}">
-                                <div >
-                                    <label for="name" class="mr-2 mb-0">Họ tên:</label>
-                                    <div class="input-group">
-                                        <input type="hidden" name="action" value="displaybyname">
-                                        
-                                        <div class="input-group-append">
-                                            <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
-                                        </div>
-                                    </div>
-                                </div>
+                               
                             </form>
                         </div>
                     </div>
@@ -193,8 +184,10 @@
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
-                            <th>Payment ID</th>
+                            
                             <th>Order ID</th>
+                        
+                            <th>Customer Name</th>
                             <th>Payment Method</th>
                             <th>Price</th>
                             <th>Payment Date</th>
@@ -207,8 +200,10 @@
                         <c:if test="${not empty listP}">
                             <c:forEach items="${listP}" var="payment">
                                 <tr>
-                                    <td>${payment.getPaymentID()}</td>
+                                    
                                     <td>${payment.getOrderID()}</td>
+                                    
+                                    <td>${payment.getFirstName()} ${payment.getMiddleName()} ${payment.getLastName()}</td>
                                     <td>${payment.getPaymentMethod()}</td>
                                     <td><fmt:formatNumber value="${payment.getPrice()}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
                                     <td><fmt:formatDate value="${payment.getPaymentDate()}" pattern="yyyy-MM-dd" /></td>

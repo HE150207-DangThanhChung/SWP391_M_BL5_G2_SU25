@@ -8,6 +8,7 @@
 package controller;
 
 import dal.CustomerDAO;
+import dal.EmployeeDAO;
 import dal.OrderDAO;
 import dal.ProductDAO;
 import dal.StoreStockDAO;
@@ -137,6 +138,10 @@ public class OrderController extends HttpServlet {
         ProductDAO productDAO = new ProductDAO();
         List<Product> products = productDAO.getAllProducts();
         request.setAttribute("products", products);
+
+        EmployeeDAO employeeDAO = new EmployeeDAO();
+        List<Employee> employees = employeeDAO.getAllEmployees();
+        request.setAttribute("employees", employees);
 
         request.getRequestDispatcher("/views/order/addOrder.jsp").forward(request, response);
     }

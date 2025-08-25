@@ -79,9 +79,11 @@ public class PaymentsDAO {
 
     public List<Payments> getAllPaymentbySellerId(int sid) {
         List<Payments> listP = new ArrayList<>();
-        String sql = "SELECT PM.PaymentID, PM.OrderID, PM.PaymentMethod, PM.PaymentDate, PM.PaymentStatus, PM.Price, PM.TransactionCode " +
+        String sql = "SELECT PM.PaymentID, PM.OrderID, PM.PaymentMethod, PM.PaymentDate, PM.PaymentStatus, PM.Price, PM.TransactionCode, " +
+                     "C.CustomerId, C.FirstName, C.MiddleName, C.LastName " +
                      "FROM Payments PM " +
                      "JOIN [Order] O ON PM.OrderID = O.OrderId " +
+                     "JOIN Customer C ON O.CustomerId = C.CustomerId " +
                      "WHERE O.SaleBy = ?";
         try (Connection con = new DBContext().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -96,6 +98,10 @@ public class PaymentsDAO {
                 p.setPaymentStatus(rs.getString("PaymentStatus"));
                 p.setPrice(rs.getString("Price"));
                 p.setTransactionCode(rs.getString("TransactionCode"));
+                p.setCustomerId(rs.getInt("CustomerId"));
+                p.setFirstName(rs.getString("FirstName"));
+                p.setMiddleName(rs.getString("MiddleName"));
+                p.setLastName(rs.getString("LastName"));
                 listP.add(p);
             }
         } catch (Exception e) {
@@ -106,9 +112,11 @@ public class PaymentsDAO {
 
     public List<Payments> getAllPaymentbySellerIdandMethod(int sid, String method) {
         List<Payments> listP = new ArrayList<>();
-        String sql = "SELECT PM.PaymentID, PM.OrderID, PM.PaymentMethod, PM.PaymentDate, PM.PaymentStatus, PM.Price, PM.TransactionCode " +
+        String sql = "SELECT PM.PaymentID, PM.OrderID, PM.PaymentMethod, PM.PaymentDate, PM.PaymentStatus, PM.Price, PM.TransactionCode, " +
+                     "C.CustomerId, C.FirstName, C.MiddleName, C.LastName " +
                      "FROM Payments PM " +
                      "JOIN [Order] O ON PM.OrderID = O.OrderID " + 
+                     "JOIN Customer C ON O.CustomerId = C.CustomerId " +
                      "WHERE O.SaleBy = ? AND PM.PaymentMethod = ?";
         try (Connection con = new DBContext().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -124,6 +132,10 @@ public class PaymentsDAO {
                 p.setPaymentStatus(rs.getString("PaymentStatus"));
                 p.setPrice(rs.getString("Price"));
                 p.setTransactionCode(rs.getString("TransactionCode"));
+                p.setCustomerId(rs.getInt("CustomerId"));
+                p.setFirstName(rs.getString("FirstName"));
+                p.setMiddleName(rs.getString("MiddleName"));
+                p.setLastName(rs.getString("LastName"));
                 listP.add(p);
             }
         } catch (Exception e) {
@@ -134,9 +146,11 @@ public class PaymentsDAO {
 
     public List<Payments> getAllPaymentbySellerIdandStatus(int sid, String status) {
         List<Payments> listP = new ArrayList<>();
-        String sql = "SELECT PM.PaymentID, PM.OrderID, PM.PaymentMethod, PM.PaymentDate, PM.PaymentStatus, PM.Price, PM.TransactionCode " +
+        String sql = "SELECT PM.PaymentID, PM.OrderID, PM.PaymentMethod, PM.PaymentDate, PM.PaymentStatus, PM.Price, PM.TransactionCode, " +
+                     "C.CustomerId, C.FirstName, C.MiddleName, C.LastName " +
                      "FROM Payments PM " +
                      "JOIN [Order] O ON PM.OrderID = O.OrderID " +
+                     "JOIN Customer C ON O.CustomerId = C.CustomerId " +
                      "WHERE O.SaleBy = ? AND PM.PaymentStatus = ?";
         try (Connection con = new DBContext().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
@@ -152,6 +166,10 @@ public class PaymentsDAO {
                 p.setPaymentStatus(rs.getString("PaymentStatus"));
                 p.setPrice(rs.getString("Price"));
                 p.setTransactionCode(rs.getString("TransactionCode"));
+                p.setCustomerId(rs.getInt("CustomerId"));
+                p.setFirstName(rs.getString("FirstName"));
+                p.setMiddleName(rs.getString("MiddleName"));
+                p.setLastName(rs.getString("LastName"));
                 listP.add(p);
             }
         } catch (Exception e) {

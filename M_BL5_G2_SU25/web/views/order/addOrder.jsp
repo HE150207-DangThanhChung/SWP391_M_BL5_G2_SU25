@@ -42,8 +42,42 @@
                     </select>
                 </td>
             </tr>
-            <tr><th>Người tạo (ID)</th><td><input type="number" name="createdById" required /></td></tr>
-            <tr><th>Người bán (ID)</th><td><input type="number" name="saleById" required /></td></tr>
+            <tr><th>Người tạo</th>
+                <td>
+                    <c:choose>
+                        <c:when test="${not empty sessionScope.employeeId}">
+                            <input type="hidden" name="createdById" value="${sessionScope.employeeId}" />
+                            <input type="text" value="${sessionScope.employeeName}" readonly />
+                        </c:when>
+                        <c:otherwise>
+                            <select name="createdById" required>
+                                <option value="">-- Chọn người tạo --</option>
+                                <c:forEach var="e" items="${employees}">
+                                    <c:if test="${e.roleId == 2}">
+                                        <option value="${e.employeeId}">
+                                            ${e.lastName} ${e.middleName} ${e.firstName} (${e.employeeId})
+                                        </option>
+                                    </c:if>
+                                </c:forEach>
+                            </select>
+                        </c:otherwise>
+                    </c:choose>
+                </td>
+            </tr>
+            <tr><th>Người bán</th>
+                <td>
+                    <select name="saleById" required>
+                        <option value="">-- Chọn người bán --</option>
+                        <c:forEach var="e" items="${employees}">
+                            <c:if test="${e.roleId == 3}">
+                                <option value="${e.employeeId}">
+                                    ${e.lastName} ${e.middleName} ${e.firstName} (${e.employeeId})
+                                </option>
+                            </c:if>
+                        </c:forEach>
+                    </select>
+                </td>
+            </tr>
             <tr><th>Cửa hàng</th>
                 <td>
                     <select name="storeId" required>

@@ -18,8 +18,13 @@ public class Payments {
     private Date PaymentDate;
     private String PaymentStatus;
     private String TransactionCode;
+    private int CustomerId;
+    private String FirstName;
+    private String MiddleName;
+    private String LastName;
 
-    public Payments(int PaymentID, int OrderID, String PaymentMethod, String Price, Date PaymentDate, String PaymentStatus, String TransactionCode) {
+    public Payments(int PaymentID, int OrderID, String PaymentMethod, String Price, Date PaymentDate, String PaymentStatus, String TransactionCode, 
+            int CustomerId, String FirstName, String MiddleName, String LastName) {
         this.PaymentID = PaymentID;
         this.OrderID = OrderID;
         this.PaymentMethod = PaymentMethod;
@@ -27,6 +32,10 @@ public class Payments {
         this.PaymentDate = PaymentDate;
         this.PaymentStatus = PaymentStatus;
         this.TransactionCode = TransactionCode;
+        this.CustomerId = CustomerId;
+        this.FirstName = FirstName;
+        this.MiddleName = MiddleName;
+        this.LastName = LastName;
     }
 
     public Payments() {
@@ -90,8 +99,42 @@ public class Payments {
 
     @Override
     public String toString() {
-        return "Payments{" + "PaymentID=" + PaymentID + ", OrderID=" + OrderID + ", PaymentMethod=" + PaymentMethod + ", Price=" + Price + ", PaymentDate=" + PaymentDate + ", PaymentStatus=" + PaymentStatus + ", TransactionCode=" + TransactionCode + '}';
+        return "Payments{" + "PaymentID=" + PaymentID + ", OrderID=" + OrderID + ", PaymentMethod=" + PaymentMethod + 
+               ", Price=" + Price + ", PaymentDate=" + PaymentDate + ", PaymentStatus=" + PaymentStatus + 
+               ", TransactionCode=" + TransactionCode + ", CustomerId=" + CustomerId + 
+               ", FirstName=" + FirstName + ", MiddleName=" + MiddleName + ", LastName=" + LastName + '}';
     }
 
+    public int getCustomerId() {
+        return CustomerId;
+    }
+
+    public void setCustomerId(int CustomerId) {
+        this.CustomerId = CustomerId;
+    }
+
+    public String getFirstName() {
+        return FirstName;
+    }
+
+    public void setFirstName(String FirstName) {
+        this.FirstName = FirstName;
+    }
+
+    public String getMiddleName() {
+        return MiddleName;
+    }
+
+    public void setMiddleName(String MiddleName) {
+        this.MiddleName = MiddleName;
+    }
+
+    public String getLastName() {
+        return LastName;
+    }
+
+    public void setLastName(String LastName) {
+        this.LastName = LastName;
+    }
     
 }
