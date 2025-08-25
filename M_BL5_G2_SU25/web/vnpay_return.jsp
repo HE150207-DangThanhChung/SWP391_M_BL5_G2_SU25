@@ -69,33 +69,7 @@
         </style>
     </head>
     <body>
-        <%
-            Map<String, String> fields = new HashMap<>();
-            for (Enumeration<String> params = request.getParameterNames(); params.hasMoreElements();) {
-                String fieldName = params.nextElement();
-                if (!"vnp_SecureHash".equals(fieldName)) {
-                    fields.put(fieldName, request.getParameter(fieldName));
-                }
-            }
-            String vnp_SecureHash = request.getParameter("vnp_SecureHash");
-            String signValue = Config.hashAllFields(fields);
-            String status = "";
-
-            if (signValue.equals(vnp_SecureHash)) {
-                if ("00".equals(request.getParameter("vnp_ResponseCode"))) {
-                    status = "success";
-                    Config.insertOrder(request.getParameter("vnp_TxnRef"), request.getParameter("vnp_BankTranNo"));
-                    Config.removeCartItem();
-                    Config.updateQuantity();
-                } else {
-                    status = "fail";
-                }
-            } else {
-                out.print("Chữ ký không hợp lệ");
-            }
-
-            request.setAttribute("status", status);
-        %>
+    <!-- Logic xác thực và trạng thái đã được xử lý ở servlet. JSP chỉ nhận biến status và hiển thị. -->
         <c:choose>
             <c:when test="${status eq 'success'}">
                 <div class="congratulation-area text-center mt-5">
@@ -165,7 +139,7 @@
                                     <label><%= request.getParameter("vnp_BankCode")%></label>
                                 </div>
                                 <div class="btn-wrapper mt-4">
-                                    <a href="homecustomer" class="cmn-btn btn-bg-1">Go to Home</a>
+                                    <a href="orders" class="cmn-btn btn-bg-1">Go to Home</a>
                                 </div>
                             </div>
                         </div>
@@ -182,7 +156,7 @@
                                 </div>
                                 <h3>Thanh toán không thành công</h3>
                                 <div class="btn-wrapper mt-4">
-                                    <a href="homecustomer" class="cmn-btn btn-bg-1">Go to Home</a>
+                                    <a href="orders" class="cmn-btn btn-bg-1">Go to Home</a>
                                 </div>
                             </div>
                         </div>

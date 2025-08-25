@@ -10,6 +10,7 @@ package controller;
 import dal.CustomerDAO;
 import dal.OrderDAO;
 import dal.ProductDAO;
+import dal.StoreStockDAO;
 import dal.StoreDAO;
 import model.Order;
 import model.OrderDetail;
@@ -29,6 +30,7 @@ import model.Product;
 @WebServlet(name = "OrderController", urlPatterns = {"/orders", "/order/view", "/order/edit", "/order/create"})
 public class OrderController extends HttpServlet {
     private OrderDAO orderDAO = new OrderDAO();
+    private StoreStockDAO storeStockDAO = new StoreStockDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -182,6 +184,16 @@ public class OrderController extends HttpServlet {
             Order order = new Order(0, orderDate, status, customer, createdBy, saleBy, store, orderDetails);
             boolean success = orderDAO.createOrder(order);
             if (success) {
+                for (OrderDetail detail : orderDetails) {
+                    int productVariantId = detail.getProductVariantId();
+                    int quantity = detail.getQuantity();
+                    model.StoreStock stock = storeStockDAO.getStoreStock(storeId, productVariantId);
+                    if (stock != null) {
+                        int newQuantity = stock.getQuantity() - quantity;
+                        stock.setQuantity(newQuantity < 0 ? 0 : newQuantity);
+                        storeStockDAO.updateStoreStock(stock);
+                    }
+                }
                 response.sendRedirect(request.getContextPath() + "/orders");
             } else {
                 request.setAttribute("error", "Lỗi tạo đơn hàng!");

@@ -132,7 +132,7 @@
             row.querySelector('input[name="discount"]').value = '';
             row.querySelector('input[name="taxRate"]').value = '';
             row.querySelector('input[name="totalAmount"]').value = '';
-            row.querySelector('input[name="detailStatus"]').value = 'Active';
+            row.querySelector('input[name="detailStatus"]').value = 'Completed';
             
             // Thêm sự kiện tính tổng tiền khi thay đổi số lượng hoặc giảm giá
             var quantityInput = row.querySelector('input[name="quantity"]');
