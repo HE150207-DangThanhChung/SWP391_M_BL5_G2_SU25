@@ -46,7 +46,6 @@ public class ProductController extends HttpServlet {
         if (pathInfo == null || "/".equals(pathInfo)) {
             if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
                 List<Product> products = productDAO.getAllProducts();
-                Gson gson = new Gson();
                 response.setContentType("application/json");
                 PrintWriter out = response.getWriter();
                 out.print(gson.toJson(products));
@@ -65,17 +64,19 @@ public class ProductController extends HttpServlet {
             List<Brand> brands = productDAO.getAllBrands();
             List<Supplier> suppliers = productDAO.getAllSuppliers();
             List<Store> stores = productDAO.getAllStores();
+            List<Attribute> allAttributes = productDAO.getAllAttributes();
+            Map<Integer, List<AttributeOption>> attributeOptions = new HashMap<>();
+            for (Attribute attribute : allAttributes) {
+                attributeOptions.put(attribute.getAttributeId(), productDAO.getAttributeOptionsByAttributeId(attribute.getAttributeId()));
+            }
             request.setAttribute("categories", categories);
             request.setAttribute("brands", brands);
             request.setAttribute("suppliers", suppliers);
             request.setAttribute("stores", stores);
-            // We no longer load attributes here. The JSP will fetch them dynamically.
-            
+            request.setAttribute("allAttributes", allAttributes);
+            request.setAttribute("attributeOptions", attributeOptions);
             request.getRequestDispatcher("/views/product/addProduct.jsp").forward(request, response);
-        } else if (pathInfo.equals("/attributes")) {
-            // NEW ENDPOINT FOR AJAX
-            handleGetAttributes(request, response);
-        }  else if (pathInfo.equals("/edit")) {
+        } else if (pathInfo.equals("/edit")) {
             String productIdStr = request.getParameter("productId");
             if (productIdStr != null) {
                 int productId = Integer.parseInt(productIdStr);
@@ -83,13 +84,18 @@ public class ProductController extends HttpServlet {
                 List<Category> categories = productDAO.getAllCategories();
                 List<Brand> brands = productDAO.getAllBrands();
                 List<Supplier> suppliers = productDAO.getAllSuppliers();
-                List<Attribute> attributes = productDAO.getAllAttributes();
+                List<Attribute> allAttributes = productDAO.getAllAttributes();
                 List<Store> stores = productDAO.getAllStores();
+                Map<Integer, List<AttributeOption>> attributeOptions = new HashMap<>();
+                for (Attribute attribute : allAttributes) {
+                    attributeOptions.put(attribute.getAttributeId(), productDAO.getAttributeOptionsByAttributeId(attribute.getAttributeId()));
+                }
                 request.setAttribute("product", product);
                 request.setAttribute("categories", categories);
                 request.setAttribute("brands", brands);
                 request.setAttribute("suppliers", suppliers);
-                request.setAttribute("attributes", attributes);
+                request.setAttribute("allAttributes", allAttributes);
+                request.setAttribute("attributeOptions", attributeOptions);
                 request.setAttribute("stores", stores);
                 request.getRequestDispatcher("/views/product/editProduct.jsp").forward(request, response);
             } else {
@@ -100,9 +106,9 @@ public class ProductController extends HttpServlet {
             if (productIdStr != null) {
                 int productId = Integer.parseInt(productIdStr);
                 Product product = productDAO.getProductById(productId);
-                List<Attribute> attributes = productDAO.getAllAttributes();
+                List<Attribute> allAttributes = productDAO.getAllAttributes();
                 request.setAttribute("product", product);
-                request.setAttribute("attributes", attributes);
+                request.setAttribute("attributes", allAttributes);
                 request.getRequestDispatcher("/views/product/productDetail.jsp").forward(request, response);
             } else {
                 response.sendRedirect("/product");
@@ -115,11 +121,9 @@ public class ProductController extends HttpServlet {
             Double maxPrice = request.getParameter("maxPrice") != null && !request.getParameter("maxPrice").isEmpty() ? Double.parseDouble(request.getParameter("maxPrice")) : null;
             String sortBy = request.getParameter("sortBy");
             String sortOrder = request.getParameter("sortOrder");
-            String searchTerm = request.getParameter("searchTerm"); // Add searchTerm
-
+            String searchTerm = request.getParameter("searchTerm");
             try {
                 List<Product> products = productDAO.getFilteredAndSortedProducts(categoryId, brandId, status, minPrice, maxPrice, sortBy, sortOrder, searchTerm);
-                Gson gson = new Gson();
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
                 PrintWriter out = response.getWriter();
@@ -131,36 +135,6 @@ public class ProductController extends HttpServlet {
             }
         } else {
             response.sendRedirect("/product");
-        }
-    }
-    
-    private void handleGetAttributes(HttpServletRequest request, HttpServletResponse response) 
-            throws IOException {
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-        PrintWriter out = response.getWriter();
-
-        String categoryIdStr = request.getParameter("categoryId");
-        if (categoryIdStr == null || categoryIdStr.isEmpty()) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            out.print("{\"error\":\"Missing categoryId\"}");
-            out.flush();
-            return;
-        }
-
-        try {
-            int categoryId = Integer.parseInt(categoryIdStr);
-            List<Attribute> attributes = productDAO.getAttributesWithOptionsByCategoryId(categoryId);
-            String jsonResponse = gson.toJson(attributes);
-            out.print(jsonResponse);
-        } catch (NumberFormatException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            out.print("{\"error\":\"Invalid categoryId format\"}");
-        } catch (SQLException e) {
-            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            out.print("{\"error\":\"Database error: " + e.getMessage() + "\"}");
-        } finally {
-            out.flush();
         }
     }
 
@@ -204,25 +178,26 @@ public class ProductController extends HttpServlet {
                     List<AttributeOption> attributes = new ArrayList<>();
                     String[] attributeOptionIds = request.getParameterValues("attributeOptionId[" + variantIndex + "][]");
                     if (attributeOptionIds != null) {
+                        Map<Integer, List<AttributeOption>> attributeOptionsCache = new HashMap<>();
+                        for (Attribute attr : productDAO.getAllAttributes()) {
+                            attributeOptionsCache.put(attr.getAttributeId(), productDAO.getAttributeOptionsByAttributeId(attr.getAttributeId()));
+                        }
                         for (String optionIdStr : attributeOptionIds) {
                             if (optionIdStr != null && !optionIdStr.isEmpty()) {
                                 AttributeOption attrOption = new AttributeOption();
                                 attrOption.setAttributeOptionId(Integer.parseInt(optionIdStr));
-                                // Fetch AttributeOption details to set Attribute
-                                List<AttributeOption> options = productDAO.getAttributeOptionsByAttributeId(
-                                        productDAO.getAllAttributes().stream()
-                                                .filter(attr -> productDAO.getAttributeOptionsByAttributeId(attr.getAttributeId())
-                                                .stream().anyMatch(opt -> opt.getAttributeOptionId() == Integer.parseInt(optionIdStr)))
-                                                .findFirst().map(Attribute::getAttributeId).orElse(0)
-                                );
-                                options.stream()
-                                        .filter(opt -> opt.getAttributeOptionId() == Integer.parseInt(optionIdStr))
-                                        .findFirst()
-                                        .ifPresent(opt -> {
-                                            attrOption.setValue(opt.getValue());
-                                            attrOption.setAttribute(opt.getAttribute());
-                                        });
-                                attributes.add(attrOption);
+                                for (List<AttributeOption> options : attributeOptionsCache.values()) {
+                                    options.stream()
+                                            .filter(opt -> opt.getAttributeOptionId() == Integer.parseInt(optionIdStr))
+                                            .findFirst()
+                                            .ifPresent(opt -> {
+                                                attrOption.setValue(opt.getValue());
+                                                attrOption.setAttribute(opt.getAttribute());
+                                            });
+                                }
+                                if (attrOption.getValue() != null) {
+                                    attributes.add(attrOption);
+                                }
                             }
                         }
                     }
@@ -234,7 +209,6 @@ public class ProductController extends HttpServlet {
                     while (request.getParameter("variantSerial[" + variantIndex + "][" + serialIndex + "]") != null) {
                         String serialNumber = request.getParameter("variantSerial[" + variantIndex + "][" + serialIndex + "]");
                         String storeIdStr = request.getParameter("variantStoreId[" + variantIndex + "][" + serialIndex + "]");
-                        String serialStatus = request.getParameter("variantSerialStatus[" + variantIndex + "][" + serialIndex + "]");
                         if (serialNumber != null && !serialNumber.isEmpty() && storeIdStr != null && !storeIdStr.isEmpty()) {
                             ProductSerial serial = new ProductSerial();
                             serial.setSerialNumber(serialNumber);
@@ -269,9 +243,13 @@ public class ProductController extends HttpServlet {
                 }
                 product.setVariants(variants);
 
-                productDAO.addProduct(product, variantImageParts, variantImageUrls, request);
-                request.setAttribute("message", "Product added successfully");
-                request.getRequestDispatcher("/views/product/addProduct.jsp").forward(request, response);
+                try {
+                    productDAO.addProduct(product, variantImageParts, variantImageUrls, request);
+                    response.sendRedirect(request.getContextPath() + "/product?message=Product+added+successfully");
+                } catch (Exception e) {
+                    request.setAttribute("error", "Lỗi khi thêm sản phẩm: " + e.getMessage());
+                    doGet(request, response);
+                }
                 break;
             }
             case "/edit": {
@@ -298,6 +276,10 @@ public class ProductController extends HttpServlet {
                 List<List<String>> variantImageUrls = new ArrayList<>();
 
                 if (variantProductCodes != null) {
+                    Map<Integer, List<AttributeOption>> attributeOptionsCache = new HashMap<>();
+                    for (Attribute attr : productDAO.getAllAttributes()) {
+                        attributeOptionsCache.put(attr.getAttributeId(), productDAO.getAttributeOptionsByAttributeId(attr.getAttributeId()));
+                    }
                     for (int i = 0; i < variantProductCodes.length; i++) {
                         ProductVariant variant = new ProductVariant();
                         int variantId = (variantIds != null && i < variantIds.length && !variantIds[i].isEmpty()) ? Integer.parseInt(variantIds[i]) : 0;
@@ -314,21 +296,18 @@ public class ProductController extends HttpServlet {
                                 if (optionIdStr != null && !optionIdStr.isEmpty()) {
                                     AttributeOption attrOption = new AttributeOption();
                                     attrOption.setAttributeOptionId(Integer.parseInt(optionIdStr));
-                                    // Fetch AttributeOption details
-                                    List<AttributeOption> options = productDAO.getAttributeOptionsByAttributeId(
-                                            productDAO.getAllAttributes().stream()
-                                                    .filter(attr -> productDAO.getAttributeOptionsByAttributeId(attr.getAttributeId())
-                                                    .stream().anyMatch(opt -> opt.getAttributeOptionId() == Integer.parseInt(optionIdStr)))
-                                                    .findFirst().map(Attribute::getAttributeId).orElse(0)
-                                    );
-                                    options.stream()
-                                            .filter(opt -> opt.getAttributeOptionId() == Integer.parseInt(optionIdStr))
-                                            .findFirst()
-                                            .ifPresent(opt -> {
-                                                attrOption.setValue(opt.getValue());
-                                                attrOption.setAttribute(opt.getAttribute());
-                                            });
-                                    attributes.add(attrOption);
+                                    for (List<AttributeOption> options : attributeOptionsCache.values()) {
+                                        options.stream()
+                                                .filter(opt -> opt.getAttributeOptionId() == Integer.parseInt(optionIdStr))
+                                                .findFirst()
+                                                .ifPresent(opt -> {
+                                                    attrOption.setValue(opt.getValue());
+                                                    attrOption.setAttribute(opt.getAttribute());
+                                                });
+                                    }
+                                    if (attrOption.getValue() != null) {
+                                        attributes.add(attrOption);
+                                    }
                                 }
                             }
                         }
@@ -341,7 +320,6 @@ public class ProductController extends HttpServlet {
                             String serialIdStr = request.getParameter("variantSerialId[" + i + "][" + serialIndex + "]");
                             String serialNumber = request.getParameter("variantSerial[" + i + "][" + serialIndex + "]");
                             String storeIdStr = request.getParameter("variantStoreId[" + i + "][" + serialIndex + "]");
-                            String serialStatus = request.getParameter("variantSerialStatus[" + i + "][" + serialIndex + "]");
                             if (serialNumber != null && !serialNumber.isEmpty() && storeIdStr != null && !storeIdStr.isEmpty()) {
                                 ProductSerial serial = new ProductSerial();
                                 serial.setProductSerialId(serialIdStr != null && !serialIdStr.isEmpty() ? Integer.parseInt(serialIdStr) : 0);
@@ -390,9 +368,13 @@ public class ProductController extends HttpServlet {
                     product.setVariants(variants);
                 }
 
-                productDAO.updateProduct(product, variantImageParts, variantImageUrls, request);
-                request.setAttribute("message", "Product updated successfully");
-                response.sendRedirect(request.getContextPath() + "/product/edit?productId=" + productId);
+                try {
+                    productDAO.updateProduct(product, variantImageParts, variantImageUrls, request);
+                    response.sendRedirect(request.getContextPath() + "/product/edit?productId=" + productId + "&message=Product+updated+successfully");
+                } catch (Exception e) {
+                    request.setAttribute("error", "Lỗi khi cập nhật sản phẩm: " + e.getMessage());
+                    doGet(request, response);
+                }
                 break;
             }
             default:
