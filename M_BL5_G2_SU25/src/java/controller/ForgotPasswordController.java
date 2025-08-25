@@ -72,6 +72,8 @@ public class ForgotPasswordController extends HttpServlet {
                 mailed ? "Đã gửi mật khẩu mới tới email của bạn."
                         : "Không thể gửi email (SMTP). Kiểm tra cấu hình và thử lại.");
 
+//        System.out.println("exists? " + loginDAO.existsEmailActive("tayhosohigh@gmail.com"));
+//        System.out.println("update? " + loginDAO.updatePasswordByEmail("tayhosohigh@gmail.com", "ABC12345"));
         req.getRequestDispatcher("/views/common/forgotPassword.jsp").forward(req, resp);
     }
 }

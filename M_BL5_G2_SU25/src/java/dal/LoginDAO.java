@@ -95,7 +95,7 @@ public class LoginDAO {
             return null;
         }
     }
-    // 4.1 Check if email exists and is Active
+    
 
     public boolean existsEmailActive(String email) {
         String sql = """
@@ -114,7 +114,7 @@ public class LoginDAO {
         }
     }
 
-    // 4.2 Update password by email (plaintext for now)
+    
     public boolean updatePasswordByEmail(String email, String newPassword) {
         String sql = """
         UPDATE Employee
@@ -147,7 +147,7 @@ public class LoginDAO {
          PreparedStatement ps = con.prepareStatement(sql)) {
 
         ps.setString(1, username);
-        ps.setString(2, password); // ⚠️ plaintext, sau này nên thay bằng hash
+        ps.setString(2, password); 
 
         try (ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {

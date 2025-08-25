@@ -127,14 +127,12 @@
         <section class="card">
             <div class="card__header">Sửa Khách hàng</div>
 
-            <!-- Validation errors -->
             <c:if test="${not empty errors}">
                 <ul class="errors">
                     <c:forEach items="${errors}" var="e"><li>${e}</li></c:forEach>
                     </ul>
             </c:if>
 
-            <!-- Pre-format DoB -->
             <fmt:formatDate value="${customer.dob}" pattern="yyyy-MM-dd" var="dobFmt"/>
 
             <form id="editCustomerForm" action="${ctx}/customer" method="post" accept-charset="UTF-8">
@@ -225,7 +223,6 @@
             </form>
         </section>
 
-        <!-- City -> Ward cascading (uses /lookup/ward-options?cityId=...) -->
         <script>
             (function () {
                 const ctx = '${ctx}';

@@ -80,8 +80,10 @@
                                             ${product.status}
                                         </span>
                                     </p>
+                                    
+                                    <%-- The crucial change here --%>
+                                    <a href="${pageContext.request.contextPath}/editVariant?action=add&productId=${product.productId}" class="btn btn-primary">Thêm biến thể mới</a>
 
-                                    <!-- Variants -->
                                     <h6 class="mt-4">Biến thể (${product.variants != null ? product.variants.size() : 0})</h6>
                                     <c:forEach var="variant" items="${product.variants}" varStatus="loop">
                                         <div class="card variant-card">
@@ -90,39 +92,36 @@
                                                 <p><strong>Mã sản phẩm:</strong> ${variant.productCode}</p>
                                                 <p><strong>Giá:</strong> ${variant.price}</p>
                                                 <p><strong>Bảo hành:</strong> ${variant.warrantyDurationMonth} tháng</p>
-                                                <!-- Images -->
                                                 <p><strong>Hình ảnh:</strong></p>
                                                 <div class="d-flex flex-wrap">
                                                     <c:forEach var="image" items="${variant.images}">
                                                         <img src="${pageContext.request.contextPath}/${image.src}" alt="${image.alt}" class="product-img">
                                                     </c:forEach>
                                                     <c:if test="${empty variant.images}">
-                                                        <span class="text-muted">No images</span>
+                                                        <span class="text-muted">Không có hình ảnh</span>
                                                     </c:if>
                                                 </div>
-                                                <!-- Specifications -->
                                                 <p><strong>Thông số kỹ thuật:</strong></p>
                                                 <ul class="spec-list">
                                                     <c:forEach var="attrOption" items="${variant.attributes}">
                                                         <li>${attrOption.attribute.attributeName}: ${attrOption.value}</li>
                                                     </c:forEach>
                                                     <c:if test="${empty variant.attributes}">
-                                                        <li class="text-muted">No specifications</li>
+                                                        <li class="text-muted">Không có thông số kỹ thuật</li>
                                                     </c:if>
                                                 </ul>
-                                                <!-- Serials -->
                                                 <p><strong>Serials:</strong></p>
                                                 <ul class="serial-list">
                                                     <c:forEach var="serial" items="${variant.serials}">
                                                         <li>Số serial: ${serial.serialNumber}, Cửa hàng: ${serial.storeName}, Tạo: ${serial.createdAt}, Cập nhật: ${serial.updatedAt}</li>
                                                     </c:forEach>
                                                     <c:if test="${empty variant.serials}">
-                                                        <li class="text-muted">No serials</li>
+                                                        <li class="text-muted">Không có số serial</li>
                                                     </c:if>
                                                 </ul>
-                                                <!-- Edit Button -->
-                                                <a href="${pageContext.request.contextPath}/editVariant?productId=${product.productId}&productVariantId=${variant.productVariantId}" 
-                                                   class="btn btn-primary mt-2">Chỉnh sửa biến thể</a>
+                                                <%-- The crucial change here --%>
+                                                <a href="${pageContext.request.contextPath}/editVariant?action=edit&productVariantId=${variant.productVariantId}" 
+                                                   class="btn btn-warning mt-2">Chỉnh sửa biến thể</a>
                                             </div>
                                         </div>
                                     </c:forEach>

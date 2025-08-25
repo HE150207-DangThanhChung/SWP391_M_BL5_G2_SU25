@@ -15,7 +15,6 @@ import java.util.List;
  * @author tayho
  */
 public class CustomerDAO {
-// ---------- Row mapper ----------
 
     private Customer mapRow(ResultSet rs) throws SQLException {
         Customer c = new Customer();
@@ -48,7 +47,6 @@ public class CustomerDAO {
         return c;
     }
 
-    // ---------- Single item ----------
     public Customer getById(int id) {
         String sql = """
             SELECT c.CustomerId, c.FirstName, c.MiddleName, c.LastName, c.Phone, c.Email,
@@ -70,7 +68,6 @@ public class CustomerDAO {
         }
     }
 
-    // ---------- Exists / validation ----------
     public boolean emailExists(String email, Integer excludeCustomerId) {
         String sql = "SELECT 1 FROM dbo.Customer WHERE Email = ?"
                 + (excludeCustomerId != null ? " AND CustomerId <> ?" : "");
@@ -105,7 +102,6 @@ public class CustomerDAO {
         }
     }
 
-    // ---------- Insert / Update ----------
     public boolean insert(Customer x) {
         String sql = """
             INSERT INTO dbo.Customer
@@ -187,11 +183,7 @@ public class CustomerDAO {
         }
     }
 
-    // ---------- List + Pagination ----------
-    /**
-     * Paginated list with optional search (name/email/phone), status filter,
-     * and sorting. sortBy whitelist: id | name | email | phone | status | dob
-     */
+    
     public List<Customer> list(int pageIndex, int pageSize,
             String search, String status,
             String sortBy, String sortDir) {
@@ -272,7 +264,6 @@ public class CustomerDAO {
     }
     
 
-    // Soft-status helper (e.g., "Active" / "Banned")
     public boolean updateStatus(int customerId, String status) {
         String sql = "UPDATE dbo.Customer SET Status = ? WHERE CustomerId = ?";
         try (Connection cn = DBContext.getConnection(); PreparedStatement ps = cn.prepareStatement(sql)) {

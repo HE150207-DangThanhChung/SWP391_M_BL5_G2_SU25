@@ -205,7 +205,6 @@
                 <main class="content">
                     <c:set var="ctx" value="${pageContext.request.contextPath}"/>
 
-                    <!-- Toolbar / Search & Filters -->
                     <div class="toolbar">
                         <form action="${ctx}/customer" method="get" class="d-flex" style="gap:.5rem;flex-wrap:wrap;">
                             <input type="hidden" name="action" value="list"/>
@@ -230,7 +229,6 @@
                         </form>
                     </div>
 
-                    <!-- Flash message (optional) -->
                     <c:if test="${not empty param.msg}">
                         <div class="alert">
                             <c:choose>
@@ -241,7 +239,6 @@
                         </div>
                     </c:if>
 
-                    <!-- Data table -->
                     <div class="table-wrap">
                         <table>
                             <thead>
@@ -275,7 +272,7 @@
                                         </a>
                                     </th>
                                     <th>Giới tính</th>
-                                    <th class="col-hide-sm">Địa chỉ</th>
+                                    <th class="col-hide-sm">Địa chỉ chi tiết</th>
                                     <th class="col-hide-md">Phường/Xã</th>
                                     <th class="col-hide-md">Tỉnh/Thành</th>
                                     <th>
@@ -341,14 +338,12 @@
                                             </c:choose>
                                         </td>
                                         <td>
-                                            <!-- Edit (GET), same as Coupon -->
                                             <form method="get" action="${ctx}/customer" style="display:inline;">
                                                 <input type="hidden" name="action" value="editForm"/>
                                                 <input type="hidden" name="customerId" value="${c.customerId}"/>
                                                 <button type="submit" class="act">Sửa</button>
                                             </form>
 
-                                            <!-- Toggle status (POST), same pattern as Coupon -->
                                             <form method="post" action="${ctx}/customer" style="display:inline;"
                                                   onsubmit="return confirm('Xác nhận cập nhật trạng thái?');">
                                                 <input type="hidden" name="action" value="updateStatus"/>
@@ -365,15 +360,13 @@
                         </table>
                     </div>
 
-                    <!-- Footer: summary & pagination -->
                     <div class="footer-bar">
                         <div class="summary">Tổng có <strong>${totalRecords}</strong> bản ghi</div>
-                        <div>Hiển thị <strong>${size}</strong> mỗi trang</div>
+                        <!--<div>Hiển thị <strong>${size}</strong> mỗi trang</div>-->
 
                         <c:set var="prev" value="${page > 1 ? page - 1 : 1}"/>
                         <c:set var="next" value="${page < totalPages ? page + 1 : totalPages}"/>
 
-                        <!-- windowed page range -->
                         <c:set var="start" value="${page - 2}"/>
                         <c:if test="${start < 1}"><c:set var="start" value="1"/></c:if>
                         <c:set var="end" value="${start + 4}"/>
