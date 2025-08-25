@@ -144,12 +144,12 @@
                                     <input type="hidden" name="action" value="status">
                                     <input type="hidden" name="sid" value="${sessionScope.employee.employeeId}">
                                 <div >
-                                    <label for="sortby" class="mr-2 mb-0">Trạng thái:</label>
-                                    <select name="status" class="form-control" id="status" onchange="document.getElementById('status').submit();">
+                                    <label for="status" class="mr-2 mb-0">Trạng thái:</label>
+                                    <select name="status" class="form-control" id="status" onchange="this.form.submit();">
                                         <option value="" >Tất cả</option>
                                         <c:forEach items="${listPs}" var="p">
                                             <option value="${p.getPaymentStatus()}" 
-                                                    <c:if test="${param.status == p.getPaymentStatus()}">selected</c:if>>
+                                                    <c:if test="${param.status eq p.getPaymentStatus()}">selected</c:if>>
                                                 ${p.getPaymentStatus()}
                                             </option>
                                         </c:forEach>
@@ -162,11 +162,11 @@
                                 <input type="hidden" name="sid" value="${sessionScope.employee.employeeId}">
                                 <div >
                                     <label for="method" class="mr-2 mb-0">Cách thức thanh toán:</label>
-                                    <select name="method" class="form-control" id="method" onchange="document.getElementById('paymentmethod').submit();">
-                                        <option value="All">Tất cả</option>
+                                    <select name="method" class="form-control" id="method" onchange="this.form.submit();">
+                                        <option value="">Tất cả</option>
                                         <c:forEach items="${listPm}" var="p">
                                             <option value="${p.getPaymentMethod()}" 
-                                                    <c:if test="${param.method == p.getPaymentMethod()}">selected</c:if>>
+                                                    <c:if test="${param.method eq p.getPaymentMethod()}">selected</c:if>>
                                                 ${p.getPaymentMethod()}
                                             </option>
                                         </c:forEach>

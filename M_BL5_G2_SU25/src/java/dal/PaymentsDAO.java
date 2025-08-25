@@ -246,7 +246,7 @@ public class PaymentsDAO {
 
     public static void main(String[] args) {
         PaymentsDAO u = new PaymentsDAO();
-      List<Payments> p = u.getAllPaymentbySellerId(5);
+      List<Payments> p = u.getAllPaymentbySellerIdandStatus(5, "Đang xử lý");
         for (Payments payments : p) {
             System.out.println(payments);
         }
