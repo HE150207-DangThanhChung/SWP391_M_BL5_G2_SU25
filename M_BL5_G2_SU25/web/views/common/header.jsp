@@ -272,6 +272,24 @@
                         %>
                     </h4>                           
                 </div>
+                <div style="margin-left:auto; display:flex; align-items:center; gap:24px;">
+                    <c:if test="${sessionScope.authUser != null && sessionScope.authUser.roleId == 1}">
+                        <div id="header-notification-bell" style="position:relative; margin-right:16px; cursor:pointer;">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" style="color:#2563eb;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                            </svg>
+                            <span id="header-notification-count" style="position:absolute;top:-6px;right:-6px;background:#dc2626;color:white;border-radius:50%;padding:2px 7px;font-size:12px;font-weight:bold;min-width:22px;text-align:center;display:none;">0</span>
+                            
+                            <!-- Dropdown thông báo -->
+                            <div id="header-notification-dropdown" style="display:none; position:absolute; right:0; top:100%; margin-top:10px; width:320px; background:white; border:1px solid #e5e7eb; border-radius:8px; box-shadow:0 10px 15px -3px rgba(0, 0, 0, 0.1); z-index:50;">
+                                <div style="padding:12px; border-bottom:1px solid #e5e7eb; font-weight:600; color:#374151;">Yêu cầu mới hôm nay</div>
+                                <div id="header-notification-content">
+                                    <!-- Nội dung thông báo sẽ được load bằng JavaScript -->
+                                </div>
+                            </div>
+                        </div>
+                    </c:if>
+                </div>
                 <ul class="menu">
                     <li>
                         <div class="dropdown">
@@ -317,5 +335,134 @@
                 </div>
             </nav>
         </div>
+        
+        <!-- JavaScript cho thông báo header -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                // Load thông báo khi trang được tải
+                loadHeaderNotifications();
+                
+                // Xử lý click vào chuông thông báo
+                $('#header-notification-bell').on('click', function(e) {
+                    e.stopPropagation();
+                    $('#header-notification-dropdown').toggle();
+                    
+                    // Đánh dấu đã xem thông báo
+                    markHeaderNotificationsAsSeen();
+                });
+                
+                // Đóng dropdown khi click ra ngoài
+                $(document).on('click', function() {
+                    $('#header-notification-dropdown').hide();
+                });
+                
+                // Load lại thông báo mỗi 2 phút
+                setInterval(function() {
+                    loadHeaderNotifications();
+                }, 120000); // 2 minutes
+            });
+            
+            // Load thông báo từ server
+            function loadHeaderNotifications() {
+                $.ajax({
+                    url: '${pageContext.request.contextPath}/api/header-notifications.jsp',
+                    method: 'GET',
+                    success: function(data) {
+                        updateHeaderNotificationUI(data);
+                    },
+                    error: function() {
+                        // Ignore errors
+                    }
+                });
+            }
+            
+            // Cập nhật giao diện thông báo
+            function updateHeaderNotificationUI(data) {
+                var count = data.count || 0;
+                var requests = data.requests || [];
+                
+                var countBadge = $('#header-notification-count');
+                var content = $('#header-notification-content');
+                var bell = $('#header-notification-bell svg');
+                
+                // Cập nhật số đếm
+                if (count > 0) {
+                    countBadge.text(count).show();
+                    
+                    // Kiểm tra xem có thông báo mới không
+                    var lastSeenTime = localStorage.getItem('headerLastSeenNotificationTime') || '0';
+                    var hasNewNotifications = false;
+                    
+                    for (var i = 0; i < requests.length; i++) {
+                        var requestTime = new Date(requests[i].createdAt).getTime();
+                        if (requestTime > parseInt(lastSeenTime)) {
+                            hasNewNotifications = true;
+                            break;
+                        }
+                    }
+                    
+                    // Thêm animation nếu có thông báo mới
+                    if (hasNewNotifications) {
+                        bell.css('animation', 'bounce 1s infinite');
+                    } else {
+                        bell.css('animation', 'none');
+                    }
+                } else {
+                    countBadge.hide();
+                    bell.css('animation', 'none');
+                }
+                
+                // Cập nhật nội dung dropdown
+                var html = '';
+                if (requests.length > 0) {
+                    for (var i = 0; i < requests.length; i++) {
+                        var req = requests[i];
+                        html += '<div style="padding:12px; border-bottom:1px solid #f3f4f6; hover:background:#f9fafb;">' +
+                            '<div style="display:flex; justify-content:space-between; align-items:center;">' +
+                            '<div>' +
+                            '<span style="font-weight:500; color:#1f2937;">#' + req.id + '</span>' +
+                            '<span style="margin-left:8px; color:#6b7280;">' + req.description + '</span>' +
+                            '</div>' +
+                            '<a href="${pageContext.request.contextPath}/management/form-requests/view?id=' + req.id + '" style="color:#3b82f6; text-decoration:none; font-size:14px;">Xem</a>' +
+                            '</div>' +
+                            '</div>';
+                    }
+                } else {
+                    html = '<div style="padding:16px; text-align:center; color:#6b7280;">Không có yêu cầu mới hôm nay</div>';
+                }
+                content.html(html);
+            }
+            
+            // Đánh dấu đã xem thông báo
+            function markHeaderNotificationsAsSeen() {
+                var currentTime = new Date().getTime();
+                localStorage.setItem('headerLastSeenNotificationTime', currentTime.toString());
+                
+                // Tắt animation
+                $('#header-notification-bell svg').css('animation', 'none');
+            }
+            
+            // CSS animation cho bounce effect
+            $('<style>').prop('type', 'text/css').html(`
+                @keyframes bounce {
+                    0%, 20%, 53%, 80%, 100% {
+                        animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+                        transform: translate3d(0,0,0);
+                    }
+                    40%, 43% {
+                        animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+                        transform: translate3d(0, -8px, 0);
+                    }
+                    70% {
+                        animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+                        transform: translate3d(0, -4px, 0);
+                    }
+                    90% {
+                        transform: translate3d(0,-1px,0);
+                    }
+                }
+            `).appendTo('head');
+        </script>
     </body>
 </html>

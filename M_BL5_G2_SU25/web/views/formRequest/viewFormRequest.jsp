@@ -7,8 +7,8 @@
 %>
 <!DOCTYPE html>
 <html>
-<head>
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>Chi tiết yêu cầu</title>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <style>
@@ -26,7 +26,7 @@
         .btn-secondary:hover { background-color: #d1d5db; }
         .action-buttons-container { display: flex; gap: 0.75rem; }
     </style>
-</head>
+    </head>
 <body class="bg-gray-50 text-gray-800">
 <div class="layout-wrapper">
     <jsp:include page="/views/common/sidebar.jsp"/>
@@ -104,5 +104,5 @@
         <jsp:include page="/views/common/footer.jsp"/>
     </div>
 </div>
-</body>
+    </body>
 </html>

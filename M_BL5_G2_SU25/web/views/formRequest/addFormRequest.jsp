@@ -155,6 +155,11 @@
                         icon: 'success',
                         confirmButtonColor: '#3b82f6'
                     }).then(() => {
+                        // Xóa thông tin "đã xem" để admin sẽ thấy thông báo mới
+                        localStorage.removeItem('lastSeenNotificationTime');
+                        localStorage.removeItem('headerLastSeenNotificationTime');
+                        
+                        // Chuyển về trang danh sách
                         window.location.href = '${pageContext.request.contextPath}/management/form-requests';
                     });
                 },

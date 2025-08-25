@@ -5,12 +5,15 @@
 package controller;
 
 import dal.EmployeeDAO;
+import dal.FormRequestDAO;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.UUID;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.MultipartConfig;
@@ -20,6 +23,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.Part;
 import model.Employee;
+import model.FormRequest;
 
 @WebServlet(name = "EmployeeController", urlPatterns = {
     "/management/employees",
@@ -28,7 +32,8 @@ import model.Employee;
     "/management/employees/detail",
     "/management/employees/delete",
     "/management/employees/change-status",
-    "/management/employees/upload-avatar"
+    "/management/employees/upload-avatar",
+    "/management/employees/report"
 })
 @MultipartConfig(
     fileSizeThreshold = 1024 * 1024, // 1 MB
@@ -59,6 +64,7 @@ public class EmployeeController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String path = request.getServletPath();
+        System.out.println("DEBUG: EmployeeController doGet called with path: " + path);
         
         switch (path) {
             case "/management/employees":
@@ -72,6 +78,10 @@ public class EmployeeController extends HttpServlet {
                 break;
             case "/management/employees/detail":
                 doGetDetail(request, response);
+                break;
+            case "/management/employees/report":
+                System.out.println("DEBUG: Routing to doGetReport method");
+                doGetReport(request, response);
                 break;
             default:
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -532,5 +542,173 @@ public class EmployeeController extends HttpServlet {
         jsonString += "}";
         
         response.getWriter().write(jsonString);
+    }
+    
+    // New method for handling employee reports
+    private void doGetReport(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        EmployeeDAO employeeDao = new EmployeeDAO();
+        FormRequestDAO formRequestDao = new FormRequestDAO();
+        String idStr = request.getParameter("id");
+        String searchQuery = request.getParameter("search");
+        String statusFilter = request.getParameter("status");
+        
+        // Debug output to help diagnose the issue
+        System.out.println("DEBUG: doGetReport called with id=" + idStr + ", search=" + searchQuery + ", status=" + statusFilter);
+        
+        if (idStr == null || idStr.isEmpty()) {
+            // If no specific employee ID is provided, show all employee reports
+            List<Employee> employees = employeeDao.getAllActiveEmployees();
+            
+            // Apply search filter if provided
+            if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+                String search = searchQuery.trim().toLowerCase();
+                employees = employees.stream()
+                    .filter(emp -> 
+                        emp.getFirstName().toLowerCase().contains(search) ||
+                        emp.getLastName().toLowerCase().contains(search) ||
+                        emp.getEmail().toLowerCase().contains(search) ||
+                        String.valueOf(emp.getEmployeeId()).contains(search))
+                    .collect(java.util.stream.Collectors.toList());
+            }
+            
+            // Fetch all form requests for all employees
+            List<FormRequest> allFormRequests = new ArrayList<>();
+            
+            // Filter by status if provided
+            if (statusFilter != null && !statusFilter.isEmpty() && !"all".equals(statusFilter)) {
+                allFormRequests = formRequestDao.getByStatus(statusFilter);
+            } else {
+                allFormRequests = formRequestDao.getAll();
+            }
+            
+            // Get report stats for all employees
+            HashMap<String, Integer> overallStats = new HashMap<>();
+            int totalReports = allFormRequests.size();
+            
+            // Count report statuses
+            int pendingReports = (int) allFormRequests.stream().filter(r -> "Pending".equals(r.getStatus())).count();
+            int approvedReports = (int) allFormRequests.stream().filter(r -> "Approved".equals(r.getStatus())).count();
+            int rejectedReports = (int) allFormRequests.stream().filter(r -> "Rejected".equals(r.getStatus())).count();
+            int resolvedReports = approvedReports;
+            
+            // Calculate approval rate
+            double approvalRate = totalReports > 0 ? (double) approvedReports / totalReports * 100 : 0;
+            
+            // Set attributes for the view
+            request.setAttribute("employees", employees);
+            request.setAttribute("search", searchQuery);
+            request.setAttribute("employeeReports", allFormRequests);
+            request.setAttribute("statusFilter", statusFilter);
+            request.setAttribute("isAllReportsView", true);
+            
+            // Set statistics
+            request.setAttribute("totalReports", totalReports);
+            request.setAttribute("pendingReports", pendingReports);
+            request.setAttribute("approvedReports", approvedReports);
+            request.setAttribute("rejectedReports", rejectedReports);
+            request.setAttribute("resolvedReports", resolvedReports);
+            request.setAttribute("approvalRate", approvalRate);
+            
+            request.getRequestDispatcher("/views/employee/viewEmployeeReport.jsp").forward(request, response);
+            return;
+        }
+        
+        try {
+            System.out.println("DEBUG: Parsing employee ID from: " + idStr);
+            
+            // Ensure we have a valid ID string
+            if (idStr == null || idStr.trim().isEmpty()) {
+                System.out.println("ERROR: Employee ID is null or empty");
+                response.sendRedirect(request.getContextPath() + "/management/employees");
+                return;
+            }
+            
+            int id = Integer.parseInt(idStr.trim());
+            System.out.println("DEBUG: Successfully parsed employee ID: " + id);
+            
+            // Get employee information
+            Employee employee = employeeDao.getEmployeeById(id);
+            
+            System.out.println("DEBUG: Retrieved employee: " + (employee != null ? 
+                "ID=" + employee.getEmployeeId() + ", Name=" + employee.getFirstName() + " " + employee.getLastName() : "null"));
+            
+            if (employee == null || employee.getEmployeeId() == 0) {
+                System.out.println("ERROR: Employee not found for ID: " + id);
+                response.sendRedirect(request.getContextPath() + "/management/employees");
+                return;
+            }
+            
+            // Get form requests (reports) for this specific employee using optimized DAO methods
+            List<FormRequest> employeeReports;
+            
+            // Use appropriate DAO method based on filter
+            if (statusFilter != null && !statusFilter.isEmpty() && !"all".equals(statusFilter)) {
+                // If status filter is provided, use the method that filters by both employee ID and status
+                System.out.println("DEBUG: Getting reports for Employee ID: " + id + " with status: " + statusFilter);
+                employeeReports = formRequestDao.getByEmployeeIdAndStatus(id, statusFilter);
+            } else {
+                // Otherwise just get all reports for this employee
+                System.out.println("DEBUG: Getting all reports for Employee ID: " + id);
+                employeeReports = formRequestDao.getByEmployeeId(id);
+            }
+            
+            System.out.println("DEBUG: Found " + employeeReports.size() + " reports for employee " + id);
+            
+            // Check if no reports are found
+            if (employeeReports.isEmpty()) {
+                if (statusFilter != null && !statusFilter.isEmpty() && !"all".equals(statusFilter)) {
+                    // If a filter is applied and no results, just let the JSP handle it with its existing message
+                    System.out.println("DEBUG: No reports found for Employee ID " + id + " with status filter: " + statusFilter);
+                } else {
+                    // If no filter and still no reports, check if employee has any reports at all
+                    HashMap<String, Integer> statsCheck = formRequestDao.getEmployeeReportStats(id);
+                    if (statsCheck.get("total") == 0) {
+                        System.out.println("DEBUG: Employee has no reports at all - redirecting with message");
+                        request.getSession().setAttribute("noReportsMessage", 
+                            "Nhân viên " + employee.getFirstName() + " " + employee.getLastName() + " chưa có yêu cầu nào được ghi nhận.");
+                        response.sendRedirect(request.getContextPath() + "/management/employees?showNoReportsAlert=true");
+                        return;
+                    }
+                }
+            } else {
+                System.out.println("DEBUG: Reports found - NOT setting noReports flag");
+                // Ensure noReports flag is false when we have reports
+                request.setAttribute("noReports", false);
+            }
+            
+            // No need to sort - reports are already sorted by creation date (newest first) in the SQL query
+            
+            // Pass employee object as "e" (to match JSP naming convention)
+            request.setAttribute("e", employee);
+            request.setAttribute("employeeReports", employeeReports);
+            request.setAttribute("statusFilter", statusFilter);
+            
+            // Get optimized statistics directly from the database
+            HashMap<String, Integer> reportStats = formRequestDao.getEmployeeReportStats(id);
+            
+            int totalReports = reportStats.get("total");
+            int pendingReports = reportStats.get("pending");
+            int approvedReports = reportStats.get("approved");
+            int rejectedReports = reportStats.get("rejected");
+            int resolvedReports = approvedReports; // For now, approved means resolved
+            
+            System.out.println("DEBUG: Statistics - Total: " + totalReports + ", Pending: " + pendingReports + ", Approved: " + approvedReports + ", Rejected: " + rejectedReports);
+            
+            request.setAttribute("totalReports", totalReports);
+            request.setAttribute("pendingReports", pendingReports);
+            request.setAttribute("approvedReports", approvedReports);
+            request.setAttribute("rejectedReports", rejectedReports);
+            request.setAttribute("resolvedReports", resolvedReports);
+            
+            // Calculate performance metrics
+            double approvalRate = totalReports > 0 ? (double) approvedReports / totalReports * 100 : 0;
+            request.setAttribute("approvalRate", approvalRate);
+            
+            request.getRequestDispatcher("/views/employee/viewEmployeeReport.jsp").forward(request, response);
+            
+        } catch (NumberFormatException e) {
+            response.sendRedirect(request.getContextPath() + "/management/employees");
+        }
     }
 }
