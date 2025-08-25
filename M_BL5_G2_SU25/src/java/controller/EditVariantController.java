@@ -130,16 +130,17 @@ public class EditVariantController extends HttpServlet {
             return;
         }
 
-        List<Attribute> productCategoryAttributes = productDAO.getAttributesByCategoryId(product.getCategoryId());
+        List<Attribute> allAttributes = productDAO.getAllAttributes();
         Map<Integer, List<AttributeOption>> attributeOptions = new HashMap<>();
-        for (Attribute attribute : productCategoryAttributes) {
+        for (Attribute attribute : allAttributes) {
             attributeOptions.put(attribute.getAttributeId(), productDAO.getAttributeOptionsByAttributeId(attribute.getAttributeId()));
         }
+        
         List<Store> stores = productDAO.getAllStores();
-
+        
         request.setAttribute("variant", variant);
         request.setAttribute("productId", productId);
-        request.setAttribute("allAttributes", productCategoryAttributes);
+        request.setAttribute("allAttributes", allAttributes);
         request.setAttribute("attributeOptions", attributeOptions);
         request.setAttribute("stores", stores);
         request.getRequestDispatcher("/views/product/editProductVariant.jsp").forward(request, response);
@@ -154,17 +155,18 @@ public class EditVariantController extends HttpServlet {
             request.getRequestDispatcher("/views/product/productDetail.jsp").forward(request, response);
             return;
         }
-        
-        List<Attribute> productCategoryAttributes = productDAO.getAttributesByCategoryId(product.getCategoryId());
+
+        List<Attribute> allAttributes = productDAO.getAllAttributes();
         Map<Integer, List<AttributeOption>> attributeOptions = new HashMap<>();
-        for (Attribute attribute : productCategoryAttributes) {
+        for (Attribute attribute : allAttributes) {
             attributeOptions.put(attribute.getAttributeId(), productDAO.getAttributeOptionsByAttributeId(attribute.getAttributeId()));
         }
+        
         List<Store> stores = productDAO.getAllStores();
 
         request.setAttribute("productId", productId);
         request.setAttribute("product", product);
-        request.setAttribute("allAttributes", productCategoryAttributes);
+        request.setAttribute("allAttributes", allAttributes);
         request.setAttribute("attributeOptions", attributeOptions);
         request.setAttribute("stores", stores);
         request.getRequestDispatcher("/views/product/addProductVariant.jsp").forward(request, response);
@@ -184,18 +186,12 @@ public class EditVariantController extends HttpServlet {
         variant.setPrice(price);
         variant.setWarrantyDurationMonth(warrantyDurationMonth);
 
-        // Fetch attributes based on the product's category, to validate the incoming data
-        Product product = productDAO.getProductById(productId);
-        if (product == null) {
-            throw new SQLException("Product not found for ID: " + productId);
-        }
-        List<Attribute> allAttributes = productDAO.getAttributesByCategoryId(product.getCategoryId());
+        List<Attribute> allAttributes = productDAO.getAllAttributes();
         Map<Integer, List<AttributeOption>> attributeOptionsCache = new HashMap<>();
         for (Attribute attribute : allAttributes) {
             attributeOptionsCache.put(attribute.getAttributeId(), productDAO.getAttributeOptionsByAttributeId(attribute.getAttributeId()));
         }
 
-        // Process attributes
         List<AttributeOption> attributes = new ArrayList<>();
         String[] attributeOptionIds = request.getParameterValues("attributeOptionId[]");
         if (attributeOptionIds != null) {
@@ -227,7 +223,6 @@ public class EditVariantController extends HttpServlet {
         }
         variant.setAttributes(attributes);
 
-        // Process images
         List<Part> imageParts = new ArrayList<>();
         List<String> imageUrls = new ArrayList<>();
         List<ProductImage> images = new ArrayList<>();
@@ -277,7 +272,6 @@ public class EditVariantController extends HttpServlet {
         }
         variant.setImages(images);
 
-        // Process serials
         List<ProductSerial> serials = new ArrayList<>();
         for (ProductSerial existingSerial : existingVariant.getSerials()) {
             String serialIdParam = request.getParameter("serialId_" + existingSerial.getProductSerialId());
@@ -326,7 +320,6 @@ public class EditVariantController extends HttpServlet {
         newVariant.setPrice(price);
         newVariant.setWarrantyDurationMonth(warrantyDurationMonth);
 
-        // Process attributes
         List<AttributeOption> attributes = new ArrayList<>();
         String[] attributeOptionIds = request.getParameterValues("attributeOptionId[]");
         if (attributeOptionIds != null) {
@@ -345,7 +338,6 @@ public class EditVariantController extends HttpServlet {
         }
         newVariant.setAttributes(attributes);
 
-        // Process images
         List<Part> imageParts = new ArrayList<>();
         for (Part part : request.getParts()) {
             if (part.getName().startsWith("imageFile")) {
@@ -355,7 +347,6 @@ public class EditVariantController extends HttpServlet {
             }
         }
 
-        // Process serials
         List<ProductSerial> serials = new ArrayList<>();
         String[] serialNumbers = request.getParameterValues("serialNumber[]");
         String[] storeIds = request.getParameterValues("storeId[]");

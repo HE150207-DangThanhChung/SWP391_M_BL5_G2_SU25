@@ -46,6 +46,15 @@
             .image-upload:not(:last-child), .serial-input:not(:last-child) {
                 border-bottom: 1px dashed #e2e8f0;
             }
+            .error-message {
+                color: red;
+                font-size: 0.875rem;
+                margin-top: 0.25rem;
+                display: none;
+            }
+            .error-border {
+                border: 2px solid red !important;
+            }
         </style>
     </head>
     <body>
@@ -63,14 +72,17 @@
                 <div class="form-group">
                     <label for="productCode">Mã sản phẩm:</label>
                     <input type="text" class="form-control" id="productCode" name="productCode" required>
+                    <div class="error-message">Vui lòng nhập mã sản phẩm</div>
                 </div>
                 <div class="form-group">
                     <label for="price">Giá:</label>
                     <input type="number" class="form-control" id="price" name="price" step="0.01" required>
+                    <div class="error-message">Giá phải lớn hơn 0</div>
                 </div>
                 <div class="form-group">
                     <label for="warrantyDurationMonth">Thời gian bảo hành (Tháng):</label>
                     <input type="number" class="form-control" id="warrantyDurationMonth" name="warrantyDurationMonth" required>
+                    <div class="error-message">Thời gian bảo hành không được âm</div>
                 </div>
 
                 <h3>Thông số sản phẩm</h3>
@@ -79,10 +91,11 @@
                         <label>${attribute.attributeName}:</label>
                         <select class="form-control" name="attributeOptionId[]" required>
                             <option value="">Chọn một tùy chọn...</option>
-                            <c:forEach var="option" items="${attributeOptions.get(attribute.attributeId)}">
+                            <c:forEach var="option" items="${attributeOptions[attribute.attributeId]}">
                                 <option value="${option.attributeOptionId}">${option.value}</option>
                             </c:forEach>
                         </select>
+                        <div class="error-message">Vui lòng chọn ${attribute.attributeName.toLowerCase()}</div>
                     </div>
                 </c:forEach>
 
@@ -91,6 +104,7 @@
                     <div class="image-upload">
                         <label>Hình ảnh 1:</label>
                         <input type="file" class="form-control-file" name="imageFile" accept="image/*" required>
+                        <div class="error-message">Vui lòng chọn hình ảnh</div>
                     </div>
                 </div>
                 <button type="button" class="btn btn-secondary" onclick="addImageField()">Thêm hình ảnh khác</button>
@@ -101,6 +115,7 @@
                         <div class="col">
                             <label>Serial 1:</label>
                             <input type="text" class="form-control" name="serialNumber[]" placeholder="Serial Number" required>
+                            <div class="error-message">Vui lòng nhập serial</div>
                         </div>
                         <div class="col">
                             <label>Cửa hàng:</label>
@@ -110,6 +125,7 @@
                                     <option value="${store.storeId}">${store.storeName}</option>
                                 </c:forEach>
                             </select>
+                            <div class="error-message">Vui lòng chọn cửa hàng</div>
                         </div>
                     </div>
                 </div>
@@ -120,9 +136,8 @@
                 <a href="${pageContext.request.contextPath}/product/detail?productId=${product.productId}" class="btn btn-light">Hủy</a>
             </form>
         </div>
-        
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-        
         <script>
             let imageCount = 1;
             function addImageField() {
@@ -133,6 +148,8 @@
                 div.innerHTML = `
                     <label>Hình ảnh ${imageCount}:</label>
                     <input type="file" class="form-control-file" name="imageFile" accept="image/*">
+                    <div class="error-message">Vui lòng chọn hình ảnh</div>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="removeField(this)">Xóa</button>
                 `;
                 container.appendChild(div);
             }
@@ -147,6 +164,7 @@
                     <div class="col">
                         <label>Serial ${serialCount}:</label>
                         <input type="text" class="form-control" name="serialNumber[]" placeholder="Serial Number">
+                        <div class="error-message">Vui lòng nhập serial</div>
                     </div>
                     <div class="col">
                         <label>Cửa hàng:</label>
@@ -156,10 +174,112 @@
                                 <option value="${store.storeId}">${store.storeName}</option>
                             </c:forEach>
                         </select>
+                        <div class="error-message">Vui lòng chọn cửa hàng</div>
+                    </div>
+                    <div class="col-auto">
+                        <button type="button" class="btn btn-danger btn-sm" onclick="removeField(this)">Xóa</button>
                     </div>
                 `;
                 container.appendChild(div);
             }
+
+            function removeField(button) {
+                const parentDiv = button.closest('.image-upload, .serial-input');
+                parentDiv.remove();
+            }
+
+            document.addEventListener('DOMContentLoaded', function() {
+                const form = document.querySelector('form');
+                form.addEventListener('submit', function(event) {
+                    let hasError = false;
+
+                    // Reset error states
+                    document.querySelectorAll('.error-border').forEach(el => el.classList.remove('error-border'));
+                    document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
+
+                    // Validate main fields
+                    const productCode = document.getElementById('productCode');
+                    if (productCode.value.trim() === '') {
+                        productCode.classList.add('error-border');
+                        productCode.nextElementSibling.style.display = 'block';
+                        hasError = true;
+                    }
+
+                    const price = document.getElementById('price');
+                    if (parseFloat(price.value) <= 0 || price.value.trim() === '') {
+                        price.classList.add('error-border');
+                        price.nextElementSibling.style.display = 'block';
+                        hasError = true;
+                    }
+
+                    const warranty = document.getElementById('warrantyDurationMonth');
+                    if (parseInt(warranty.value) < 0 || warranty.value.trim() === '') {
+                        warranty.classList.add('error-border');
+                        warranty.nextElementSibling.style.display = 'block';
+                        hasError = true;
+                    }
+
+                    // Validate attribute options
+                    const attributeOptions = document.querySelectorAll('select[name="attributeOptionId[]"]');
+                    const selectedOptions = new Set();
+                    attributeOptions.forEach(select => {
+                        if (select.value === '') {
+                            select.classList.add('error-border');
+                            select.nextElementSibling.style.display = 'block';
+                            hasError = true;
+                        } else if (selectedOptions.has(select.value)) {
+                            select.classList.add('error-border');
+                            select.nextElementSibling.textContent = 'Giá trị thuộc tính đã được chọn';
+                            select.nextElementSibling.style.display = 'block';
+                            hasError = true;
+                        } else {
+                            selectedOptions.add(select.value);
+                        }
+                    });
+
+                    // Validate images
+                    const imageFiles = document.querySelectorAll('input[name="imageFile"]');
+                    let hasImage = false;
+                    imageFiles.forEach(fileInput => {
+                        if (fileInput.files.length > 0) {
+                            hasImage = true;
+                        }
+                    });
+                    if (!hasImage) {
+                        document.querySelector('#image-upload-container .error-message').style.display = 'block';
+                        hasError = true;
+                    }
+
+                    // Validate serials
+                    const serialInputs = document.querySelectorAll('#serial-container .serial-input');
+                    serialInputs.forEach(serialGroup => {
+                        const serialNumberInput = serialGroup.querySelector('input[name="serialNumber[]"]');
+                        const storeIdSelect = serialGroup.querySelector('select[name="storeId[]"]');
+
+                        let serialHasError = false;
+                        if (serialNumberInput.value.trim() === '') {
+                            serialNumberInput.classList.add('error-border');
+                            serialNumberInput.nextElementSibling.style.display = 'block';
+                            serialHasError = true;
+                        }
+
+                        if (storeIdSelect.value.trim() === '') {
+                            storeIdSelect.classList.add('error-border');
+                            storeIdSelect.nextElementSibling.style.display = 'block';
+                            serialHasError = true;
+                        }
+
+                        if (serialHasError) {
+                            hasError = true;
+                        }
+                    });
+
+                    if (hasError) {
+                        event.preventDefault();
+                        alert('Vui lòng điền đầy đủ và chính xác tất cả các trường.');
+                    }
+                });
+            });
         </script>
     </body>
 </html>

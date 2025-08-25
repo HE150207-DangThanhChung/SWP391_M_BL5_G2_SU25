@@ -53,6 +53,9 @@
         .variant-card {
             margin-bottom: 20px;
         }
+        .form-group {
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -67,14 +70,14 @@
                     <div class="alert alert-danger mt-3">${error}</div>
                 </c:if>
                 <form action="${pageContext.request.contextPath}/product/add" method="post" enctype="multipart/form-data">
-                    <div class="mb-3">
+                    <div class="form-group">
                         <label class="form-label">Tên sản phẩm</label>
                         <input type="text" class="form-control" name="productName" value="${product.productName}" required>
                         <div class="error-message">Vui lòng nhập tên sản phẩm</div>
                     </div>
-                    <div class="mb-3">
+                    <div class="form-group">
                         <label class="form-label">Danh mục</label>
-                        <select class="form-select" name="categoryId" id="category-select" required>
+                        <select class="form-select" name="categoryId" required>
                             <option value="">Chọn danh mục</option>
                             <c:forEach var="category" items="${categories}">
                                 <option value="${category.categoryId}">${category.categoryName}</option>
@@ -82,7 +85,7 @@
                         </select>
                         <div class="error-message">Vui lòng chọn danh mục</div>
                     </div>
-                    <div class="mb-3">
+                    <div class="form-group">
                         <label class="form-label">Thương hiệu</label>
                         <select class="form-select" name="brandId" required>
                             <option value="">Chọn thương hiệu</option>
@@ -92,7 +95,7 @@
                         </select>
                         <div class="error-message">Vui lòng chọn thương hiệu</div>
                     </div>
-                    <div class="mb-3">
+                    <div class="form-group">
                         <label class="form-label">Nhà cung cấp</label>
                         <select class="form-select" name="supplierId" required>
                             <option value="">Chọn nhà cung cấp</option>
@@ -102,7 +105,7 @@
                         </select>
                         <div class="error-message">Vui lòng chọn nhà cung cấp</div>
                     </div>
-                    <div class="mb-3">
+                    <div class="form-group">
                         <label class="form-label">Trạng thái</label>
                         <select class="form-select" name="status" required>
                             <option value="">Chọn trạng thái</option>
@@ -117,30 +120,39 @@
                         <div class="card mb-3 variant-card" data-variant-index="0">
                             <div class="card-body">
                                 <h6>Biến thể 1</h6>
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label class="form-label">Mã sản phẩm</label>
                                     <input type="text" class="form-control" name="variantProductCode[0]" required>
                                     <div class="error-message">Vui lòng nhập mã sản phẩm</div>
                                 </div>
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label class="form-label">Giá</label>
                                     <input type="number" step="0.01" class="form-control" name="variantPrice[0]" required>
                                     <div class="error-message">Giá phải lớn hơn 0</div>
                                 </div>
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label class="form-label">Bảo hành (Tháng)</label>
                                     <input type="number" class="form-control" name="variantWarranty[0]" required>
                                     <div class="error-message">Thời gian bảo hành không được âm</div>
                                 </div>
-
-                                <div class="mb-3">
+                                <div class="form-group">
                                     <label class="form-label">Thông số kỹ thuật</label>
                                     <div class="attributes-container">
-                                        <p class="text-muted">Vui lòng chọn danh mục để xem thông số.</p>
+                                        <c:forEach var="attribute" items="${allAttributes}">
+                                            <div class="form-group">
+                                                <label>${attribute.attributeName}</label>
+                                                <select class="form-control" name="attributeOptionId[0][]" required>
+                                                    <option value="">Chọn ${attribute.attributeName}</option>
+                                                    <c:forEach var="option" items="${attributeOptions[attribute.attributeId]}">
+                                                        <option value="${option.attributeOptionId}">${option.value}</option>
+                                                    </c:forEach>
+                                                </select>
+                                                <div class="error-message">Vui lòng chọn ${attribute.attributeName.toLowerCase()}</div>
+                                            </div>
+                                        </c:forEach>
                                     </div>
                                 </div>
-
-                                <div class="mb-3 serials-container">
+                                <div class="form-group serials-container">
                                     <label class="form-label">Serials</label>
                                     <div class="input-group mb-2 serial-group">
                                         <input type="text" class="form-control" name="variantSerial[0][0]" placeholder="Số serial" required>
@@ -154,8 +166,7 @@
                                     </div>
                                     <button type="button" class="btn btn-outline-secondary btn-add-serial">Thêm serial</button>
                                 </div>
-
-                                <div class="mb-3 images-container">
+                                <div class="form-group images-container">
                                     <label class="form-label">Hình ảnh</label>
                                     <div class="input-group mb-2 image-group">
                                         <input type="file" class="form-control" name="variantImage[0][]" accept="image/*">
@@ -181,99 +192,41 @@
 </div>
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
-
 <script>
-    // Store current attributes globally to use when adding new variants
-    let currentAttributes = [];
     let variantIndexCounter = 1; // Start with 1 as index 0 is already on the page
 
-    // **FIX**: Pre-render store options from JSTL into a JavaScript variable.
-    // This avoids the error of using JSTL tags inside a JS template string.
+    // Pre-render store options to avoid JSTL in JavaScript
     const storeOptionsHtml = `
         <option value="">Chọn cửa hàng</option>
         <c:forEach var="store" items="${stores}">
-            <option value="${store.storeId}">${fn:escapeXml(store.storeName)}</option>
+            <option value="\${store.storeId}">\${fn:escapeXml(store.storeName)}</option>
         </c:forEach>
     `;
 
+    // Pre-render attribute options to avoid JSTL in JavaScript
+    const attributeOptionsHtml = {};
+    <c:forEach var="attribute" items="${allAttributes}">
+        attributeOptionsHtml[${attribute.attributeId}] = `
+            <option value="">Chọn \${attribute.attributeName}</option>
+            <c:forEach var="option" items="${attributeOptions[attribute.attributeId]}">
+                <option value="\${option.attributeOptionId}">\${fn:escapeXml(option.value)}</option>
+            </c:forEach>
+        `;
+    </c:forEach>
+
     document.addEventListener("DOMContentLoaded", function () {
-        const categorySelect = document.getElementById('category-select');
         const addVariantBtn = document.getElementById('add-variant-btn');
         const form = document.querySelector("form[action$='/product/add']");
 
-        if (categorySelect) {
-            categorySelect.addEventListener('change', fetchAttributesForCategory);
-        }
         if (addVariantBtn) {
             addVariantBtn.addEventListener('click', addVariant);
         }
         if (form) {
             form.addEventListener("submit", validateForm);
         }
-        
-        // Universal event listener for dynamically added remove buttons
         document.getElementById('variants-container').addEventListener('click', handleVariantContainerClick);
     });
 
-    async function fetchAttributesForCategory(event) {
-        const categoryId = event.target.value;
-        if (!categoryId) {
-            currentAttributes = [];
-            updateAllVariantAttributes();
-            return;
-        }
-
-        try {
-            const response = await fetch(`${pageContext.request.contextPath}/product/attributes?categoryId=\${categoryId}`);
-            if (!response.ok) throw new Error('Network response was not ok');
-            const data = await response.json();
-            currentAttributes = data;
-            updateAllVariantAttributes();
-        } catch (error) {
-            console.error('Error fetching attributes:', error);
-            alert('Không thể tải thông số kỹ thuật cho danh mục này.');
-            currentAttributes = [];
-            updateAllVariantAttributes();
-        }
-    }
-
-    function updateAllVariantAttributes() {
-        document.querySelectorAll('.variant-card').forEach(card => {
-            populateAttributesForVariant(card);
-        });
-    }
-
-    function populateAttributesForVariant(variantCard) {
-        const attributesContainer = variantCard.querySelector('.attributes-container');
-        const variantIndex = variantCard.dataset.variantIndex;
-        attributesContainer.innerHTML = '';
-
-        if (currentAttributes.length === 0) {
-            attributesContainer.innerHTML = '<p class="text-muted">Vui lòng chọn danh mục để xem thông số.</p>';
-            return;
-        }
-
-        currentAttributes.forEach(attribute => {
-            let optionsHtml = `<option value="">Chọn \${attribute.attributeName}</option>`;
-            if (attribute.options) {
-                attribute.options.forEach(option => {
-                    optionsHtml += `<option value="\${option.attributeOptionId}">\${option.value}</option>`;
-                });
-            }
-
-            const attributeHtml = `
-                <div class="mb-2">
-                    <label class="form-label">\${attribute.attributeName}</label>
-                    <select class="form-select" name="attributeOptionId[\${variantIndex}][]" required>
-                        \${optionsHtml}
-                    </select>
-                    <div class="error-message">Vui lòng chọn \${attribute.attributeName.toLowerCase()}</div>
-                </div>
-            `;
-            attributesContainer.insertAdjacentHTML('beforeend', attributeHtml);
-        });
-    }
-    
     function addVariant() {
         const container = document.getElementById('variants-container');
         const newVariant = document.createElement('div');
@@ -281,29 +234,44 @@
         const newVariantIndex = variantIndexCounter++;
         newVariant.dataset.variantIndex = newVariantIndex;
 
+        let attributesHtml = '';
+        <c:forEach var="attribute" items="${allAttributes}">
+            attributesHtml += `
+                <div class="form-group">
+                    <label>\${attribute.attributeName}</label>
+                    <select class="form-control" name="attributeOptionId[\${newVariantIndex}][]" required>
+                        \${attributeOptionsHtml[\${attribute.attributeId}]}
+                    </select>
+                    <div class="error-message">Vui lòng chọn \${attribute.attributeName.toLowerCase()}</div>
+                </div>
+            `;
+        </c:forEach>
+
         newVariant.innerHTML = `
             <div class="card-body">
                 <h6>Biến thể \${newVariantIndex + 1}</h6>
-                 <div class="mb-3">
+                <div class="form-group">
                     <label class="form-label">Mã sản phẩm</label>
                     <input type="text" class="form-control" name="variantProductCode[\${newVariantIndex}]" required>
                     <div class="error-message">Vui lòng nhập mã sản phẩm</div>
                 </div>
-                <div class="mb-3">
+                <div class="form-group">
                     <label class="form-label">Giá</label>
                     <input type="number" step="0.01" class="form-control" name="variantPrice[\${newVariantIndex}]" required>
                     <div class="error-message">Giá phải lớn hơn 0</div>
                 </div>
-                <div class="mb-3">
+                <div class="form-group">
                     <label class="form-label">Bảo hành (Tháng)</label>
                     <input type="number" class="form-control" name="variantWarranty[\${newVariantIndex}]" required>
                     <div class="error-message">Thời gian bảo hành không được âm</div>
                 </div>
-                <div class="mb-3">
+                <div class="form-group">
                     <label class="form-label">Thông số kỹ thuật</label>
-                    <div class="attributes-container"></div>
+                    <div class="attributes-container">
+                        \${attributesHtml}
+                    </div>
                 </div>
-                <div class="mb-3 serials-container">
+                <div class="form-group serials-container">
                     <label class="form-label">Serials</label>
                     <div class="input-group mb-2 serial-group">
                         <input type="text" class="form-control" name="variantSerial[\${newVariantIndex}][0]" placeholder="Số serial" required>
@@ -312,7 +280,7 @@
                     </div>
                     <button type="button" class="btn btn-outline-secondary btn-add-serial">Thêm serial</button>
                 </div>
-                <div class="mb-3 images-container">
+                <div class="form-group images-container">
                     <label class="form-label">Hình ảnh</label>
                     <div class="input-group mb-2 image-group">
                         <input type="file" class="form-control" name="variantImage[\${newVariantIndex}][]" accept="image/*">
@@ -325,12 +293,10 @@
             </div>
         `;
         container.appendChild(newVariant);
-        populateAttributesForVariant(newVariant); // Populate attributes for the new variant
     }
 
     function handleVariantContainerClick(event) {
         const target = event.target;
-        // Add Serial Button
         if (target.classList.contains('btn-add-serial')) {
             const serialContainer = target.closest('.serials-container');
             const variantIndex = target.closest('.variant-card').dataset.variantIndex;
@@ -344,9 +310,7 @@
                 <button type="button" class="btn btn-outline-danger btn-remove-serial">Xóa</button>
             `;
             serialContainer.insertBefore(newSerial, target);
-        }
-        // Add Image Button
-        else if (target.classList.contains('btn-add-image')) {
+        } else if (target.classList.contains('btn-add-image')) {
             const imageContainer = target.closest('.images-container');
             const variantIndex = target.closest('.variant-card').dataset.variantIndex;
             const imageGroups = imageContainer.querySelectorAll('.image-group');
@@ -359,25 +323,21 @@
                 <button type="button" class="btn btn-outline-danger btn-remove-image">Xóa</button>
             `;
             imageContainer.insertBefore(newImage, target);
-        }
-        // Remove Buttons
-        else if (target.classList.contains('btn-remove-serial')) {
-             const serialGroup = target.closest('.serial-group');
-             if (serialGroup.parentElement.querySelectorAll('.serial-group').length > 1) {
-                 serialGroup.remove();
-             } else {
-                 alert("Không thể xóa serial cuối cùng!");
-             }
-        }
-        else if (target.classList.contains('btn-remove-image')) {
+        } else if (target.classList.contains('btn-remove-serial')) {
+            const serialGroup = target.closest('.serial-group');
+            if (serialGroup.parentElement.querySelectorAll('.serial-group').length > 1) {
+                serialGroup.remove();
+            } else {
+                alert("Không thể xóa serial cuối cùng!");
+            }
+        } else if (target.classList.contains('btn-remove-image')) {
             const imageGroup = target.closest('.image-group');
             if (imageGroup.parentElement.querySelectorAll('.image-group').length > 1) {
                 imageGroup.remove();
             } else {
                 alert("Không thể xóa hình ảnh cuối cùng!");
             }
-        }
-        else if (target.classList.contains('btn-remove-variant')) {
+        } else if (target.classList.contains('btn-remove-variant')) {
             const variantCard = target.closest('.variant-card');
             if (document.querySelectorAll('.variant-card').length > 1) {
                 variantCard.remove();
@@ -387,7 +347,7 @@
             }
         }
     }
-    
+
     function updateVariantTitles() {
         const variantCards = document.querySelectorAll('.variant-card');
         variantCards.forEach((card, index) => {
@@ -396,11 +356,13 @@
     }
 
     function validateForm(event) {
-        // Your existing validation logic here. It should work without changes.
-        // ... (pasting your provided validation logic for completeness)
         event.preventDefault();
         const form = event.target;
         const allFields = form.querySelectorAll("input[required], select[required]");
+        let firstInvalid = null;
+        let valid = true;
+
+        // Reset error states
         allFields.forEach(field => {
             field.classList.remove("error-border");
             const errorMessage = field.nextElementSibling;
@@ -408,11 +370,12 @@
                 errorMessage.style.display = "none";
             }
         });
-        let firstInvalid = null;
-        let valid = true;
+
+        // Validate required fields
         allFields.forEach(field => {
             let isInvalid = false;
             let errorMessageText = field.nextElementSibling?.textContent || "Vui lòng nhập giá trị hợp lệ";
+
             if (field.type === "number") {
                 if (field.name.includes("variantPrice") && (!field.value.trim() || parseFloat(field.value) <= 0)) {
                     isInvalid = true;
@@ -424,6 +387,7 @@
             } else if (!field.value.trim()) {
                 isInvalid = true;
             }
+
             if (isInvalid) {
                 valid = false;
                 field.classList.add("error-border");
@@ -435,31 +399,74 @@
                 if (!firstInvalid) firstInvalid = field;
             }
         });
-        document.querySelectorAll('.variant-card').forEach((variant, index) => {
-            const imageInputs = variant.querySelectorAll(`input[type="file"][name^="variantImage["]`);
+
+        // Validate unique attribute options per variant
+        document.querySelectorAll('.variant-card').forEach(variant => {
+            const selects = variant.querySelectorAll('select[name^="attributeOptionId"]');
+            const selectedOptions = new Set();
+            selects.forEach(select => {
+                if (select.value && selectedOptions.has(select.value)) {
+                    valid = false;
+                    select.classList.add('error-border');
+                    const errorMessage = select.nextElementSibling;
+                    errorMessage.textContent = 'Không thể chọn cùng giá trị cho nhiều thông số';
+                    errorMessage.style.display = 'block';
+                    if (!firstInvalid) firstInvalid = select;
+                } else if (select.value) {
+                    selectedOptions.add(select.value);
+                }
+            });
+        });
+
+        // Validate at least one image per variant
+        document.querySelectorAll('.variant-card').forEach(variant => {
+            const imageInputs = variant.querySelectorAll('input[name^="variantImage["]');
+            const imageUrls = variant.querySelectorAll('input[name^="variantImageUrl["]');
             let hasImage = false;
-            imageInputs.forEach(input => { if (input.files.length > 0) hasImage = true; });
-            const imageUrls = variant.querySelectorAll(`input[type="text"][name^="variantImageUrl["]`);
-            imageUrls.forEach(input => { if (input.value.trim()) hasImage = true; });
+            imageInputs.forEach(input => {
+                if (input.files && input.files.length > 0) hasImage = true;
+            });
+            imageUrls.forEach(input => {
+                if (input.value.trim()) hasImage = true;
+            });
             if (!hasImage) {
                 valid = false;
-                const imageContainer = variant.querySelector('.images-container');
-                if(imageContainer){
-                    const errorMessage = imageContainer.querySelector('.error-message');
-                    errorMessage.textContent = "Vui lòng cung cấp ít nhất một hình ảnh hoặc URL";
-                    errorMessage.style.display = "block";
-                    if (!firstInvalid) firstInvalid = imageContainer.querySelector('input');
-                }
+                const errorMessage = variant.querySelector('.images-container .error-message');
+                errorMessage.textContent = "Vui lòng cung cấp ít nhất một hình ảnh hoặc URL";
+                errorMessage.style.display = "block";
+                if (!firstInvalid) firstInvalid = variant.querySelector('input[name^="variantImage["]');
             }
         });
-        if (!valid) {
+
+        // Validate serials
+        document.querySelectorAll('.serial-group').forEach(serialGroup => {
+            const serialInput = serialGroup.querySelector('input[name^="variantSerial["]');
+            const storeSelect = serialGroup.querySelector('select[name^="variantStoreId["]');
+            if (serialInput.value.trim() && !storeSelect.value) {
+                valid = false;
+                storeSelect.classList.add("error-border");
+                const errorMessage = storeSelect.nextElementSibling;
+                errorMessage.textContent = "Vui lòng chọn cửa hàng";
+                errorMessage.style.display = "block";
+                if (!firstInvalid) firstInvalid = storeSelect;
+            } else if (!serialInput.value.trim() && storeSelect.value) {
+                valid = false;
+                serialInput.classList.add("error-border");
+                const errorMessage = serialInput.nextElementSibling;
+                errorMessage.textContent = "Vui lòng nhập số serial";
+                errorMessage.style.display = "block";
+                if (!firstInvalid) firstInvalid = serialInput;
+            }
+        });
+
+        if (valid) {
+            form.submit();
+        } else {
             if (firstInvalid) {
                 firstInvalid.scrollIntoView({ behavior: "smooth", block: "center" });
                 firstInvalid.focus();
             }
             alert("Vui lòng nhập đầy đủ và đúng các trường bắt buộc!");
-        } else {
-            form.submit();
         }
     }
 </script>
