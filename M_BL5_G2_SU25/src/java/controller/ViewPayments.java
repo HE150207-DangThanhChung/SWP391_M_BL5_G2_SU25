@@ -67,6 +67,18 @@ public class ViewPayments extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         String strsellerId = request.getParameter("sid");
+        if (strsellerId == null || strsellerId.trim().isEmpty()) {
+            // Nếu không có sid, lấy từ session
+            model.Employee employee = (model.Employee) request.getSession().getAttribute("employee");
+            if (employee != null) {
+                strsellerId = String.valueOf(employee.getEmployeeId());
+            }
+            if (strsellerId == null) {
+                response.sendRedirect("login"); // Chuyển về trang login nếu không có sid
+                return;
+            }
+        }
+        
         String action = request.getParameter("action");
         String name = request.getParameter("name");
         String status = request.getParameter("status");
@@ -93,13 +105,6 @@ public class ViewPayments extends HttpServlet {
                         listP = pDao.getAllPaymentbySellerId(sellerId);
                     } else {
                         listP = pDao.getAllPaymentbySellerIdandMethod(sellerId, method);
-                    }
-                    break;
-                case "displayName":
-                    if (name == null || name.isEmpty()) {
-                        listP = pDao.getAllPaymentbySellerId(sellerId);
-                    } else {
-                        listP = pDao.getAllPaymentbySellerIdandName(sellerId, name);
                     }
                     break;
                 case "status":
@@ -134,7 +139,8 @@ public class ViewPayments extends HttpServlet {
             // Forward the request and response to the JSP page
             request.getRequestDispatcher("/views/payment/viewpayment.jsp").forward(request, response);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("Error in ViewPayments: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

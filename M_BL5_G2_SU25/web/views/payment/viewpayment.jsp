@@ -125,6 +125,7 @@
             </div>
         </div>
         <div class="container-fluid">
+      
 
                 <div class="container-xl">
                     <div class="table-wrapper">
@@ -137,49 +138,138 @@
                             </div>
                             <div class="row col-lg-9">
                                 <!-- Name filter -->
-                          
+
+                                <!-- Sort by filter -->
+                                <form action="viewpayments" method="get" id = "status" class="col-lg-4 d-flex align-items-center filter-group">
+                                    <input type="hidden" name="action" value="status">
+                                    <input type="hidden" name="sid" value="${sessionScope.employee.employeeId}">
+                                <div >
+                                    <label for="sortby" class="mr-2 mb-0">Trạng thái:</label>
+                                    <select name="status" class="form-control" id="status" onchange="document.getElementById('status').submit();">
+                                        <option value="" >Tất cả</option>
+                                        <c:forEach items="${listPs}" var="p">
+                                            <option value="${p.getPaymentStatus()}" 
+                                                    <c:if test="${param.status == p.getPaymentStatus()}">selected</c:if>>
+                                                ${p.getPaymentStatus()}
+                                            </option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                            </form>
+                            <!-- Payment method filter -->
+                            <form action="viewpayments" method="get" id="paymentmethod" class="col-lg-4 d-flex align-items-center filter-group">
+                                <input type="hidden" name="action" value="paymentmethod">
+                                <input type="hidden" name="sid" value="${sessionScope.employee.employeeId}">
+                                <div >
+                                    <label for="method" class="mr-2 mb-0">Cách thức thanh toán:</label>
+                                    <select name="method" class="form-control" id="method" onchange="document.getElementById('paymentmethod').submit();">
+                                        <option value="All">Tất cả</option>
+                                        <c:forEach items="${listPm}" var="p">
+                                            <option value="${p.getPaymentMethod()}" 
+                                                    <c:if test="${param.method == p.getPaymentMethod()}">selected</c:if>>
+                                                ${p.getPaymentMethod()}
+                                            </option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                            </form>
+                            <form action="viewpayments" method="get" class="col-lg-4 d-flex align-items-center filter-group">
+                                <input type="hidden" name="action" value="displayName">
+                                <input type="hidden" name="sid" value="${sessionScope.user.getUserID()}">
+                                <div >
+                                    <label for="name" class="mr-2 mb-0">Họ tên:</label>
+                                    <div class="input-group">
+                                        <input type="hidden" name="action" value="displaybyname">
+                                        
+                                        <div class="input-group-append">
+                                            <button type="submit" class="btn btn-primary"><i class="fa fa-search"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Họ tên</th>
-                            <th>Phương thức thanh toán</th>
-                            <th>Tổng tiền</th>
-                            <th>Ngày đặt</th>
-                            <th>Trạng thái</th>
-                            <th >Mã thanh toán</th>
+                            <th>Payment ID</th>
+                            <th>Order ID</th>
+                            <th>Payment Method</th>
+                            <th>Price</th>
+                            <th>Payment Date</th>
+                            <th>Payment Status</th>
+                            <th>Transaction Code</th>
                         </tr>
                     </thead>
 
                     <tbody>
                         <c:if test="${not empty listP}">
-                         
+                            <c:forEach items="${listP}" var="payment">
                                 <tr>
-                                    <td>${status.index + 1}</td>
-                                    <td>${payment.paymentMethod}</td>
-                                    <td><fmt:formatNumber value="${payment.price}" type="currency" currencySymbol="₫" groupingUsed="true" maxFractionDigits="0" /></td>
-                                    <td><fmt:formatDate value="${payment.paymentDate}" pattern="dd/MM/yyyy" /></td>
-                                   
+                                    <td>${payment.getPaymentID()}</td>
+                                    <td>${payment.getOrderID()}</td>
+                                    <td>${payment.getPaymentMethod()}</td>
+                                    <td><fmt:formatNumber value="${payment.getPrice()}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
+                                    <td><fmt:formatDate value="${payment.getPaymentDate()}" pattern="yyyy-MM-dd" /></td>
                                     <td>
-                                        ${payment.transactionCode}
+                                        <c:choose>
+                                            <c:when test="${payment.getPaymentStatus() eq 'Chờ thanh toán'}">
+                                                <span class="status text-warning">&bull;</span> Chờ thanh toán
+                                            </c:when>
+                                            <c:when test="${payment.getPaymentStatus() eq 'Đang xử lý'}">
+                                                <span class="status text-warning">&bull;</span> Đang xử lý
+                                            </c:when>
+                                            <c:when test="${payment.getPaymentStatus() eq 'Đã thanh toán'}">
+                                                <span class="status text-success">&bull;</span> Đã thanh toán
+                                            </c:when>
+                                            <c:when test="${payment.getPaymentStatus() eq 'Đã bị hủy'}">
+                                                <span class="status text-danger">&bull;</span> Đã bị hủy
+                                            </c:when>
+                                            <c:otherwise>
+                                                ${payment.getPaymentStatus()}
+                                            </c:otherwise>
+                                        </c:choose>
                                     </td>
+                                    <td>${payment.getTransactionCode()}</td>
                                 </tr>
-                         
+                            </c:forEach>
 
                         </c:if>
-                  
+                        <c:if test="${empty listP}">
+                            <tr>
+                                <td colspan="7" class="text-center">Không có thanh toán nào trùng khớp.</td>
+                            </tr>
+                        </c:if>
                     </tbody>
                 </table>
                 <!-- Pagination (Optional) -->
-             
-             
+                <nav aria-label="Page navigation" class="d-flex justify-content-center mt-3">
+                    <ul class="pagination">
+                        <!-- Previous button -->
+                        <li class="page-item ${currentPage == 1 ? 'disabled' : ''}">
+                            <a class="page-link" href="?sid=${param.sid}&action=${param.action}&name=${param.name}&status=${param.status}&method=${param.method}&page=${currentPage - 1}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
 
-                      
+                        <!-- Page number buttons -->
+                        <c:forEach begin="1" end="${totalPages}" var="i">
+                            <li class="page-item ${currentPage == i ? 'active' : ''}">
+                                <a class="page-link" href="?sid=${param.sid}&action=${param.action}&name=${param.name}&status=${param.status}&method=${param.method}&page=${i}">${i}</a>
+                            </li>
+                        </c:forEach>
 
+                        <!-- Next button -->
+                        <li class="page-item ${currentPage == totalPages ? 'disabled' : ''}">
+                            <a class="page-link" href="?sid=${param.sid}&action=${param.action}&name=${param.name}&status=${param.status}&method=${param.method}&page=${currentPage + 1}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             </div>
-        </div>
-  
+
     </div>
 </body>
 <script>

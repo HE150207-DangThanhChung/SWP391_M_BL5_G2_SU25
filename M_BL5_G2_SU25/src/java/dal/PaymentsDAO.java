@@ -81,9 +81,8 @@ public class PaymentsDAO {
         List<Payments> listP = new ArrayList<>();
         String sql = "SELECT PM.PaymentID, PM.OrderID, PM.PaymentMethod, PM.PaymentDate, PM.PaymentStatus, PM.Price, PM.TransactionCode " +
                      "FROM Payments PM " +
-                     "JOIN Orders O ON PM.OrderID = O.OrderID " +
-                     "JOIN Products P ON O.StoreID = P.StoreID " +
-                     "WHERE P.SellerID = ?";
+                     "JOIN [Order] O ON PM.OrderID = O.OrderId " +
+                     "WHERE O.SaleBy = ?";
         try (Connection con = new DBContext().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, sid);
@@ -109,9 +108,8 @@ public class PaymentsDAO {
         List<Payments> listP = new ArrayList<>();
         String sql = "SELECT PM.PaymentID, PM.OrderID, PM.PaymentMethod, PM.PaymentDate, PM.PaymentStatus, PM.Price, PM.TransactionCode " +
                      "FROM Payments PM " +
-                     "JOIN Orders O ON PM.OrderID = O.OrderID " +
-                     "JOIN Products P ON O.StoreID = P.StoreID " +
-                     "WHERE P.SellerID = ? AND PM.PaymentMethod = ?";
+                     "JOIN [Order] O ON PM.OrderID = O.OrderID " + 
+                     "WHERE O.SaleBy = ? AND PM.PaymentMethod = ?";
         try (Connection con = new DBContext().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, sid);
@@ -138,9 +136,8 @@ public class PaymentsDAO {
         List<Payments> listP = new ArrayList<>();
         String sql = "SELECT PM.PaymentID, PM.OrderID, PM.PaymentMethod, PM.PaymentDate, PM.PaymentStatus, PM.Price, PM.TransactionCode " +
                      "FROM Payments PM " +
-                     "JOIN Orders O ON PM.OrderID = O.OrderID " +
-                     "JOIN Products P ON O.StoreID = P.StoreID " +
-                     "WHERE P.SellerID = ? AND PM.PaymentStatus = ?";
+                     "JOIN [Order] O ON PM.OrderID = O.OrderID " +
+                     "WHERE O.SaleBy = ? AND PM.PaymentStatus = ?";
         try (Connection con = new DBContext().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, sid);
@@ -159,36 +156,6 @@ public class PaymentsDAO {
             }
         } catch (Exception e) {
             throw new RuntimeException("getAllPaymentbySellerIdandStatus() failed", e);
-        }
-        return listP;
-    }
-
-    public List<Payments> getAllPaymentbySellerIdandName(int sid, String name) {
-        List<Payments> listP = new ArrayList<>();
-        String sql = "SELECT PM.PaymentID, PM.OrderID, PM.PaymentMethod, PM.PaymentDate, PM.PaymentStatus, PM.Price, PM.TransactionCode " +
-                     "FROM Payments PM " +
-                     "JOIN Orders O ON PM.OrderID = O.OrderID " +
-                     "JOIN Products P ON O.StoreID = P.StoreID " +
-                     "JOIN Users U ON O.CustomerID = U.UserID " +
-                     "WHERE P.SellerID = ? AND CONCAT(U.FirstName, ' ', U.LastName) LIKE ?";
-        try (Connection con = new DBContext().getConnection();
-             PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, sid);
-            ps.setString(2, "%" + name + "%");
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Payments p = new Payments();
-                p.setPaymentID(rs.getInt("PaymentID"));
-                p.setOrderID(rs.getInt("OrderID"));
-                p.setPaymentMethod(rs.getString("PaymentMethod"));
-                p.setPaymentDate(rs.getDate("PaymentDate"));
-                p.setPaymentStatus(rs.getString("PaymentStatus"));
-                p.setPrice(rs.getString("Price"));
-                p.setTransactionCode(rs.getString("TransactionCode"));
-                listP.add(p);
-            }
-        } catch (Exception e) {
-            throw new RuntimeException("getAllPaymentbySellerIdandName() failed", e);
         }
         return listP;
     }
@@ -279,7 +246,7 @@ public class PaymentsDAO {
 
     public static void main(String[] args) {
         PaymentsDAO u = new PaymentsDAO();
-      List<Payments> p = u.getAllPaymentbySellerId(3);
+      List<Payments> p = u.getAllPaymentbySellerId(5);
         for (Payments payments : p) {
             System.out.println(payments);
         }
