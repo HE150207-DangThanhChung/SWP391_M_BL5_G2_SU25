@@ -133,6 +133,12 @@ public class ProfileController extends HttpServlet {
         }
 
         Employee e = eDao.getEmployeeByUsername(username);
+
+        if (e.getEmployeeId() < 0) {
+            response.sendRedirect("views/common/login.jsp");
+            return;
+        }
+
         Store s = sDao.findById(e.getStoreId());
         Role r = rDao.getRoleById(e.getRoleId());
         Ward w = wDao.getById(e.getWardId());
