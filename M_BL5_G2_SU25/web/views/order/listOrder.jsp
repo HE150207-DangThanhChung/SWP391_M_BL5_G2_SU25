@@ -6,6 +6,7 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html lang="vi">
 <head>
@@ -257,6 +258,12 @@
                                                 onclick="window.location.href='${pageContext.request.contextPath}/order/edit?id=${order.orderId}'">
                                             <i class="bi bi-pencil-square me-1"></i>Sửa
                                         </button>
+                                        <c:if test="${order.status eq 'Pending'}">
+                                            <button class="btn btn-success"
+                                                    onclick="window.location.href='${pageContext.request.contextPath}/checkoutInfo?orderId=${order.orderId}'">
+                                                <i class="bi bi-cash-coin me-1"></i>Thanh toán
+                                            </button>
+                                        </c:if>
                                     </div>
                                 </td>
                             </tr>
