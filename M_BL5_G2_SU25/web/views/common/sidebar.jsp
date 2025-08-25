@@ -133,7 +133,7 @@
                     <i class="fas fa-tags"></i> 
                     Quản lí mã khuyến mãi
                 </a>
-                <a href="">
+                <a href="orders">
                     <i class="fas fa-tags"></i> 
                     Quản lí đơn hàng
                 </a>
@@ -156,6 +156,11 @@
                 <a href="${pageContext.request.contextPath}/receipt">
                     <i class="fas fa-tags"></i>
                     Quản lí Hoá Đơn
+                </a>
+
+                <a href="${pageContext.request.contextPath}/viewpayments?sid=${sessionScope.employeeId}">
+                    <i class="fas fa-tags"></i>
+                    Quản lí Thanh Toán
                 </a>
         </aside>
     </body>

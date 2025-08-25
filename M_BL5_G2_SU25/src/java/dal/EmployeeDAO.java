@@ -504,6 +504,57 @@ public String getEmployeeNameById(int id) {
         return null;
     }
     
+    public List<Employee> getAllEmployees() {
+        List<Employee> empList = new ArrayList<>();
+        String sql = """
+        SELECT e.[EmployeeId], e.[UserName], e.[FirstName], e.[MiddleName], e.[LastName], 
+               e.[Phone], e.[Email], e.[CCCD], e.[Status], e.[Avatar],
+               e.[DoB], e.[Address], e.[StartAt], e.[Gender], 
+               e.[RoleId], e.[StoreId], r.[RoleName], s.[StoreName]
+        FROM [Employee] e
+        LEFT JOIN [Role] r ON e.RoleId = r.RoleId
+        LEFT JOIN [Store] s ON e.StoreId = s.StoreId
+        ORDER BY e.EmployeeId
+        """;
+
+        try {
+            con = DBContext.getConnection();
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Employee e = new Employee();
+                e.setEmployeeId(rs.getInt("EmployeeId"));
+                e.setUserName(rs.getString("UserName"));
+                e.setFirstName(rs.getString("FirstName"));
+                e.setMiddleName(rs.getString("MiddleName"));
+                e.setLastName(rs.getString("LastName"));
+                e.setPhone(rs.getString("Phone"));
+                e.setEmail(rs.getString("Email"));
+                e.setCccd(rs.getString("CCCD"));
+                e.setStatus(rs.getString("Status"));
+                e.setAvatar(rs.getString("Avatar"));
+                e.setDob(rs.getDate("DoB"));
+                e.setAddress(rs.getString("Address"));
+                e.setStartAt(rs.getDate("StartAt"));
+                e.setGender(rs.getString("Gender"));
+                e.setRoleId(rs.getInt("RoleId"));
+                e.setStoreId(rs.getInt("StoreId"));
+                e.setRoleName(rs.getString("RoleName"));
+                e.setStoreName(rs.getString("StoreName"));
+                empList.add(e);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            DBContext.closeConnection(rs);
+            DBContext.closeConnection(ps);
+            DBContext.closeConnection(con);
+        }
+
+        return empList;
+    }
+    
      public boolean editProfile(int employeeId, String username, String firstName, String middleName, String lastName, String phone, String email, String gender, String status, String cccd, java.sql.Date dob, String address, String avatar, int wardId) {
         StringBuilder sql = new StringBuilder("""
             UPDATE Employee
