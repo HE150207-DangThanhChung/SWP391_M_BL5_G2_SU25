@@ -167,85 +167,100 @@
                                     if ('${logo}' !== '') {
                                         const logo = document.getElementById("preview-logo");
                                         logo.src = '${pageContext.request.contextPath}/${logo}';
-                                        logo.classList.remove("hidden");
-                                    }
-                                });
+                                                    logo.classList.remove("hidden");
+                                                }
+                                            });
 
-                                document.getElementById("save-receipt").addEventListener("click", function () {
-                                    const title = document.getElementById("receipt-title").value;
-                                    const font = document.getElementById("receipt-font").value;
-                                    const color = document.getElementById("receipt-color").value;
-                                    const logoFile = document.getElementById("receipt-logo").files[0];
+                                            document.getElementById("save-receipt").addEventListener("click", function () {
+                                                const title = document.getElementById("receipt-title").value;
+                                                const font = document.getElementById("receipt-font").value;
+                                                const color = document.getElementById("receipt-color").value;
+                                                const logoFile = document.getElementById("receipt-logo").files[0];
 
-                                    const formData = new FormData();
-                                    formData.append('title', title);
-                                    formData.append('font', font);
-                                    formData.append('color', color);
+                                                if (title.trim() === '') {
+                                                    showToast("Tiêu đề không được trống!", "error");
+                                                    return;
+                                                }
 
-                                    if (logoFile) {
-                                        formData.append('logo', logoFile);
-                                    }
+                                                if (title.trim().length > 30) {
+                                                    showToast("Tiêu đề không được nhiều hơn 30 kí tự!", "error");
+                                                    return;
+                                                }
 
-                                    $.ajax({
-                                        url: "${pageContext.request.contextPath}/receipt/edit",
-                                        type: "POST",
-                                        data: formData,
-                                        processData: false,
-                                        contentType: false,
-                                        success: function (response) {
-                                            if (response.success) {
-                                                showToast(response.message);
-                                            } else {
-                                                showToast(response.message, "error");
+                                                if (title.trim().length < 10) {
+                                                    showToast("Tiêu đề không được bé hơn 10 kí tự!", "error");
+                                                    return;
+                                                }
+
+                                                const formData = new FormData();
+                                                formData.append('title', title);
+                                                formData.append('font', font);
+                                                formData.append('color', color);
+
+                                                if (logoFile) {
+                                                    formData.append('logo', logoFile);
+                                                }
+
+                                                $.ajax({
+                                                    url: "${pageContext.request.contextPath}/receipt/edit",
+                                                    type: "POST",
+                                                    data: formData,
+                                                    processData: false,
+                                                    contentType: false,
+                                                    success: function (response) {
+                                                        if (response.success) {
+                                                            showToast(response.message, 'success');
+                                                        } else {
+                                                            showToast(response.message, "error");
+                                                        }
+                                                    },
+                                                    error: function (xhr, status, error) {
+                                                        console.error("AJAX Error:", status, error);
+                                                        showToast("Không thể kết nối server.", "error");
+                                                    }
+                                                });
+                                            });
+
+                                            function updatePreview() {
+                                                const title = document.getElementById("receipt-title").value;
+                                                document.getElementById("preview-title").innerText = title;
+
+                                                const font = document.getElementById("receipt-font").value;
+                                                document.getElementById("print-area").style.fontFamily = font;
+
+                                                const color = document.getElementById("receipt-color").value;
+                                                document.getElementById("preview-title").style.color = color;
+
+                                                console.log(title + font + color)
                                             }
-                                        },
-                                        error: function (xhr, status, error) {
-                                            console.error("AJAX Error:", status, error);
-                                            showToast("Không thể kết nối server.", "error");
-                                        }
-                                    });
-                                });
 
-                                function updatePreview() {
-                                    const title = document.getElementById("receipt-title").value;
-                                    document.getElementById("preview-title").innerText = title;
+                                            function previewLogo(event) {
+                                                const file = event.target.files[0];
+                                                if (file) {
+                                                    const reader = new FileReader();
+                                                    reader.onload = function (e) {
+                                                        const logo = document.getElementById("preview-logo");
+                                                        logo.src = e.target.result;
+                                                        logo.classList.remove("hidden");
+                                                    };
+                                                    reader.readAsDataURL(file);
+                                                }
+                                            }
 
-                                    const font = document.getElementById("receipt-font").value;
-                                    document.getElementById("print-area").style.fontFamily = font;
-
-                                    const color = document.getElementById("receipt-color").value;
-                                    document.getElementById("preview-title").style.color = color;
-
-                                    console.log(title + font + color)
-                                }
-
-                                function previewLogo(event) {
-                                    const file = event.target.files[0];
-                                    if (file) {
-                                        const reader = new FileReader();
-                                        reader.onload = function (e) {
-                                            const logo = document.getElementById("preview-logo");
-                                            logo.src = e.target.result;
-                                            logo.classList.remove("hidden");
-                                        };
-                                        reader.readAsDataURL(file);
-                                    }
-                                }
-
-                                function showToast(message, type) {
-                                    let colors = {
-                                        success: "linear-gradient(to right, #00b09b, #96c93d)",
-                                        error: "linear-gradient(to right, #ff416c, #ff4b2b)"
-                                    };
-                                    Toastify({
-                                        text: message,
-                                        duration: 2000,
-                                        close: true,
-                                        gravity: "top",
-                                        position: "right",
-                                        backgroundColor: colors[type] || "#333"
-                                    }).showToast();
-                                }
+                                            function showToast(message, type) {
+                                                let colors = {
+                                                    success: "linear-gradient(to right, #00b09b, #96c93d)",
+                                                    error: "linear-gradient(to right, #ff416c, #ff4b2b)"
+                                                };
+                                                Toastify({
+                                                    text: message,
+                                                    duration: 2000,
+                                                    close: true,
+                                                    gravity: "top",
+                                                    position: "right",
+                                                    backgroundColor: colors[type] || "#333"
+                                                }).showToast();
+                                            }
         </script>
 
     </body>
