@@ -4,145 +4,138 @@
 <%@page import="java.text.DecimalFormat"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%-- 
+    Document   : viewReceipt
+    Created on : Aug 24, 2025, 3:55:51 PM
+    Author     : hoang
+--%>
 <!DOCTYPE html>
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Payment List</title>
-        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-        <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-        <link rel="stylesheet" href="assets/css/main.css" />
+        <meta charset="UTF-8">
+        <title>Chi tiết hoá đơn</title>
+        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <style>
+            html, body {
+                height: 100%;
+            }
             body {
-                color: #566787;
-                background: #f5f5f5;
-                font-family: 'Varela Round', sans-serif;
-                font-size: 13px;
-            }
-
-            .table-wrapper {
-                min-width: 1000px;
-                background: #fff;
-                padding: 20px 25px;
-                border-radius: 3px;
-                box-shadow: 0 1px 1px rgba(0, 0, 0, .05);
-                margin-top: 20px
-            }
-
-            .table-title {
-                color: white;
-                background: #4b5366;
-                padding: 16px 25px;
-                margin: -20px -25px 10px;
-                border-radius: 3px 3px 0 0;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-            }
-
-            .table-title h2 {
+                font-family: "Inter", sans-serif;
+                background-color: #f0f0f0;
+                color: #374151;
                 margin: 0;
-                font-size: 24px;
-                color: white;
+                padding: 0;
             }
-
-            table.table th {
-                background-color: #f8f9fa;
-                font-weight: bold;
-                border-bottom: 2px solid #dee2e6;
+            .layout-wrapper {
+                display: flex;
+                min-height: 100vh;
             }
-
-            table.table tr:nth-child(even) {
-                background-color: #f2f2f2;
+            .main-panel {
+                flex: 1 1 auto;
+                display: flex;
+                flex-direction: column;
+                min-height: 100vh;
+                padding: 20px;
             }
-
-            table.table tr:hover {
-                background: #e9ecef;
+            .content-wrapper {
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                padding: 20px;
+                margin-bottom: 20px;
             }
-
-            .btn-danger {
-                color: #fff;
-                background-color: #dc3545;
-                text-align: center;
+            .page-title {
+                color: #2d3748;
+                font-size: 1.5rem;
+                font-weight: 600;
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+                border-bottom: 1px solid #e2e8f0;
             }
-
-            .btn-danger:hover {
-                background-color: #c82333;
+            .filter-section {
+                background: #f8fafc;
+                padding: 15px;
+                border-radius: 6px;
+                margin-bottom: 20px;
             }
-
-            .status {
-                font-size: 16px;
-                margin-right: 5px;
+            .table {
+                background: white;
+                border-radius: 8px;
+                overflow: hidden;
             }
-
-            .text-success {
-                color: #10c469;
+            .table th {
+                background: #f8fafc;
+                color: #4a5568;
+                font-weight: 600;
+                border-bottom: 2px solid #e2e8f0;
             }
-
-            .text-warning {
-                color: #FFC107;
+            .table td {
+                vertical-align: middle;
             }
-
-            .text-danger {
-                color: #ff5b5b;
+            .status-dot {
+                display: inline-block;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                margin-right: 6px;
             }
-
+            .status-warning { background-color: #fbd38d; }
+            .status-success { background-color: #68d391; }
+            .status-danger { background-color: #fc8181; }
+            .status-text {
+                font-weight: 500;
+            }
             .pagination {
-                float: right;
-                margin: 0 0 5px;
+                margin-top: 1rem;
+                justify-content: center;
             }
-
-            .pagination li a {
-                border: none;
-                font-size: 13px;
-                color: #999;
-                margin: 0 2px;
-                text-align: center;
-                padding: 6px 12px;
+            .page-link {
+                color: #4a5568;
+                border: 1px solid #e2e8f0;
             }
-
-            .pagination li.active a {
-                background: #03A9F4;
-                color: white;
+            .page-link:hover {
+                background-color: #f7fafc;
+                color: #2d3748;
             }
-
-            .pagination li.disabled a {
-                color: #ccc;
+            .page-item.active .page-link {
+                background-color: #4299e1;
+                border-color: #4299e1;
             }
-            .filter-group{
-                margin-top: 5px;
+            .filter-group {
+                margin-bottom: 1rem;
+            }
+            .filter-group label {
+                font-weight: 500;
+                color: #4a5568;
+            }
+            .form-control {
+                border-radius: 6px;
+                border: 1px solid #e2e8f0;
+            }
+            .form-control:focus {
+                border-color: #4299e1;
+                box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.2);
             }
         </style>
     </head>
     <body>
-        <div class="preloader">
-            <div class="preloader-inner">
-                <div class="preloader-icon">
-                    <span></span>
-                    <span></span>
-                </div>
-            </div>
-        </div>
-        <div class="container-fluid">
-      
-
-                <div class="container-xl">
-                    <div class="table-wrapper">
-                        <div class="table-title">
-                            <h2>Lịch sử giao dịch</h2>
-                        </div>
-                        <div class="row mb-3 filter-group">
-                            <div class="col-lg-3">
-
-                            </div>
-                            <div class="row col-lg-9">
+        <div class="layout-wrapper flex">
+            <jsp:include page="/views/common/sidebar.jsp"/>
+            <div class="main-panel">
+                <jsp:include page="/views/common/header.jsp"/>
+                <div class="content-wrapper">
+                    <h2 class="page-title">Lịch sử giao dịch</h2>
+                    <div class="filter-section">
+                        <div class="row">
                                 <!-- Name filter -->
 
                                 <!-- Sort by filter -->
                                 <form action="viewpayments" method="get" id = "status" class="col-lg-4 d-flex align-items-center filter-group">
                                     <input type="hidden" name="action" value="status">
-                                    <input type="hidden" name="sid" value="${sessionScope.employee.employeeId}">
+                                    <input type="hidden" name="sid" value="${sessionScope.employeeId}">
                                 <div >
                                     <label for="status" class="mr-2 mb-0">Trạng thái:</label>
                                     <select name="status" class="form-control" id="status" onchange="this.form.submit();">
@@ -159,7 +152,7 @@
                             <!-- Payment method filter -->
                             <form action="viewpayments" method="get" id="paymentmethod" class="col-lg-4 d-flex align-items-center filter-group">
                                 <input type="hidden" name="action" value="paymentmethod">
-                                <input type="hidden" name="sid" value="${sessionScope.employee.employeeId}">
+                                <input type="hidden" name="sid" value="${sessionScope.employeeId}">
                                 <div >
                                     <label for="method" class="mr-2 mb-0">Cách thức thanh toán:</label>
                                     <select name="method" class="form-control" id="method" onchange="this.form.submit();">
@@ -210,16 +203,20 @@
                                     <td>
                                         <c:choose>
                                             <c:when test="${payment.getPaymentStatus() eq 'Chờ thanh toán'}">
-                                                <span class="status text-warning">&bull;</span> Chờ thanh toán
+                                                <span class="status-dot status-warning"></span>
+                                                <span class="status-text text-warning">Chờ thanh toán</span>
                                             </c:when>
                                             <c:when test="${payment.getPaymentStatus() eq 'Đang xử lý'}">
-                                                <span class="status text-warning">&bull;</span> Đang xử lý
+                                                <span class="status-dot status-warning"></span>
+                                                <span class="status-text text-warning">Đang xử lý</span>
                                             </c:when>
                                             <c:when test="${payment.getPaymentStatus() eq 'Đã thanh toán'}">
-                                                <span class="status text-success">&bull;</span> Đã thanh toán
+                                                <span class="status-dot status-success"></span>
+                                                <span class="status-text text-success">Đã thanh toán</span>
                                             </c:when>
                                             <c:when test="${payment.getPaymentStatus() eq 'Đã bị hủy'}">
-                                                <span class="status text-danger">&bull;</span> Đã bị hủy
+                                                <span class="status-dot status-danger"></span>
+                                                <span class="status-text text-danger">Đã bị hủy</span>
                                             </c:when>
                                             <c:otherwise>
                                                 ${payment.getPaymentStatus()}
