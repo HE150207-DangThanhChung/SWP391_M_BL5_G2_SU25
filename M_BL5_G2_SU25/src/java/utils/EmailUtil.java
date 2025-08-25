@@ -14,18 +14,6 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import java.util.Date;
-import java.util.Properties;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import javax.mail.Authenticator;
-import javax.mail.Message;
-import javax.mail.MessagingException;
-import javax.mail.PasswordAuthentication;
-import javax.mail.Session;
-import javax.mail.Transport;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
 
 /**
  *
@@ -69,7 +57,7 @@ public class EmailUtil {
         Session session = Session.getInstance(pros, auth);
         System.out.println("Khởi tạo Session: " + (System.currentTimeMillis() - startTime) + "ms");
         // Gửi email
-//        final String to = "ntd28082003@gmail.com";
+
         // tạo một tin nhắn
         MimeMessage msg = new MimeMessage(session);
 
@@ -85,7 +73,7 @@ public class EmailUtil {
             //Quy định ngày gửi
             msg.setSentDate(new Date());
             // Quy định email phản hồi
-            msg.setReplyTo(null); // InternetAddress.parse(to, false)
+            msg.setReplyTo(null); 
             //Nội dung
             msg.setContent(noiDung, "text/HTML; charset=UTF-8");
             // Gửi email
