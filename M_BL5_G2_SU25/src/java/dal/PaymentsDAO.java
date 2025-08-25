@@ -84,7 +84,7 @@ public class PaymentsDAO {
                      "FROM Payments PM " +
                      "JOIN [Order] O ON PM.OrderID = O.OrderId " +
                      "JOIN Customer C ON O.CustomerId = C.CustomerId " +
-                     "WHERE O.SaleBy = ?";
+                     "WHERE O.CreatedBy = ?";
         try (Connection con = new DBContext().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, sid);
@@ -117,7 +117,7 @@ public class PaymentsDAO {
                      "FROM Payments PM " +
                      "JOIN [Order] O ON PM.OrderID = O.OrderID " + 
                      "JOIN Customer C ON O.CustomerId = C.CustomerId " +
-                     "WHERE O.SaleBy = ? AND PM.PaymentMethod = ?";
+                     "WHERE O.CreatedBy = ? AND PM.PaymentMethod = ?";
         try (Connection con = new DBContext().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, sid);
@@ -151,7 +151,7 @@ public class PaymentsDAO {
                      "FROM Payments PM " +
                      "JOIN [Order] O ON PM.OrderID = O.OrderID " +
                      "JOIN Customer C ON O.CustomerId = C.CustomerId " +
-                     "WHERE O.SaleBy = ? AND PM.PaymentStatus = ?";
+                     "WHERE O.CreatedBy = ? AND PM.PaymentStatus = ?";
         try (Connection con = new DBContext().getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, sid);
