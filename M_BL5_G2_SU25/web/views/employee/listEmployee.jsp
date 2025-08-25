@@ -154,10 +154,20 @@
                             <h1 class="text-2xl font-bold">Quản lí nhân viên</h1>
                             <p class="text-gray-500">Quản lí tất cả các nhân viên trong hệ thống</p>
                         </div>
-                        <a href="${pageContext.request.contextPath}/management/employees/add"
-                           class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
-                            Thêm mới
-                        </a>
+                        <div class="flex gap-3">
+                            <a href="${pageContext.request.contextPath}/management/employees/report"
+                               class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium transition-colors flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                          d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                                </svg>
+                                Xem báo cáo
+                            </a>
+                            <a href="${pageContext.request.contextPath}/management/employees/add"
+                               class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
+                                Thêm mới
+                            </a>
+                        </div>
                     </div>
 
                     <!-- Search & Filter -->
@@ -439,6 +449,47 @@
                     }
                 });
             }
+            
+            // Function to handle viewing employee reports
+            function viewEmployeeReport(employeeId) {
+                console.log("Viewing report for employee ID: " + employeeId);
+                // Ensure we have a valid employee ID
+                if (!employeeId) {
+                    console.error("Employee ID is undefined or invalid");
+                    return;
+                }
+                
+                // Redirect to the employee report page with the correct ID
+                window.location.href = "${pageContext.request.contextPath}/management/employees/report?id=" + employeeId;
+            }
+            
+            // Check for no reports alert
+            document.addEventListener('DOMContentLoaded', function() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const showAlert = urlParams.get('showNoReportsAlert');
+                
+                if (showAlert === 'true') {
+                    const message = '${sessionScope.noReportsMessage}';
+                    if (message && message.trim() !== '') {
+                        Swal.fire({
+                            title: 'Thông báo',
+                            text: message,
+                            icon: 'info',
+                            confirmButtonColor: '#3085d6',
+                            confirmButtonText: 'Đã hiểu',
+                            timer: 4000,
+                            timerProgressBar: true
+                        });
+                        
+                        // Clear the session message after showing
+                        <c:remove var="noReportsMessage" scope="session" />
+                        
+                        // Clean up URL by removing the alert parameter
+                        const newUrl = window.location.pathname + window.location.search.replace(/[?&]showNoReportsAlert=true/, '').replace(/^&/, '?');
+                        window.history.replaceState({}, document.title, newUrl);
+                    }
+                }
+            });
         </script>
     </body>
 </html>

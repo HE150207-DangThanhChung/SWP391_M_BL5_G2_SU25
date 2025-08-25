@@ -578,4 +578,44 @@ public String getEmployeeNameById(int id) {
         return false;
     }
     
+    public List<Employee> getAllActiveEmployees() {
+        List<Employee> employees = new ArrayList<>();
+        String sql = "SELECT * FROM Employee WHERE Status = 'Active'";
+
+        try {
+            con = DBContext.getConnection();
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Employee e = new Employee();
+                e.setEmployeeId(rs.getInt("EmployeeId"));
+                e.setUserName(rs.getString("UserName"));
+                e.setFirstName(rs.getString("FirstName"));
+                e.setMiddleName(rs.getString("MiddleName"));
+                e.setLastName(rs.getString("LastName"));
+                e.setPhone(rs.getString("Phone"));
+                e.setEmail(rs.getString("Email"));
+                e.setCccd(rs.getString("CCCD"));
+                e.setStatus(rs.getString("Status"));
+                e.setAvatar(rs.getString("Avatar"));
+                e.setDob(rs.getDate("DoB"));
+                e.setAddress(rs.getString("Address"));
+                e.setStartAt(rs.getDate("StartAt"));
+                e.setGender(rs.getString("Gender"));
+                e.setRoleId(rs.getInt("RoleId"));
+                e.setStoreId(rs.getInt("StoreId"));
+                employees.add(e);
+            }
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            DBContext.closeConnection(rs);
+            DBContext.closeConnection(ps);
+            DBContext.closeConnection(con);
+        }
+
+        return employees;
+    }
 }

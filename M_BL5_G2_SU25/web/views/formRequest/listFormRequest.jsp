@@ -27,9 +27,8 @@
         <jsp:include page="/views/common/header.jsp"/>
         <main class="content p-6" style="flex:1;">
             <div class="mb-6 flex items-center justify-between">
-                <div>
+                <div class="flex items-center gap-4">
                     <h1 class="text-2xl font-bold">Quản lí yêu cầu</h1>
-                    <p class="text-gray-500">Quản lí tất cả các yêu cầu trong hệ thống</p>
                 </div>
                 <a href="${pageContext.request.contextPath}/management/form-requests/add"
                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium transition-colors">
