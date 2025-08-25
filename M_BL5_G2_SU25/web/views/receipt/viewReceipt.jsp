@@ -7,6 +7,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -41,6 +43,11 @@
                 margin-top: auto;
             }
 
+            /* Receipt font styling */
+            .receipt-content {
+                font-family: ${receiptConfig.font != null ? receiptConfig.font : "'Inter', sans-serif"};
+            }
+
             /* Khi in: chỉ hiện phần #print-area, ẩn tất cả .no-print */
             @media print {
                 .no-print {
@@ -62,6 +69,7 @@
                     background: #fff;
                     font-size: 14pt;
                     line-height: 1.5;
+                    font-family: ${receiptConfig.font != null ? receiptConfig.font : "'Inter', sans-serif"};
                 }
             }
         </style>
@@ -72,7 +80,9 @@
             <div class="main-panel flex flex-col min-h-screen">
                 <jsp:include page="/views/common/header.jsp"/>
 
-                <a class="text-center mt-3" href="${pageContext.request.contextPath}/receipt/edit"><button class="bg-blue-600 hover:bg-blue-900 transition text-white p-2 rounded">Chỉnh sửa giao diện hoá đơn</button></a>
+                <a class="text-center mt-3" href="${pageContext.request.contextPath}/receipt/edit">
+                    <button class="bg-blue-600 hover:bg-blue-900 transition text-white p-2 rounded">Chỉnh sửa giao diện hoá đơn</button>
+                </a>
 
                 <main class="content grid grid-cols-3 gap-4 p-6">
                     <div class="col-span-1 bg-white rounded-lg shadow p-4 overflow-y-auto">
@@ -138,87 +148,15 @@
                     </div>
 
                     <div class="col-span-2 flex flex-col items-center">
-                        <div id="print-area" class="w-full bg-white rounded-lg p-8">
-                            <c:choose>
-                                <c:when test="${not empty receipt}">
-                                    <div class="text-center border-b pb-4 mb-6">
-                                        <h1 class="text-2xl font-bold uppercase">HÓA ĐƠN BÁN HÀNG</h1>
-                                        <p class="text-gray-600">Công ty TNHH ABC</p>
-                                        <p class="text-gray-600">Ngày lập: ${receipt.date}</p>
-                                    </div>
-
-                                    <div class="grid grid-cols-2 gap-6 mb-6">
-                                        <div>
-                                            <h2 class="font-semibold mb-1">Khách hàng</h2>
-                                            <p>${receipt.customerName}</p>
-                                            <p>SĐT: ${receipt.customerPhone}</p>
-                                            <p>Email: ${receipt.customerEmail}</p>
-                                        </div>
-                                        <div class="text-right">
-                                            <h2 class="font-semibold mb-1">Mã hóa đơn</h2>
-                                            <p class="font-mono text-lg">#${receipt.id}</p>
-                                            <span class="inline-block mt-2 px-3 py-1 rounded-full text-sm 
-                                                  ${receipt.paid ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}">
-                                                ${receipt.paid ? 'Đã thanh toán' : 'Chưa thanh toán'}
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    <table class="w-full border-collapse text-sm mb-6">
-                                        <thead>
-                                            <tr class="bg-gray-100 border-b">
-                                                <th class="p-2 text-left">Sản phẩm</th>
-                                                <th class="p-2 text-center">SL</th>
-                                                <th class="p-2 text-right">Đơn giá</th>
-                                                <th class="p-2 text-right">Thành tiền</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <c:forEach var="item" items="${receipt.items}">
-                                                <tr class="border-b hover:bg-gray-50">
-                                                    <td class="p-2">${item.productName}</td>
-                                                    <td class="p-2 text-center">${item.quantity}</td>
-                                                    <td class="p-2 text-right">
-                                                        <fmt:formatNumber value="${item.price}" type="currency" currencySymbol="₫"/>
-                                                    </td>
-                                                    <td class="p-2 text-right">
-                                                        <fmt:formatNumber value="${item.total}" type="currency" currencySymbol="₫"/>
-                                                    </td>
-                                                </tr>
-                                            </c:forEach>
-                                        </tbody>
-                                    </table>
-
-                                    <div class="flex justify-end mb-6">
-                                        <div class="w-1/2">
-                                            <div class="flex justify-between py-1">
-                                                <span>Tạm tính:</span>
-                                                <span><fmt:formatNumber value="${receipt.subtotal}" type="currency" currencySymbol="₫"/></span>
-                                            </div>
-                                            <div class="flex justify-between py-1">
-                                                <span>VAT (10%):</span>
-                                                <span><fmt:formatNumber value="${receipt.vat}" type="currency" currencySymbol="₫"/></span>
-                                            </div>
-                                            <div class="flex justify-between py-2 border-t font-bold text-lg">
-                                                <span>Tổng cộng:</span>
-                                                <span><fmt:formatNumber value="${receipt.total}" type="currency" currencySymbol="₫"/></span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </c:when>
-                                <c:otherwise>
-                                    <p class="text-gray-500 text-center">Vui lòng chọn một đơn hàng để xem chi tiết hóa đơn.</p>
-                                </c:otherwise>
-                            </c:choose>
+                        <div id="print-area" class="w-full bg-white rounded-lg p-8 receipt-content">
+                            <p class="text-gray-500 text-center">Vui lòng chọn một đơn hàng để xem chi tiết hóa đơn.</p>
                         </div>
 
                         <div class="flex justify-center space-x-3 mt-4 no-print">
-                            <c:if test="${not empty receipt}">
-                                <button onclick="printReceipt()" 
-                                        class="px-4 py-2 bg-blue-600 text-white rounded transition shadow hover:bg-blue-700">
-                                    In hóa đơn
-                                </button>
-                            </c:if>
+                            <button onclick="printReceipt()" 
+                                    class="px-4 py-2 bg-blue-600 text-white rounded transition shadow hover:bg-blue-700">
+                                In hóa đơn
+                            </button>
                         </div>
                     </div>
                 </main>
@@ -228,6 +166,14 @@
         </div>
 
         <script>
+            // Configuration from server
+            const receiptConfig = {
+                color: "${color}",
+                logo: "${logo}",
+                title: "${title}",
+                font: "${font}"
+            };
+
             function printReceipt() {
                 window.print();
             }
@@ -237,32 +183,33 @@
                 let tamtinh = 0;
                 let tongcong = 0;
                 let giamgia = 0;
-                
+
                 $.get("${pageContext.request.contextPath}/receipt/detail?id=" + orderId, function (res) {
                     console.log(res);
                     if (res.success) {
                         const r = res.order;
                         const items = res.orderDetails;
 
-                        // Build HTML for receipt dynamically
+                        // Build HTML for receipt dynamically with configuration
                         let html = `
-                    <div class="text-center border-b pb-4 mb-6">
-                        <h1 class="text-2xl font-bold uppercase">HÓA ĐƠN BÁN HÀNG</h1>
+                    <div class="text-center border-b pb-4 mb-6" style="border-color: ` + receiptConfig.color + `;">
+                        ` + (receiptConfig.logo ? `<img src="${pageContext.request.contextPath}/` + receiptConfig.logo + `" alt="Logo" class="mx-auto mb-3" style="max-height: 80px; max-width: 200px;">` : '') + `
+                        <h1 class="text-2xl font-bold uppercase" style="color: ` + receiptConfig.color + `;">` + (receiptConfig.title || 'HÓA ĐƠN BÁN HÀNG') + `</h1>
                         <p class="text-gray-600">Công ty TNHH ABC</p>
                         <p class="text-gray-600">Ngày lập: ` + r.orderDate + `</p>
                     </div>
 
                     <div class="grid grid-cols-2 gap-6 mb-6">
                         <div>
-                            <h2 class="font-semibold mb-1">Khách hàng</h2>
+                            <h2 class="font-semibold mb-1" style="color: ` + receiptConfig.color + `;">Khách hàng</h2>
                             <p>` + r.customer.firstName + ' ' + r.customer.middleName + ' ' + r.customer.lastName + `</p>
                             <p>SĐT: ` + r.customer.phone + `</p>
                             <p>Email: ` + r.customer.email + `</p>
                         </div>
                         <div class="text-right">
-                            <h2 class="font-semibold mb-1">Mã hóa đơn</h2>
+                            <h2 class="font-semibold mb-1" style="color: ` + receiptConfig.color + `;">Mã hóa đơn</h2>
                             <p class="font-mono text-lg">#` + r.orderId + `</p>
-                            <span class="inline-block mt-2 px-3 py-1 rounded-full text-sm bg-green-100 text-green-600">
+                            <span class="inline-block mt-2 px-3 py-1 rounded-full text-sm text-white" style="background-color: ` + receiptConfig.color + `;">
                                 Đã thanh toán
                             </span>
                         </div>
@@ -270,13 +217,13 @@
 
                     <table class="w-full border-collapse text-sm mb-6">
                         <thead>
-                            <tr class="bg-gray-100 border-b">
-                                <th class="p-2 text-left">Sản phẩm</th>
-                                <th class="p-2 text-center">SL</th>
-                                <th class="p-2 text-center">Đơn giá</th>
-                                <th class="p-2 text-center">Giảm giá</th>
-                                <th class="p-2 text-center">Thuế</th>
-                                <th class="p-2 text-center">Thành tiền</th>
+                            <tr class="border-b" style="background-color: ` + receiptConfig.color + `20; border-color: ` + receiptConfig.color + `;">
+                                <th class="p-2 text-left" style="color: ` + receiptConfig.color + `;">Sản phẩm</th>
+                                <th class="p-2 text-center" style="color: ` + receiptConfig.color + `;">SL</th>
+                                <th class="p-2 text-center" style="color: ` + receiptConfig.color + `;">Đơn giá</th>
+                                <th class="p-2 text-center" style="color: ` + receiptConfig.color + `;">Giảm giá</th>
+                                <th class="p-2 text-center" style="color: ` + receiptConfig.color + `;">Thuế</th>
+                                <th class="p-2 text-center" style="color: ` + receiptConfig.color + `;">Thành tiền</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -287,18 +234,18 @@
                         <tr class="border-b hover:bg-gray-50">
                             <td class="p-2">` + item.productName + `</td>
                             <td class="p-2 text-center">` + item.quantity + `</td>
-                            <td class="p-2 text-right">` + item.price + `</td>
-                            <td class="p-2 text-right">` + item.discount + `</td>
-                            <td class="p-2 text-right">` + ((item.price*item.quantity)/100)*10 + `</td>
-                            <td class="p-2 text-right">` + item.totalAmount + `</td>
+                            <td class="p-2 text-right">` + formatVND(item.price) + `</td>
+                            <td class="p-2 text-right">` + formatVND(item.discount) + `</td>
+                            <td class="p-2 text-right">` + formatVND(((item.price * item.quantity) / 100) * 10) + `</td>
+                            <td class="p-2 text-right">` + formatVND(item.totalAmount) + `</td>
                         </tr>
                     `;
-                        
-                        thue += ((item.price*item.quantity)/100)*10;
-                        tamtinh += item.totalAmount;
-                        giamgia += item.discount;
-                        tongcong += item.totalAmount;
-                    
+
+                            thue += ((item.price * item.quantity) / 100) * item.taxRate;
+                            tamtinh += item.price * item.quantity;
+                            giamgia += item.discount;
+                            tongcong += item.totalAmount;
+
                         });
 
                         html += `
@@ -309,32 +256,39 @@
                         <div class="w-1/2">
                             <div class="flex justify-between py-1">
                                 <span>Tạm tính:</span>
-                                <span>` + tamtinh + `</span>
+                                <span>` + formatVND(tamtinh) + `</span>
                             </div>
                             <div class="flex justify-between py-1">
                                 <span>Giảm giá:</span>
-                                <span>` + giamgia + `</span>
+                                <span>` + formatVND(giamgia) + `</span>
                             </div>
                             <div class="flex justify-between py-1">
                                 <span>Thuế:</span>
-                                <span>` + thue + `</span>
+                                <span>` + formatVND(thue) + `</span>
                             </div>
-                            <div class="flex justify-between py-2 border-t font-bold text-lg">
+                            <div class="flex justify-between py-2 border-t font-bold text-lg" style="border-color: ` + receiptConfig.color + `; color: ` + receiptConfig.color + `;">
                                 <span>Tổng cộng:</span>
-                                <span>` + tongcong + `</span>
+                                <span>` + formatVND(tongcong) + `</span>
                             </div>
                         </div>
                     </div>
                 `;
 
-                        // Replace content inside print-area
-                        $("#print-area").html(html);
+                        // Replace content inside print-area and apply font
+                        $("#print-area").html(html).css('font-family', receiptConfig.font);
                     } else {
                         $("#print-area").html(
                                 `<p class="text-gray-500 text-center">Không tìm thấy hóa đơn.</p>`
                                 );
                     }
                 });
+            }
+
+            function formatVND(amount) {
+                return new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND'
+                }).format(amount);
             }
         </script>
     </body>

@@ -5,6 +5,9 @@
         <meta charset="UTF-8">
         <title>Edit Receipt</title>
         <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
         <style>
             html, body {
                 height: 100%;
@@ -65,22 +68,22 @@
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-sm font-medium">Tiêu đề hóa đơn</label>
-                                <input type="text" id="receipt-title" value="HÓA ĐƠN BÁN HÀNG"
+                                <input type="text" id="receipt-title" value="${title}"
                                        class="w-full border rounded p-2" oninput="updatePreview()">
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium">Font chữ</label>
                                 <select id="receipt-font" class="w-full border rounded p-2" onchange="updatePreview()">
-                                    <option value="'Inter', sans-serif">Inter</option>
-                                    <option value="'Times New Roman', serif">Times New Roman</option>
-                                    <option value="'Courier New', monospace">Courier New</option>
+                                    <option value="'Inter', sans-serif" ${font == "'Inter', sans-serif" ? "selected" : ""}>Inter</option>
+                                    <option value="'Times New Roman', serif" ${font == "'Times New Roman', serif" ? "selected" : ""}>Times New Roman</option>
+                                    <option value="'Courier New', monospace" ${font == "'Courier New', monospace" ? "selected" : ""}>Courier New</option>
                                 </select>
                             </div>
 
                             <div>
                                 <label class="block text-sm font-medium">Màu tiêu đề</label>
-                                <input type="color" id="receipt-color" value="#1e3a8a" onchange="updatePreview()">
+                                <input type="color" id="receipt-color" value="${color}" onchange="updatePreview()">
                             </div>
 
                             <div>
@@ -89,7 +92,10 @@
                             </div>
 
                             <div>
-                                <button class="bg-green-600 hover:bg-green-900 transition text-white p-2 rounded">Lưu</button>
+                                <button id="save-receipt" 
+                                        class="bg-green-600 hover:bg-green-900 transition text-white p-2 rounded">
+                                    Lưu
+                                </button>
                                 <button class="bg-red-600 hover:bg-red-900 transition text-white p-2 rounded">Huỷ</button>
                             </div>
                         </div>
@@ -144,33 +150,102 @@
                 <jsp:include page="/views/common/footer.jsp"/>
             </div>
         </div>
+
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <script src="https://cdn.jsdelivr.net/npm/toastify-js"></script>
         <script>
-            function updatePreview() {
-                // Tiêu đề
-                const title = document.getElementById("receipt-title").value;
-                document.getElementById("preview-title").innerText = title;
+                                $(document).ready(function () {
+                                    const title = document.getElementById("receipt-title").value;
+                                    document.getElementById("preview-title").innerText = '${title}';
 
-                // Font
-                const font = document.getElementById("receipt-font").value;
-                document.getElementById("print-area").style.fontFamily = font;
+                                    const font = document.getElementById("receipt-font").value;
+                                    document.getElementById("print-area").style.fontFamily = `${font}`;
 
-                // Màu
-                const color = document.getElementById("receipt-color").value;
-                document.getElementById("preview-title").style.color = color;
-            }
+                                    const color = document.getElementById("receipt-color").value;
+                                    document.getElementById("preview-title").style.color = `${color}`;
 
-            function previewLogo(event) {
-                const file = event.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        const logo = document.getElementById("preview-logo");
-                        logo.src = e.target.result;
-                        logo.classList.remove("hidden");
-                    };
-                    reader.readAsDataURL(file);
-                }
-            }
+                                    if ('${logo}' !== '') {
+                                        const logo = document.getElementById("preview-logo");
+                                        logo.src = '${pageContext.request.contextPath}/${logo}';
+                                        logo.classList.remove("hidden");
+                                    }
+                                });
+
+                                document.getElementById("save-receipt").addEventListener("click", function () {
+                                    const title = document.getElementById("receipt-title").value;
+                                    const font = document.getElementById("receipt-font").value;
+                                    const color = document.getElementById("receipt-color").value;
+                                    const logoFile = document.getElementById("receipt-logo").files[0];
+
+                                    const formData = new FormData();
+                                    formData.append('title', title);
+                                    formData.append('font', font);
+                                    formData.append('color', color);
+
+                                    if (logoFile) {
+                                        formData.append('logo', logoFile);
+                                    }
+
+                                    $.ajax({
+                                        url: "${pageContext.request.contextPath}/receipt/edit",
+                                        type: "POST",
+                                        data: formData,
+                                        processData: false,
+                                        contentType: false,
+                                        success: function (response) {
+                                            if (response.success) {
+                                                showToast(response.message);
+                                            } else {
+                                                showToast(response.message, "error");
+                                            }
+                                        },
+                                        error: function (xhr, status, error) {
+                                            console.error("AJAX Error:", status, error);
+                                            showToast("Không thể kết nối server.", "error");
+                                        }
+                                    });
+                                });
+
+                                function updatePreview() {
+                                    const title = document.getElementById("receipt-title").value;
+                                    document.getElementById("preview-title").innerText = title;
+
+                                    const font = document.getElementById("receipt-font").value;
+                                    document.getElementById("print-area").style.fontFamily = font;
+
+                                    const color = document.getElementById("receipt-color").value;
+                                    document.getElementById("preview-title").style.color = color;
+
+                                    console.log(title + font + color)
+                                }
+
+                                function previewLogo(event) {
+                                    const file = event.target.files[0];
+                                    if (file) {
+                                        const reader = new FileReader();
+                                        reader.onload = function (e) {
+                                            const logo = document.getElementById("preview-logo");
+                                            logo.src = e.target.result;
+                                            logo.classList.remove("hidden");
+                                        };
+                                        reader.readAsDataURL(file);
+                                    }
+                                }
+
+                                function showToast(message, type) {
+                                    let colors = {
+                                        success: "linear-gradient(to right, #00b09b, #96c93d)",
+                                        error: "linear-gradient(to right, #ff416c, #ff4b2b)"
+                                    };
+                                    Toastify({
+                                        text: message,
+                                        duration: 2000,
+                                        close: true,
+                                        gravity: "top",
+                                        position: "right",
+                                        backgroundColor: colors[type] || "#333"
+                                    }).showToast();
+                                }
         </script>
 
     </body>
