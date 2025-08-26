@@ -35,6 +35,19 @@
                     Thêm mới
                 </a>
             </div>
+            
+            <!-- Hiển thị thông báo lỗi nếu có -->
+            <c:if test="${param.error == 'access_denied'}">
+                <div class="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg">
+                    <div class="flex">
+                        <svg class="w-5 h-5 text-red-400 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                        </svg>
+                        <span>Bạn không có quyền thực hiện thao tác này. Chỉ admin mới có thể sửa và xóa yêu cầu.</span>
+                    </div>
+                </div>
+            </c:if>
+            
             <form method="get" action="${pageContext.request.contextPath}/management/form-requests" class="flex items-center gap-3 mb-4">
                 <input type="text" name="search" value="${param.search}" placeholder="Tìm kiếm..."
                        class="border border-gray-300 rounded-md px-3 py-2 w-64 focus:outline-none focus:ring-2 focus:ring-blue-500"/>
@@ -76,14 +89,19 @@
                                     <td class="px-6 py-4 whitespace-nowrap text-sm">${fr.employeeName}</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                                         <div class="action-buttons-container">
-                                            <a href="${pageContext.request.contextPath}/management/form-requests/edit?id=${fr.formRequestId}"
-                                               class="action-button btn-edit">
-                                                <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                          d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                                                </svg>
-                                                Sửa
-                                            </a>
+                                            <!-- Chỉ admin mới thấy nút Sửa -->
+                                            <c:if test="${sessionScope.authUser.roleId == 1}">
+                                                <a href="${pageContext.request.contextPath}/management/form-requests/edit?id=${fr.formRequestId}"
+                                                   class="action-button btn-edit">
+                                                    <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                                    </svg>
+                                                    Sửa
+                                                </a>
+                                            </c:if>
+                                            
+                                            <!-- Tất cả người dùng đều thấy nút Xem chi tiết -->
                                             <a href="${pageContext.request.contextPath}/management/form-requests/view?id=${fr.formRequestId}"
                                                class="action-button btn-view">
                                                 <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -91,16 +109,20 @@
                                                           d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                           d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
-                                                </svg>
-                                                Chi tiết
-                                            </a>
-                                            <button type="button" class="action-button btn-delete delete-btn" data-id="${fr.formRequestId}">
-                                                <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                          d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                                                </svg>
-                                                Xoá
-                                            </button>
+                                                    </svg>
+                                                    Chi tiết
+                                                </a>
+                                            
+                                            <!-- Chỉ admin mới thấy nút Xóa -->
+                                            <c:if test="${sessionScope.authUser.roleId == 1}">
+                                                <button type="button" class="action-button btn-delete delete-btn" data-id="${fr.formRequestId}">
+                                                    <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                                                    </svg>
+                                                    Xoá
+                                                </button>
+                                            </c:if>
                                         </div>
                                     </td>
                                 </tr>
@@ -190,11 +212,27 @@
                         }).then(() => {
                             window.location.href = '${pageContext.request.contextPath}/login';
                         });
+                    } else if (xhr.status === 403) {
+                        // Forbidden - No permission
+                        Swal.fire({
+                            title: 'Không có quyền!',
+                            text: 'Bạn không có quyền xóa yêu cầu. Chỉ admin mới có thể thực hiện thao tác này.',
+                            icon: 'error',
+                            confirmButtonColor: '#3b82f6'
+                        });
                     } else {
                         // Lỗi khác
+                        let errorMessage = 'Đã xảy ra lỗi khi xóa yêu cầu.';
+                        try {
+                            let response = JSON.parse(xhr.responseText);
+                            if (response.message) {
+                                errorMessage = response.message;
+                            }
+                        } catch (e) {}
+                        
                         Swal.fire({
                             title: 'Lỗi!',
-                            text: 'Đã xảy ra lỗi khi xóa yêu cầu.',
+                            text: errorMessage,
                             icon: 'error',
                             confirmButtonColor: '#3b82f6'
                         });

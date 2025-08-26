@@ -101,6 +101,22 @@ public class FormRequestController extends HttpServlet {
     }
 
     private void doGetEdit(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Kiểm tra quyền admin trước khi cho phép edit
+        boolean isAdmin = false;
+        Object authUserObj = request.getSession().getAttribute("authUser");
+        if (authUserObj != null && authUserObj instanceof model.Employee) {
+            model.Employee emp = (model.Employee) authUserObj;
+            if (emp.getRoleId() == 1 || (emp.getRoleName() != null && emp.getRoleName().toLowerCase().contains("admin"))) {
+                isAdmin = true;
+            }
+        }
+        
+        if (!isAdmin) {
+            // Nếu không phải admin, chuyển hướng về danh sách với thông báo lỗi
+            response.sendRedirect(request.getContextPath() + "/management/form-requests?error=access_denied");
+            return;
+        }
+        
         int id = Integer.parseInt(request.getParameter("id"));
         FormRequest fr = dao.getById(id);
         String employeeName = employeeDAO.getEmployeeNameById(fr.getEmployeeId());
@@ -130,7 +146,8 @@ public class FormRequestController extends HttpServlet {
         
         try {
             String description = request.getParameter("description");
-            String status = request.getParameter("status");
+            // Luôn đặt status là "Pending" cho yêu cầu mới, không phụ thuộc vào input từ client
+            String status = "Pending";
             Date createdAt = Date.valueOf(request.getParameter("createdAt"));
             
             // Sử dụng employeeId từ session thay vì từ form
@@ -172,18 +189,33 @@ public class FormRequestController extends HttpServlet {
         try {
             int id = Integer.parseInt(request.getParameter("id"));
             String description = request.getParameter("description");
-            String status = request.getParameter("status");
+            String statusFromRequest = request.getParameter("status");
             Date createdAt = Date.valueOf(request.getParameter("createdAt"));
             
             // Khi cập nhật, ta giữ nguyên employeeId ban đầu từ form
             // Nhưng chỉ cho phép người đăng nhập với quyền admin hoặc chính người tạo mới được cập nhật
             int formEmployeeId = Integer.parseInt(request.getParameter("employeeId"));
             
-            // Nếu không phải admin và không phải chính người tạo, không cho phép cập nhật
-            // Giả định rằng admin có một thuộc tính isAdmin trong session
-            Boolean isAdmin = (Boolean) request.getSession().getAttribute("isAdmin");
-            if (isAdmin == null) isAdmin = false;
+            // Kiểm tra quyền admin từ authUser
+            boolean isAdmin = false;
+            Object authUserObj = request.getSession().getAttribute("authUser");
+            if (authUserObj != null && authUserObj instanceof model.Employee) {
+                model.Employee emp = (model.Employee) authUserObj;
+                if (emp.getRoleId() == 1 || (emp.getRoleName() != null && emp.getRoleName().toLowerCase().contains("admin"))) {
+                    isAdmin = true;
+                }
+            }
             
+            // Lấy trạng thái hiện tại từ database
+            FormRequest currentRequest = dao.getById(id);
+            String finalStatus = currentRequest.getStatus(); // Mặc định giữ nguyên trạng thái cũ
+            
+            // Chỉ admin mới được thay đổi trạng thái
+            if (isAdmin) {
+                finalStatus = statusFromRequest; // Admin có thể thay đổi trạng thái
+            }
+            
+            // Kiểm tra quyền sửa: admin hoặc chính người tạo
             if (!isAdmin && sessionEmployeeId.intValue() != formEmployeeId) {
                 response.setStatus(403); // Forbidden
                 response.getWriter().write("{\"success\":false,\"message\":\"Bạn không có quyền cập nhật yêu cầu này\"}");
@@ -191,7 +223,7 @@ public class FormRequestController extends HttpServlet {
             }
             
             String employeeName = employeeDAO.getEmployeeNameById(formEmployeeId);
-            FormRequest fr = new FormRequest(id, description, status, createdAt, formEmployeeId, employeeName);
+            FormRequest fr = new FormRequest(id, description, finalStatus, createdAt, formEmployeeId, employeeName);
             dao.update(fr);
             
             // Trả về thành công
@@ -212,6 +244,22 @@ public class FormRequestController extends HttpServlet {
             // Nếu chưa đăng nhập, trả về lỗi 401 Unauthorized
             response.setStatus(401); // Unauthorized
             response.getWriter().write("{\"success\":false,\"message\":\"Phiên đăng nhập đã hết hạn\"}");
+            return;
+        }
+        
+        // Kiểm tra quyền admin trước khi cho phép xóa
+        boolean isAdmin = false;
+        Object authUserObj = request.getSession().getAttribute("authUser");
+        if (authUserObj != null && authUserObj instanceof model.Employee) {
+            model.Employee emp = (model.Employee) authUserObj;
+            if (emp.getRoleId() == 1 || (emp.getRoleName() != null && emp.getRoleName().toLowerCase().contains("admin"))) {
+                isAdmin = true;
+            }
+        }
+        
+        if (!isAdmin) {
+            response.setStatus(403); // Forbidden
+            response.getWriter().write("{\"success\":false,\"message\":\"Bạn không có quyền xóa yêu cầu\"}");
             return;
         }
         

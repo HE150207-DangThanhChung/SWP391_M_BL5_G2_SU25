@@ -54,13 +54,16 @@
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Mô tả yêu cầu *</label>
                                 <input type="text" name="description" id="description" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400" placeholder="Nhập mô tả yêu cầu" required />
                             </div>
+                            <!-- Ẩn trạng thái vì mặc định sẽ là "Chờ duyệt" -->
+                            <input type="hidden" name="status" id="status" value="Pending" />
                             <div class="mb-4">
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Trạng thái *</label>
-                                <select name="status" id="status" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white" required>
-                                    <option value="Pending">Chờ duyệt</option>
-                                    <option value="Approved">Đã duyệt</option>
-                                    <option value="Cancelled">Đã huỷ</option>
-                                </select>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Trạng thái</label>
+                                <div class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                        Chờ duyệt
+                                    </span>
+                                    <span class="ml-2 text-sm text-gray-500">(Trạng thái mặc định cho yêu cầu mới)</span>
+                                </div>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Ngày tạo *</label>
