@@ -112,7 +112,7 @@ public class ReceiptController extends HttpServlet {
         int endItem = (offset + 1) == countTotal ? offset + 1 : offset + ITEM_PER_PAGE;
 
         HashMap<String, Object> config = loadConfigFromJson();
-        
+
         request.setAttribute("font", config.get("font"));
         request.setAttribute("color", config.get("color"));
         request.setAttribute("logo", config.get("logo"));
@@ -184,10 +184,10 @@ public class ReceiptController extends HttpServlet {
 
         } catch (NumberFormatException e) {
             jsonMap.put("success", false);
-            jsonMap.put("message", "Invalid order ID format.");
+            jsonMap.put("message", "Sai định dạng mã hoá đơn.");
         } catch (Exception e) {
             jsonMap.put("success", false);
-            jsonMap.put("message", "Error fetching order details: " + e.getMessage());
+            jsonMap.put("message", "Lỗi trong quá trình lấy thông tin chi tiết hoá đơn: " + e.getMessage());
         }
 
         sendJson(response, jsonMap);
@@ -242,11 +242,11 @@ public class ReceiptController extends HttpServlet {
             config.put("lastModified", System.currentTimeMillis());
             saveConfigToJson(config);
             jsonResponse.put("success", true);
-            jsonResponse.put("message", "Receipt design saved successfully");
+            jsonResponse.put("message", "Lưu thành công!");
             jsonResponse.put("config", config);
         } catch (ServletException | IOException e) {
             jsonResponse.put("success", false);
-            jsonResponse.put("message", "Error saving receipt design: " + e.getMessage());
+            jsonResponse.put("message", "Lưu thất bại: " + e.getMessage());
         }
         sendJson(response, jsonResponse);
     }

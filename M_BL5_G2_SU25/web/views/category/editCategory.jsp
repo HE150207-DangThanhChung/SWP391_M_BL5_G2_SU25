@@ -40,7 +40,7 @@
                                         <label for="categoryName" class="block text-sm font-medium text-gray-700 mb-2">Tên danh mục *</label>
                                         <input id="categoryName" type="text" value="${c.categoryName}"
                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                               placeholder="Nhập tên danh mục">
+                                               placeholder="Tên danh mục ...">
                                         <span id="categoryNameError" class="error-text hidden text-red-500 text-sm"></span>
                                     </div>
 
@@ -49,7 +49,7 @@
                                         <label for="description" class="block text-sm font-medium text-gray-700 mb-2">Mô tả</label>
                                         <textarea id="description" rows="4"
                                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                                                  placeholder="Nhập mô tả">${c.description}</textarea>
+                                                  placeholder="Mô tả danh mục ...">${c.description}</textarea>
                                         <span id="descriptionError" class="error-text hidden text-red-500 text-sm"></span>
                                     </div>
 
@@ -59,8 +59,8 @@
                                         <select id="status"
                                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 bg-white">
                                             <option value="">-- Chọn trạng thái --</option>
-                                            <option value="Active" ${c.status == 'Active' ? 'selected' : ''}>Active</option>
-                                            <option value="Deactive" ${c.status == 'Deactive' ? 'selected' : ''}>Inactive</option>
+                                            <option value="Active" ${c.status == 'Active' ? 'selected' : ''}>Đang hoạt động</option>
+                                            <option value="Deactive" ${c.status == 'Deactive' ? 'selected' : ''}>Ngừng hoạt động</option>
                                         </select>
                                         <span id="statusError" class="error-text hidden text-red-500 text-sm"></span>
                                     </div>

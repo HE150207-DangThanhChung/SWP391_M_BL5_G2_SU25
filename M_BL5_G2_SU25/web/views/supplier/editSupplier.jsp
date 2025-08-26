@@ -11,7 +11,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Quản lí nhà cung cấp</title>
+        <title>Chỉnh sửa nhà cung cấp</title>
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
@@ -121,7 +121,7 @@
                                                type="text" 
                                                value="${s.supplierName}"
                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400"
-                                               placeholder="Enter supplier company name">
+                                               placeholder="Tên nhà cung cấp ...">
                                         <span id="supplierNameError" class="error-text" style="display: none;"></span>
                                     </div>
 
@@ -160,7 +160,7 @@
                                                type="text" 
                                                value="${s.taxCode}"
                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400"
-                                               placeholder="Enter tax identification number">
+                                               placeholder="Mã số thuế ...">
                                         <span id="supplierTaxCodeError" class="error-text" style="display: none;"></span>
                                     </div>
 
@@ -172,8 +172,8 @@
                                         <select id="supplierStatus" 
                                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white">
                                             <option value="">-- Chọn trạng thái --</option>
-                                            <option value="Active" ${s.status == 'Active' ? 'selected' : ''}>Active</option>
-                                            <option value="Deactive" ${s.status == 'Deactive' ? 'selected' : ''}>Inactive</option>
+                                            <option value="Active" ${s.status == 'Active' ? 'selected' : ''}>Đang hoạt động</option>
+                                            <option value="Deactive" ${s.status == 'Deactive' ? 'selected' : ''}>Ngừng hoạt động</option>
                                         </select>
                                         <span id="supplierStatusError" class="error-text" style="display: none;"></span>
                                     </div>
@@ -393,7 +393,7 @@
                                                         },
                                                         error: function (xhr, status, error) {
                                                             console.error('Error:', error);
-                                                            let errorMessage = 'Có lỗi xảy ra trong quá trình thêm mưới nhà cung cấp';
+                                                            let errorMessage = 'Có lỗi xảy ra trong quá trình thêm mới nhà cung cấp';
 
                                                             if (xhr.responseJSON && xhr.responseJSON.message) {
                                                                 errorMessage = xhr.responseJSON.message;

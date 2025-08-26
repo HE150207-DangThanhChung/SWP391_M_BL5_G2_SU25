@@ -107,7 +107,7 @@ public class SupplierController extends HttpServlet {
             if (!s.getEmail().equals(email)) {
                 if (dao.isEmailExisted(email)) {
                     jsonMap.put("ok", false);
-                    jsonMap.put("message", "Email is already existed!");
+                    jsonMap.put("message", "Email đã tồn tại!");
                     sendJson(response, jsonMap);
                     return;
                 }
@@ -115,7 +115,7 @@ public class SupplierController extends HttpServlet {
             if (!s.getSupplierName().equals(name)) {
                 if (dao.isNameExisted(name)) {
                     jsonMap.put("ok", false);
-                    jsonMap.put("message", "Name is already existed!");
+                    jsonMap.put("message", "Tên đã tồn tại!");
                     sendJson(response, jsonMap);
                     return;
                 }
@@ -123,7 +123,7 @@ public class SupplierController extends HttpServlet {
             if (!s.getPhone().equals(phone)) {
                 if (dao.isPhoneExisted(phone)) {
                     jsonMap.put("ok", false);
-                    jsonMap.put("message", "Phone is already existed!");
+                    jsonMap.put("message", "Số điện thoại đã tồn tại!");
                     sendJson(response, jsonMap);
                     return;
                 }
@@ -131,7 +131,7 @@ public class SupplierController extends HttpServlet {
             if (!s.getTaxCode().equals(taxCode)) {
                 if (dao.isTaxCodeExisted(taxCode)) {
                     jsonMap.put("ok", false);
-                    jsonMap.put("message", "Tax Code is already existed!");
+                    jsonMap.put("message", "Mã số thuế đã tồn tại!");
                     sendJson(response, jsonMap);
                     return;
                 }
@@ -140,15 +140,15 @@ public class SupplierController extends HttpServlet {
             boolean success = dao.editSupplier(id, name, phone, email, taxCode, status);
             if (success) {
                 jsonMap.put("ok", true);
-                jsonMap.put("message", "Supplier saved successfully!");
+                jsonMap.put("message", "Lưu nhà cung cấp thành công!");
             } else {
                 jsonMap.put("ok", false);
-                jsonMap.put("message", "Failed to save supplier. Please try again.");
+                jsonMap.put("message", "Lưu nhà cung cấp thất bại. Vui lòng thử lại sau!");
             }
             sendJson(response, jsonMap);
         } catch (IOException e) {
             jsonMap.put("ok", false);
-            jsonMap.put("message", "Something wrong, please try again later!");
+            jsonMap.put("message", "Có lỗi trong quá trình lưu nhà cung cấp. Vui lòng thử lại sau!");
             sendJson(response, jsonMap);
         }
     }
@@ -166,25 +166,25 @@ public class SupplierController extends HttpServlet {
 
             if (dao.isEmailExisted(email)) {
                 jsonMap.put("ok", false);
-                jsonMap.put("message", "Email is already existed!");
+                jsonMap.put("message", "Email đã tồn tại!");
                 sendJson(response, jsonMap);
                 return;
             }
             if (dao.isNameExisted(name)) {
                 jsonMap.put("ok", false);
-                jsonMap.put("message", "Name is already existed!");
+                jsonMap.put("message", "Tên đã tồn tại!");
                 sendJson(response, jsonMap);
                 return;
             }
             if (dao.isPhoneExisted(phone)) {
                 jsonMap.put("ok", false);
-                jsonMap.put("message", "Phone is already existed!");
+                jsonMap.put("message", "Số điện thoại đã tồn tại!");
                 sendJson(response, jsonMap);
                 return;
             }
             if (dao.isTaxCodeExisted(taxCode)) {
                 jsonMap.put("ok", false);
-                jsonMap.put("message", "Tax Code is already existed!");
+                jsonMap.put("message", "Mã số thuế đã tồn tại!");
                 sendJson(response, jsonMap);
                 return;
             }
@@ -192,15 +192,15 @@ public class SupplierController extends HttpServlet {
             boolean success = dao.addSupplier(name, phone, email, taxCode, status);
             if (success) {
                 jsonMap.put("ok", true);
-                jsonMap.put("message", "Supplier added successfully!");
+                jsonMap.put("message", "Thêm nhà cung cấp thành công!");
             } else {
                 jsonMap.put("ok", false);
-                jsonMap.put("message", "Failed to add supplier. Please try again.");
+                jsonMap.put("message", "Thêm nhà cung cấp thất bại. Vui lòng thử lại sau!");
             }
             sendJson(response, jsonMap);
         } catch (IOException e) {
             jsonMap.put("ok", false);
-            jsonMap.put("message", "Something wrong, please try again later!");
+            jsonMap.put("message", "Có lỗi xảy ra trong quá trình thêm nhà cung cấp. Vui lòng thử lại sau!");
             sendJson(response, jsonMap);
         }
     }

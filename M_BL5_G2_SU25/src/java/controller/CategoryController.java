@@ -114,7 +114,7 @@ public class CategoryController extends HttpServlet {
 
             if (!c.getCategoryName().equals(name) && dao.isNameExisted(name)) {
                 jsonMap.put("ok", false);
-                jsonMap.put("message", "Name is already existed!");
+                jsonMap.put("message", "Tên danh mục đã tồn tại!");
                 sendJson(response, jsonMap);
                 return;
             }
@@ -122,16 +122,16 @@ public class CategoryController extends HttpServlet {
             boolean success = dao.editCategory(id, name, description, status);
             if (success) {
                 jsonMap.put("ok", true);
-                jsonMap.put("message", "Category saved successfully!");
+                jsonMap.put("message", "Lưu danh mục thành công!");
             } else {
                 jsonMap.put("ok", false);
-                jsonMap.put("message", "Failed to save category. Please try again.");
+                jsonMap.put("message", "Lưu danh mục thất bại. Vui lòng thử lại sau!");
             }
             sendJson(response, jsonMap);
 
         } catch (IOException e) {
             jsonMap.put("ok", false);
-            jsonMap.put("message", "Something wrong, please try again later!");
+            jsonMap.put("message", "Có lỗi xảy ra trong quá trình lưu danh mục. Vui lòng thử lại sau!");
             sendJson(response, jsonMap);
         }
     }
@@ -147,7 +147,7 @@ public class CategoryController extends HttpServlet {
 
             if (dao.isNameExisted(name)) {
                 jsonMap.put("ok", false);
-                jsonMap.put("message", "Name is already existed!");
+                jsonMap.put("message", "Tên danh mục đã tồn tại!");
                 sendJson(response, jsonMap);
                 return;
             }
@@ -155,16 +155,16 @@ public class CategoryController extends HttpServlet {
             boolean success = dao.addCategory(name, description, status);
             if (success) {
                 jsonMap.put("ok", true);
-                jsonMap.put("message", "Category added successfully!");
+                jsonMap.put("message", "Thêm danh mục thành công!");
             } else {
                 jsonMap.put("ok", false);
-                jsonMap.put("message", "Failed to add category. Please try again.");
+                jsonMap.put("message", "Thêm danh mục thất bại. Vui lòng thử lại sau!");
             }
             sendJson(response, jsonMap);
 
         } catch (IOException e) {
             jsonMap.put("ok", false);
-            jsonMap.put("message", "Something wrong, please try again later!");
+            jsonMap.put("message", "Có lỗi xảy ra trong quá trình thêm danh mục. Vui lòng thử lại sau!");
             sendJson(response, jsonMap);
         }
     }

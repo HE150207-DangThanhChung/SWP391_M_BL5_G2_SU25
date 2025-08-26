@@ -11,7 +11,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Quản lí nhà cung cấp</title>
+        <title>Thêm nhà cung cấp</title>
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
@@ -93,7 +93,7 @@
                         <div class="flex items-center justify-between">
                             <div>
                                 <h1 class="text-3xl font-bold text-gray-900">Quản lí nhà cung cấp</h1>
-                                <p class="text-gray-600 mt-1">Add new suppliers to your system</p>
+                                <p class="text-gray-600 mt-1">Thêm mới nhà cung cấp vào hệ thống</p>
                             </div>
                             <button onclick="history.back()"
                                     class="inline-flex items-center px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-colors duration-200">
@@ -120,7 +120,7 @@
                                         <input id="supplierName" 
                                                type="text" 
                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400"
-                                               placeholder="Enter supplier company name">
+                                               placeholder="Tên nhà cung cấp mới ...">
                                         <span id="supplierNameError" class="error-text" style="display: none;"></span>
                                     </div>
 
@@ -132,7 +132,7 @@
                                         <input id="supplierPhone" 
                                                type="tel" 
                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400"
-                                               placeholder="0123456789 or +84123456789">
+                                               placeholder="0123456789 hoặc +84123456789">
                                         <span id="supplierPhoneError" class="error-text" style="display: none;"></span>
                                     </div>
 
@@ -156,7 +156,7 @@
                                         <input id="supplierTaxCode" 
                                                type="text" 
                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 placeholder-gray-400"
-                                               placeholder="Enter tax identification number">
+                                               placeholder="Mã số thuế ...">
                                         <span id="supplierTaxCodeError" class="error-text" style="display: none;"></span>
                                     </div>
 
@@ -168,8 +168,8 @@
                                         <select id="supplierStatus" 
                                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white">
                                             <option value="">-- Chọn trạng thái --</option>
-                                            <option value="Active">Active</option>
-                                            <option value="Deactive">Inactive</option>
+                                            <option value="Active">Đang hoạt động</option>
+                                            <option value="Deactive">Ngừng hoạt động</option>
                                         </select>
                                         <span id="supplierStatusError" class="error-text" style="display: none;"></span>
                                     </div>
@@ -248,7 +248,7 @@
                                                 function validateSupplierName(name) {
                                                     const trimmedName = name.trim();
                                                     if (!trimmedName || trimmedName === '') {
-                                                        return 'Supplier name is required and cannot be empty or just spaces';
+                                                        return 'Tên nhà cung cấp không được để trống hoặc chỉ có khoảng trắng!';
                                                     }
                                                     return null;
                                                 }
@@ -257,14 +257,14 @@
                                                     const trimmedPhone = phone.trim();
 
                                                     if (!trimmedPhone) {
-                                                        return 'Phone number is required and cannot be empty or just spaces';
+                                                        return 'Số điện thoại không được để trống hoặc chỉ có khoảng trắng!';
                                                     }
 
                                                     const vietnamesePhoneRegex =
                                                             /^(\+84|84|0)(3[2-9]|5[689]|7[06-9]|8[1-9]|9[0-46-9])[0-9]{7}$|^(\+84|84|0)(2[0-9])[0-9]{8}$/;
 
                                                     if (!vietnamesePhoneRegex.test(trimmedPhone)) {
-                                                        return 'Please enter a valid Vietnamese phone number (e.g., 0912345678, +84912345678)';
+                                                        return 'Sai định dạng số điện thoại Việt Nam (e.g., 0912345678, +84912345678)';
                                                     }
                                                     return null;
                                                 }
@@ -272,12 +272,12 @@
                                                 function validateEmail(email) {
                                                     const trimmedEmail = email.trim();
                                                     if (!trimmedEmail || trimmedEmail === '') {
-                                                        return 'Email address is required and cannot be empty or just spaces';
+                                                        return 'Email không được để trống hoặc chỉ có khoảng trắng!';
                                                     }
 
                                                     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                                                     if (!emailRegex.test(trimmedEmail)) {
-                                                        return 'Please enter a valid email address';
+                                                        return 'Email không đúng định dạng!';
                                                     }
                                                     return null;
                                                 }
@@ -285,14 +285,14 @@
                                                 function validateTaxCode(taxCode) {
                                                     const trimmedTaxCode = taxCode.trim();
                                                     if (!trimmedTaxCode || trimmedTaxCode === '') {
-                                                        return 'Tax code is required and cannot be empty or just spaces';
+                                                        return 'Mã số thuế không được để trống hoặc chỉ có khoảng trắng!';
                                                     }
                                                     return null;
                                                 }
 
                                                 function validateStatus(status) {
                                                     if (!status || status === '') {
-                                                        return 'Please select a status';
+                                                        return 'Trạng thái không được để trống!';
                                                     }
                                                     return null;
                                                 }
@@ -366,7 +366,7 @@
 
                                                 function addSupplier() {
                                                     if (!validateForm()) {
-                                                        showToast('Please fix the validation errors before submitting', 'error');
+                                                        showToast('Sửa hết lỗi trước khi thực hiện thêm mới!', 'error');
                                                         return;
                                                     }
 
@@ -375,7 +375,7 @@
                                                     const form = document.getElementById('supplierForm');
 
                                                     addBtn.disabled = true;
-                                                    btnText.textContent = 'Adding...';
+                                                    btnText.textContent = 'Đang thêm ...';
                                                     form.classList.add('loading');
 
                                                     $.ajax({
@@ -398,7 +398,7 @@
                                                         },
                                                         error: function (xhr, status, error) {
                                                             console.error('Error:', error);
-                                                            let errorMessage = 'An error occurred while adding the supplier';
+                                                            let errorMessage = 'Có lỗi xảy ra trong quá trình thêm mới nhà cung cấp!';
 
                                                             if (xhr.responseJSON && xhr.responseJSON.message) {
                                                                 errorMessage = xhr.responseJSON.message;

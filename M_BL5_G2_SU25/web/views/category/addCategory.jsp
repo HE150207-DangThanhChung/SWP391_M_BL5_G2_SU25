@@ -11,7 +11,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Quản lí danh mục</title>
+        <title>Thêm danh mục</title>
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
@@ -100,7 +100,7 @@
                                         </label>
                                         <input id="categoryName" type="text"
                                                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                               placeholder="Enter category name">
+                                               placeholder="Tên danh mục ...">
                                         <span id="categoryNameError" class="error-text" style="display: none;"></span>
                                     </div>
 
@@ -111,7 +111,7 @@
                                         </label>
                                         <textarea id="description"
                                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                                  placeholder="Enter category description"></textarea>
+                                                  placeholder="Mô tả danh mục ..."></textarea>
                                         <span id="descriptionError" class="error-text" style="display: none;"></span>
                                     </div>
 
@@ -123,8 +123,8 @@
                                         <select id="categoryStatus"
                                                 class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white">
                                             <option value="">-- Chọn trạng thái --</option>
-                                            <option value="Active">Active</option>
-                                            <option value="Deactive">Inactive</option>
+                                            <option value="Active">Đang hoạt động</option>
+                                            <option value="Deactive">Ngừng hoạt động</option>
                                         </select>
                                         <span id="categoryStatusError" class="error-text" style="display: none;"></span>
                                     </div>
@@ -182,16 +182,16 @@
 
                                         function validateCategoryName(name) {
                                             const trimmed = name.trim();
-                                            return trimmed ? null : 'Category name is required';
+                                            return trimmed ? null : 'Tên danh mục không được trống!';
                                         }
 
                                         function validateDescription(desc) {
                                             const trimmed = desc.trim();
-                                            return trimmed ? null : 'Description is required';
+                                            return trimmed ? null : 'Mô tả danh mục không được trống!';
                                         }
 
                                         function validateStatus(status) {
-                                            return status ? null : 'Please select a status';
+                                            return status ? null : 'Trạng thái không được trống!';
                                         }
 
                                         function showFieldError(id, message) {
@@ -245,7 +245,7 @@
 
                                         function addCategory() {
                                             if (!validateForm()) {
-                                                showToast('Please fix the validation errors before submitting', 'error');
+                                                showToast('Sửa hết lỗi hiển thị hiện tại trước khi tạo!', 'error');
                                                 return;
                                             }
 
@@ -254,7 +254,7 @@
                                             const form = document.getElementById('categoryForm');
 
                                             addBtn.disabled = true;
-                                            btnText.textContent = 'Adding...';
+                                            btnText.textContent = 'Đang thêm...';
                                             form.classList.add('loading');
 
                                             $.ajax({
@@ -274,7 +274,7 @@
                                                     }
                                                 },
                                                 error: function (xhr) {
-                                                    let msg = 'An error occurred while adding the category';
+                                                    let msg = 'Có lỗi xảy ra trong quá trình thêm danh mục!';
                                                     if (xhr.responseJSON?.message)
                                                         msg = xhr.responseJSON.message;
                                                     else if (xhr.responseText)
@@ -283,7 +283,7 @@
                                                 },
                                                 complete: function () {
                                                     addBtn.disabled = false;
-                                                    btnText.textContent = 'Add Category';
+                                                    btnText.textContent = 'Thêm danh mục';
                                                     form.classList.remove('loading');
                                                 }
                                             });
