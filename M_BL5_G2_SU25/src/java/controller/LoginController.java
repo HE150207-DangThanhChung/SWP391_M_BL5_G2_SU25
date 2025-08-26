@@ -43,7 +43,7 @@ public class LoginController extends HttpServlet {
 
         boolean isValid = loginDAO.checkLogin(username, password);
         if (!isValid) {
-            request.setAttribute("error", "Invalid username or password");
+            request.setAttribute("error", "Sai tên đăng nhập hoặc mật khẩu.");
             RequestDispatcher rd = request.getRequestDispatcher("/views/common/login.jsp");
             rd.forward(request, response);
             return;
