@@ -82,9 +82,15 @@
                 border-radius: 50%;
                 margin-right: 6px;
             }
-            .status-warning { background-color: #fbd38d; }
-            .status-success { background-color: #68d391; }
-            .status-danger { background-color: #fc8181; }
+            .status-warning {
+                background-color: #fbd38d;
+            }
+            .status-success {
+                background-color: #68d391;
+            }
+            .status-danger {
+                background-color: #fc8181;
+            }
             .status-text {
                 font-weight: 500;
             }
@@ -130,12 +136,12 @@
                     <h2 class="page-title">Lịch sử giao dịch</h2>
                     <div class="filter-section">
                         <div class="row">
-                                <!-- Name filter -->
+                            <!-- Name filter -->
 
-                                <!-- Sort by filter -->
-                                <form action="viewpayments" method="get" id = "status" class="col-lg-4 d-flex align-items-center filter-group">
-                                    <input type="hidden" name="action" value="status">
-                                    <input type="hidden" name="sid" value="${sessionScope.employeeId}">
+                            <!-- Sort by filter -->
+                            <form action="viewpayments" method="get" id = "status" class="col-lg-4 d-flex align-items-center filter-group">
+                                <input type="hidden" name="action" value="status">
+                                <input type="hidden" name="sid" value="${sessionScope.employeeId}">
                                 <div >
                                     <label for="status" class="mr-2 mb-0">Trạng thái:</label>
                                     <select name="status" class="form-control" id="status" onchange="this.form.submit();">
@@ -169,7 +175,7 @@
                             <form action="viewpayments" method="get" class="col-lg-4 d-flex align-items-center filter-group">
                                 <input type="hidden" name="action" value="displayName">
                                 <input type="hidden" name="sid" value="${sessionScope.user.getUserID()}">
-                               
+
                             </form>
                         </div>
                     </div>
@@ -177,9 +183,9 @@
                 <table class="table table-striped table-hover">
                     <thead>
                         <tr>
-                            
+
                             <th>Order ID</th>
-                        
+
                             <th>Customer Name</th>
                             <th>Payment Method</th>
                             <th>Price</th>
@@ -193,12 +199,18 @@
                         <c:if test="${not empty listP}">
                             <c:forEach items="${listP}" var="payment">
                                 <tr>
-                                    
+
                                     <td>${payment.getOrderID()}</td>
-                                    
+
                                     <td>${payment.getFirstName()} ${payment.getMiddleName()} ${payment.getLastName()}</td>
                                     <td>${payment.getPaymentMethod()}</td>
-                                    <td><fmt:formatNumber value="${payment.getPrice()}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
+                                    <td>
+                                        <fmt:formatNumber value="${payment.price}"
+                                                          pattern="#,##0 ¤"
+                                                          currencySymbol="₫"
+                                                          maxFractionDigits="0"/>
+                                    </td>
+
                                     <td><fmt:formatDate value="${payment.getPaymentDate()}" pattern="yyyy-MM-dd" /></td>
                                     <td>
                                         <c:choose>
@@ -262,27 +274,27 @@
                 </nav>
             </div>
 
-    </div>
-</body>
-<script>
-    function confirmDelete(event, paymentId) {
-        event.preventDefault(); // Ngăn chặn hành động mặc định của nút
+        </div>
+    </body>
+    <script>
+        function confirmDelete(event, paymentId) {
+            event.preventDefault(); // Ngăn chặn hành động mặc định của nút
 
-        // Hiển thị cửa sổ xác nhận
-        const confirmAction = confirm("Bạn có chắc chắn muốn xóa thanh toán này không?");
+            // Hiển thị cửa sổ xác nhận
+            const confirmAction = confirm("Bạn có chắc chắn muốn xóa thanh toán này không?");
 
-        if (confirmAction) {
-            // Nếu người dùng nhấn "OK", gửi form
-            const form = event.target.closest('form');
-            form.submit();
+            if (confirmAction) {
+                // Nếu người dùng nhấn "OK", gửi form
+                const form = event.target.closest('form');
+                form.submit();
+            }
         }
-    }
-</script>
-<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-<script src="assets/js/bootstrap.min.js"></script>
-<script src="assets/js/tiny-slider.js"></script>
-<script src="assets/js/glightbox.min.js"></script>
-<script src="assets/js/main.js"></script>
-<script type="text/javascript"></script>
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/tiny-slider.js"></script>
+    <script src="assets/js/glightbox.min.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script type="text/javascript"></script>
 </html>

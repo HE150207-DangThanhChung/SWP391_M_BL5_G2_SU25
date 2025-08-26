@@ -133,7 +133,7 @@
                     <i class="fas fa-tags"></i> 
                     Quản lí mã khuyến mãi
                 </a>
-                <a href="orders">
+                <a href="${pageContext.request.contextPath}/orders">
                     <i class="fas fa-tags"></i> 
                     Quản lí đơn hàng
                 </a>
