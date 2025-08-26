@@ -55,7 +55,7 @@
                     <option value="">Tất cả</option>
                     <option value="Pending" ${param.status == 'Pending' ? 'selected' : ''}>Chờ duyệt</option>
                     <option value="Approved" ${param.status == 'Approved' ? 'selected' : ''}>Đã duyệt</option>
-                    <option value="Rejected" ${param.status == 'Rejected' ? 'selected' : ''}>Đã huỷ</option>
+                    <option value="Cancelled" ${param.status == 'Rejected' ? 'selected' : ''}>Đã huỷ</option>
                 </select>
                 <button type="submit" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md">Lọc</button>
                 <a href="${pageContext.request.contextPath}/management/form-requests"><button type="button" class="bg-gray-800 hover:bg-gray-900 text-white px-4 py-2 rounded-md">Xoá bộ lọc</button></a>
