@@ -109,10 +109,12 @@
                     <i class="fas fa-warehouse"></i>
                     Quản lý cửa hàng
                 </a>
-                <a href="${pageContext.request.contextPath}/management/employees">
-                    <i class="fas fa-user-friends"></i> 
-                    Quản lí nhân viên
-                </a>
+                <c:if test="${sessionScope.authUser != null && sessionScope.authUser.roleId == 1}">
+                    <a href="${pageContext.request.contextPath}/management/employees">
+                        <i class="fas fa-user-friends"></i> 
+                        Quản lí nhân viên
+                    </a>
+                </c:if>
                 <a href="${pageContext.request.contextPath}/customer">
                     <i class="fas fa-tags"></i> 
                     Quản lí khách hàng

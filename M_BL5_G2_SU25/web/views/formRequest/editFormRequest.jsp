@@ -57,11 +57,29 @@
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Trạng thái *</label>
-                                <select name="status" id="status" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white" required>
-                                    <option value="Pending" <%=fr.getStatus().equals("Pending") ? "selected" : ""%>>Chờ duyệt</option>
-                                    <option value="Approved" <%=fr.getStatus().equals("Approved") ? "selected" : ""%>>Đã duyệt</option>
-                                    <option value="Cancelled" <%=fr.getStatus().equals("Cancelled") ? "selected" : ""%>>Đã huỷ</option>
-                                </select>
+                                <c:choose>
+                                    <c:when test="${sessionScope.authUser != null && sessionScope.authUser.roleId == 1}">
+                                        <!-- Admin có thể thay đổi trạng thái -->
+                                        <select name="status" id="status" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors duration-200 bg-white" required>
+                                            <option value="Pending" <%=fr.getStatus().equals("Pending") ? "selected" : ""%>>Chờ duyệt</option>
+                                            <option value="Approved" <%=fr.getStatus().equals("Approved") ? "selected" : ""%>>Đã duyệt</option>
+                                            <option value="Cancelled" <%=fr.getStatus().equals("Cancelled") ? "selected" : ""%>>Đã huỷ</option>
+                                        </select>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <!-- Nhân viên thường chỉ xem được trạng thái -->
+                                        <input type="hidden" name="status" value="<%=fr.getStatus()%>" />
+                                        <div class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-700">
+                                            <% 
+                                                String statusText = "";
+                                                if ("Pending".equals(fr.getStatus())) statusText = "Chờ duyệt";
+                                                else if ("Approved".equals(fr.getStatus())) statusText = "Đã duyệt";
+                                                else if ("Cancelled".equals(fr.getStatus())) statusText = "Đã huỷ";
+                                            %>
+                                            <%= statusText %>
+                                        </div>
+                                    </c:otherwise>
+                                </c:choose>
                             </div>
                             <div class="mb-4">
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Ngày tạo *</label>
