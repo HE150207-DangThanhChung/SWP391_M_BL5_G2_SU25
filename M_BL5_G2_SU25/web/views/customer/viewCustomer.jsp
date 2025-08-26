@@ -74,7 +74,7 @@
 
                 display: block;
                 text-align: left;
-                white-space: pre-wrap;
+                /* white-space: pre-wrap; */
                 word-break: break-word;
             }
             .actions{
