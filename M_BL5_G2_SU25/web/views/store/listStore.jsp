@@ -309,7 +309,7 @@
                             <thead>
                                 <tr>
                                     <th class="td-center"><input type="checkbox"/></th>
-                                    <th>Ảnh cửa hàng</th>
+<!--                                    <th>Ảnh cửa hàng</th>-->
                                     <th>Mã cửa hàng</th>
                                     <th>Tên cửa hàng</th>
                                     <th>Số điện thoại</th>
@@ -322,9 +322,9 @@
                                 <c:forEach var="s" items="${stores}">
                                     <tr>
                                         <td class="td-center"><input type="checkbox"/></td>
-                                        <td>
+<!--                                        <td>
                                             <img class="store-thumb" src="${pageContext.request.contextPath}/img/logo2.jpg" alt="logo"/>
-                                        </td>
+                                        </td>-->
                                         <td>${s.storeId}</td>
                                         <td>${s.storeName}</td>
                                         <td>${s.phone}</td>

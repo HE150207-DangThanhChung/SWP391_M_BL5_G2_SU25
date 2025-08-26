@@ -200,10 +200,10 @@
                 <form action="${pageContext.request.contextPath}/stores/add" method="post" class="card" novalidate>
                     <div class="form-two-col">
                         <!-- Left: Ảnh/logo -->
-                        <div class="media-box">
+<!--                        <div class="media-box">
                             <img class="store-image" src="${pageContext.request.contextPath}/img/logo2.jpg" alt="Logo Store"/>
                             <div style="font-size:13px; color:#555;">Ảnh minh họa cửa hàng</div>
-                        </div>
+                        </div>-->
 
                         <!-- Right: Thông tin -->
                         <div class="form-grid">

@@ -142,13 +142,13 @@
                 </div>
             </div>
 
-            <div class="store-top">
+<!--            <div class="store-top">
                 <img src="${pageContext.request.contextPath}/img/logo2.jpg" alt="Store Image" class="store-image"/>
                 <div>
                     <div style="font-size:20px; font-weight:700; margin-bottom:6px;">${store.storeName}</div>
                     
                 </div>
-            </div>
+            </div>-->
 
             <div class="detail-grid">
                 <div class="label">Mã cửa hàng</div>
