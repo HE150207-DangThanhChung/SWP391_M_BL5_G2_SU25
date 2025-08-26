@@ -162,8 +162,23 @@
                         localStorage.removeItem('lastSeenNotificationTime');
                         localStorage.removeItem('headerLastSeenNotificationTime');
                         
-                        // Chuyển về trang danh sách
-                        window.location.href = '${pageContext.request.contextPath}/management/form-requests';
+                        // Load lại thông báo header nếu function tồn tại (cho admin)
+                        if (typeof loadHeaderNotifications === 'function') {
+                            loadHeaderNotifications();
+                        }
+                        
+                        // Trigger event để header biết có yêu cầu mới
+                        $(document).trigger('newFormRequestCreated');
+                        
+                        // Gọi function toàn cục để trigger notification ngay lập tức
+                        if (typeof window.triggerNewRequestNotification === 'function') {
+                            window.triggerNewRequestNotification();
+                        }
+                        
+                        // Chờ một chút để thông báo được cập nhật, rồi chuyển trang
+                        setTimeout(function() {
+                            window.location.href = '${pageContext.request.contextPath}/management/form-requests';
+                        }, 500); // Delay 500ms
                     });
                 },
                 error: function (xhr) {

@@ -146,6 +146,7 @@
             });
             
             const data = $('#editFormRequestForm').serialize();
+            console.log('Sending data:', data); // Debug
             
             $.ajax({
                 url: '${pageContext.request.contextPath}/management/form-requests/edit',
@@ -153,6 +154,7 @@
                 data: data,
                 dataType: 'json',
                 success: function (response) {
+                    console.log('Success response:', response); // Debug
                     // Thành công - response là object JSON
                     Swal.fire({
                         title: 'Thành công!',
@@ -164,6 +166,8 @@
                     });
                 },
                 error: function (xhr) {
+                    console.log('Error response:', xhr); // Debug
+                    console.log('Response text:', xhr.responseText); // Debug
                     if (xhr.status === 401) {
                         // Unauthorized - Session timeout
                         Swal.fire({
