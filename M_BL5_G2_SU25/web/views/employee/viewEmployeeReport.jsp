@@ -80,7 +80,11 @@
                                             ${report.status == 'Pending' ? 'bg-yellow-100 text-yellow-800' :
                                               report.status == 'Approved' ? 'bg-green-100 text-green-800' :
                                               'bg-red-100 text-red-800'}">
-                                            ${report.status}
+                                            <c:choose>
+                                                <c:when test="${report.status == 'Pending'}">Đang chờ</c:when>
+                                                <c:when test="${report.status == 'Approved'}">Đã duyệt</c:when>
+                                                <c:when test="${report.status == 'Rejected'}">Từ chối</c:when>
+                                            </c:choose>
                                         </span>
                                     </div>
                                     <p class="mt-2 text-gray-700">${report.description}</p>
@@ -96,9 +100,6 @@
                             </div>
                         </c:otherwise>
                     </c:choose>
-
-                    
-
                 </c:when>
                 <c:otherwise>
                     <!-- Hiển thị danh sách nhân viên -->

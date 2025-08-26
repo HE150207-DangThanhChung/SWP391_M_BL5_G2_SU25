@@ -106,13 +106,21 @@ public class FormRequestController extends HttpServlet {
         Object authUserObj = request.getSession().getAttribute("authUser");
         if (authUserObj != null && authUserObj instanceof model.Employee) {
             model.Employee emp = (model.Employee) authUserObj;
-            if (emp.getRoleId() == 1 || (emp.getRoleName() != null && emp.getRoleName().toLowerCase().contains("admin"))) {
+            // Admin có roleId = 1 HOẶC roleName chứa "admin" (không phân biệt hoa thường)
+            if (emp.getRoleId() == 1) {
+                isAdmin = true;
+            } else if (emp.getRoleName() != null && emp.getRoleName().toLowerCase().contains("admin")) {
                 isAdmin = true;
             }
+            // Debug info để kiểm tra
+            System.out.println("DEBUG doGetEdit - User ID: " + emp.getEmployeeId() + ", roleId: " + emp.getRoleId() + ", roleName: " + emp.getRoleName() + ", isAdmin: " + isAdmin);
+        } else {
+            System.out.println("DEBUG doGetEdit - authUser not found or not Employee type. authUserObj: " + authUserObj);
         }
         
         if (!isAdmin) {
             // Nếu không phải admin, chuyển hướng về danh sách với thông báo lỗi
+            System.out.println("DEBUG doGetEdit - Access denied for non-admin user");
             response.sendRedirect(request.getContextPath() + "/management/form-requests?error=access_denied");
             return;
         }
@@ -201,9 +209,16 @@ public class FormRequestController extends HttpServlet {
             Object authUserObj = request.getSession().getAttribute("authUser");
             if (authUserObj != null && authUserObj instanceof model.Employee) {
                 model.Employee emp = (model.Employee) authUserObj;
-                if (emp.getRoleId() == 1 || (emp.getRoleName() != null && emp.getRoleName().toLowerCase().contains("admin"))) {
+                // Admin có roleId = 1 HOẶC roleName chứa "admin" (không phân biệt hoa thường)
+                if (emp.getRoleId() == 1) {
+                    isAdmin = true;
+                } else if (emp.getRoleName() != null && emp.getRoleName().toLowerCase().contains("admin")) {
                     isAdmin = true;
                 }
+                // Debug info để kiểm tra
+                System.out.println("DEBUG doPostEdit - User ID: " + emp.getEmployeeId() + ", roleId: " + emp.getRoleId() + ", roleName: " + emp.getRoleName() + ", isAdmin: " + isAdmin);
+            } else {
+                System.out.println("DEBUG doPostEdit - authUser not found or not Employee type. authUserObj: " + authUserObj);
             }
             
             // Lấy trạng thái hiện tại từ database
@@ -215,12 +230,16 @@ public class FormRequestController extends HttpServlet {
                 finalStatus = statusFromRequest; // Admin có thể thay đổi trạng thái
             }
             
-            // Kiểm tra quyền sửa: admin hoặc chính người tạo
-            if (!isAdmin && sessionEmployeeId.intValue() != formEmployeeId) {
-                response.setStatus(403); // Forbidden
-                response.getWriter().write("{\"success\":false,\"message\":\"Bạn không có quyền cập nhật yêu cầu này\"}");
-                return;
+            // Kiểm tra quyền sửa: 
+            if (!isAdmin) {
+                // Người dùng thường chỉ có thể sửa yêu cầu của chính mình
+                if (sessionEmployeeId.intValue() != formEmployeeId) {
+                    response.setStatus(403); // Forbidden
+                    response.getWriter().write("{\"success\":false,\"message\":\"Bạn không có quyền cập nhật yêu cầu này\"}");
+                    return;
+                }
             }
+            // Admin có thể sửa mọi yêu cầu, không cần kiểm tra thêm
             
             String employeeName = employeeDAO.getEmployeeNameById(formEmployeeId);
             FormRequest fr = new FormRequest(id, description, finalStatus, createdAt, formEmployeeId, employeeName);

@@ -305,7 +305,49 @@ public class FormRequestDAO extends DBContext {
                 "    ELSE CONCAT(e.LastName, ' ', e.MiddleName, ' ', e.FirstName) " +
                 "END AS EmployeeName " +
                 "FROM FormRequest fr JOIN Employee e ON fr.EmployeeId = e.EmployeeId " +
-                "WHERE CONVERT(date, fr.CreatedAt) = CONVERT(date, GETDATE()) ";
+                "WHERE CAST(fr.CreatedAt AS DATE) = CAST(GETDATE() AS DATE) " +
+                "ORDER BY fr.CreatedAt DESC";
+        
+        System.out.println("DEBUG: Executing SQL: " + sql);
+        
+        try (Connection conn = getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            // Test connection first
+            System.out.println("DEBUG: Database connection established successfully");
+            
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    FormRequest fr = mapRow(rs);
+                    System.out.println("DEBUG: Found request ID: " + fr.getFormRequestId() + 
+                                     ", Description: " + fr.getDescription() + 
+                                     ", CreatedAt: " + fr.getCreatedAt());
+                    list.add(fr);
+                }
+            }
+            
+            System.out.println("DEBUG: Total requests found today: " + list.size());
+            
+        } catch (Exception e) {
+            System.err.println("ERROR in getTodayNewRequests: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return list;
+    }
+    
+    /**
+     * Test method để lấy tất cả yêu cầu (for debugging)
+     */
+    public List<FormRequest> getAllRequestsForToday() {
+        List<FormRequest> list = new ArrayList<>();
+        String sql = "SELECT fr.*, " +
+                "CASE " +
+                "    WHEN e.MiddleName IS NULL THEN CONCAT(e.LastName, ' ', e.FirstName) " +
+                "    ELSE CONCAT(e.LastName, ' ', e.MiddleName, ' ', e.FirstName) " +
+                "END AS EmployeeName " +
+                "FROM FormRequest fr JOIN Employee e ON fr.EmployeeId = e.EmployeeId " +
+                "ORDER BY fr.CreatedAt DESC";
+        
         try (Connection conn = getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
