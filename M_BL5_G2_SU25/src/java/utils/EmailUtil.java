@@ -21,12 +21,10 @@ import javax.mail.internet.MimeMessage;
  */
 public class EmailUtil {
 
-//    public static final String FROM = "chungdthe150207@fpt.edu.vn";   
-//    static final String APP_PASSWORD = "pqdcvhjupaiqflum";            
-    static final String FROM_NAME = "HappySale";
+    public static final String FROM = "tayhosohigh@gmail.com";   
+    static final String APP_PASSWORD = "kdkj yflu zvur qswi";            
+//    static final String FROM_NAME = "HappySale";
 
-    public static final String FROM = "he180616nguyentuandung@gmail.com";
-    static final String APP_PASSWORD = "qrll vkzp xfxl ldrv";
 
     /**
      * Gửi email HTML đơn giản qua Gmail SMTP (STARTTLS 587).
