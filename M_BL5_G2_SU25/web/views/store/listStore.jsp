@@ -297,8 +297,8 @@
                         <span class="spacer"></span>
 
                         <a href="${pageContext.request.contextPath}/stores/add" class="btn btn-primary">➕ Thêm cửa hàng</a>
-                        <button type="button" class="btn btn-ghost">📤 Nhập file</button>
-                        <button type="button" class="btn btn-ghost">📥 Xuất file</button>
+<!--                        <button type="button" class="btn btn-ghost">📤 Nhập file</button>
+                        <button type="button" class="btn btn-ghost">📥 Xuất file</button>-->
                     </form>
                 </div>
 

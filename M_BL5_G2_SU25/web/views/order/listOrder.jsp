@@ -209,8 +209,8 @@
 
                             <div class="btn-group">
                                 <button class="btn btn-primary" onclick="window.location.href = '${pageContext.request.contextPath}/order/create'"><i class="bi bi-plus-lg me-1"></i>Tạo đơn</button>
-                                <button class="btn btn-outline-primary"><i class="bi bi-upload me-1"></i>Nhập</button>
-                                <button class="btn btn-outline-primary"><i class="bi bi-download me-1"></i>Xuất</button>
+<!--                                <button class="btn btn-outline-primary"><i class="bi bi-upload me-1"></i>Nhập</button>
+                                <button class="btn btn-outline-primary"><i class="bi bi-download me-1"></i>Xuất</button>-->
                             </div>
                         </div>
                     </div>

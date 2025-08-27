@@ -82,8 +82,8 @@
     <main class="app-main">
         <div class="container-fluid px-0">
             <div class="d-flex align-items-center justify-content-between mb-3">
-                <h1 class="h3 mb-0">Edit Store</h1>
-                <a href="${pageContext.request.contextPath}/stores" class="btn btn-outline-secondary btn-sm">← Back to list</a>
+                <h1 class="h3 mb-0">Chỉnh sửa cửa hàng</h1>
+                <a href="${pageContext.request.contextPath}/stores" class="btn btn-outline-secondary btn-sm">← Quay lại</a>
             </div>
 
             <div class="card-elevate p-4">
@@ -93,33 +93,33 @@
                             <input type="hidden" name="storeId" value="${store.storeId}"/>
 
                             <div class="mb-3">
-                                <label for="storeName" class="form-label">Store Name</label>
+                                <label for="storeName" class="form-label">Tên cửa hàng</label>
                                 <input type="text" class="form-control" id="storeName" name="storeName"
                                        value="${store.storeName}" required>
-                                <div class="invalid-feedback">Please enter the store name.</div>
+                                <div class="invalid-feedback">Vui lòng nhập tên cửa hàng.</div>
                             </div>
 
                             <div class="mb-3">
-                                <label for="address" class="form-label">Address</label>
+                                <label for="address" class="form-label">Địa chỉ</label>
                                 <input type="text" class="form-control" id="address" name="address"
                                        value="${store.address}" required>
-                                <div class="invalid-feedback">Please enter the address.</div>
+                                <div class="invalid-feedback">Vui lòng nhập địa chỉ.</div>
                             </div>
 
                             <div class="mb-3">
-                                <label for="phone" class="form-label">Phone</label>
+                                <label for="phone" class="form-label">Số điện thoại</label>
                                 <input type="tel" class="form-control" id="phone" name="phone"
                                        value="${store.phone}" pattern="^[0-9+()\-.\s]{6,}$" required>
                                 <div class="form-text">Accepts digits, space, +, -, () and .</div>
-                                <div class="invalid-feedback">Please enter a valid phone number.</div>
+                                <div class="invalid-feedback">Vui lòng nhập số điện thoại hợp lệ.</div>
                             </div>
 
                             <div class="mb-4">
-                                <label for="status" class="form-label">Status</label>
+                                <label for="status" class="form-label">Trạng thái</label>
                                 <!-- LƯU Ý: đồng bộ với listStore.jsp: dùng 'Active' / 'Deactive' -->
                                 <select class="form-select" id="status" name="status" required>
-                                    <option value="Active"   ${store.status == 'Active'   ? 'selected' : ''}>Active</option>
-                                    <option value="Deactive" ${store.status == 'Deactive' ? 'selected' : ''}>Deactive</option>
+                                    <option value="Active"   ${store.status == 'Active'   ? 'selected' : ''}>Hoạt động</option>
+                                    <option value="Deactive" ${store.status == 'Deactive' ? 'selected' : ''}>Không hoạt động</option>
                                 </select>
                                 <div class="invalid-feedback">Please select status.</div>
                             </div>

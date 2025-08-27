@@ -184,14 +184,14 @@
                     <thead>
                         <tr>
 
-                            <th>Order ID</th>
+                            <th>Mã Đơn Hàng</th>
 
-                            <th>Customer Name</th>
-                            <th>Payment Method</th>
-                            <th>Price</th>
-                            <th>Payment Date</th>
-                            <th>Payment Status</th>
-                            <th>Transaction Code</th>
+                            <th>Tên Khách Hàng</th>
+                            <th>Phương Thức Thanh Toán</th>
+                            <th>Giá Tiền</th>
+                            <th>Ngày Thanh Toán</th>
+                            <th>Trạng Thái Thanh Toán</th>
+                            <th>Mã Giao Dịch</th>
                         </tr>
                     </thead>
 
