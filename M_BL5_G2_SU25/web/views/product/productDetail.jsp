@@ -75,12 +75,22 @@
                                     <p><strong>Thương hiệu:</strong> ${product.brandName}</p>
                                     <p><strong>Danh mục:</strong> ${product.categoryName}</p>
                                     <p><strong>Nhà cung cấp:</strong> ${product.supplierName}</p>
-                                    <p><strong>Trạng thái:</strong> 
+                                    <p><strong>Trạng thái:</strong>
                                         <span class="badge ${product.status == 'Active' ? 'bg-success' : 'bg-danger'}">
-                                            ${product.status}
+                                            <c:choose>
+                                                <c:when test="${product.status == 'Active'}">
+                                                    Hoạt động
+                                                </c:when>
+                                                <c:when test="${product.status == 'Inactive'}">
+                                                    Không hoạt động
+                                                </c:when>
+                                                <c:otherwise>
+                                                    Không xác định
+                                                </c:otherwise>
+                                            </c:choose>
                                         </span>
                                     </p>
-                                    
+
                                     <%-- The crucial change here --%>
                                     <a href="${pageContext.request.contextPath}/editVariant?action=add&productId=${product.productId}" class="btn btn-primary">Thêm biến thể mới</a>
 
@@ -105,19 +115,19 @@
                                                 <ul class="spec-list">
                                                     <c:forEach var="attrOption" items="${variant.attributes}">
                                                         <li>${attrOption.attribute.attributeName}: ${attrOption.value}</li>
-                                                    </c:forEach>
-                                                    <c:if test="${empty variant.attributes}">
+                                                        </c:forEach>
+                                                        <c:if test="${empty variant.attributes}">
                                                         <li class="text-muted">Không có thông số kỹ thuật</li>
-                                                    </c:if>
+                                                        </c:if>
                                                 </ul>
                                                 <p><strong>Serials:</strong></p>
                                                 <ul class="serial-list">
                                                     <c:forEach var="serial" items="${variant.serials}">
                                                         <li>Số serial: ${serial.serialNumber}, Cửa hàng: ${serial.storeName}, Tạo: ${serial.createdAt}, Cập nhật: ${serial.updatedAt}</li>
-                                                    </c:forEach>
-                                                    <c:if test="${empty variant.serials}">
+                                                        </c:forEach>
+                                                        <c:if test="${empty variant.serials}">
                                                         <li class="text-muted">Không có số serial</li>
-                                                    </c:if>
+                                                        </c:if>
                                                 </ul>
                                                 <%-- The crucial change here --%>
                                                 <a href="${pageContext.request.contextPath}/editVariant?action=edit&productVariantId=${variant.productVariantId}" 
