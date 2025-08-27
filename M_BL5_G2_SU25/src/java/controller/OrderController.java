@@ -7,8 +7,10 @@
 
 package controller;
 
+import dal.CouponDAO;
 import dal.CustomerDAO;
 import dal.EmployeeDAO;
+import dal.OrderCouponDAO;
 import dal.OrderDAO;
 import dal.ProductDAO;
 import dal.StoreStockDAO;
@@ -26,12 +28,15 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import model.Coupon;
+import model.OrderCoupon;
 import model.Product;
 
 @WebServlet(name = "OrderController", urlPatterns = {"/orders", "/order/view", "/order/edit", "/order/create"})
 public class OrderController extends HttpServlet {
     private OrderDAO orderDAO = new OrderDAO();
     private StoreStockDAO storeStockDAO = new StoreStockDAO();
+    private OrderCouponDAO orderCouponDAO = new OrderCouponDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -189,6 +194,7 @@ public class OrderController extends HttpServlet {
             Order order = new Order(0, orderDate, status, customer, createdBy, saleBy, store, orderDetails);
             boolean success = orderDAO.createOrder(order);
             if (success) {
+                // Cập nhật kho hàng
                 for (OrderDetail detail : orderDetails) {
                     int productVariantId = detail.getProductVariantId();
                     int quantity = detail.getQuantity();
@@ -199,6 +205,22 @@ public class OrderController extends HttpServlet {
                         storeStockDAO.updateStoreStock(stock);
                     }
                 }
+
+                // Lưu thông tin mã giảm giá nếu có
+                String couponCode = request.getParameter("couponCode");
+                if (couponCode != null && !couponCode.trim().isEmpty()) {
+                    CouponDAO couponDAO = new CouponDAO();
+                    Coupon coupon = couponDAO.getByCode(couponCode);
+                    if (coupon != null) {
+                        double discountAmount = Double.parseDouble(request.getParameter("discountAmount"));
+                        OrderCoupon orderCoupon = new OrderCoupon();
+                        orderCoupon.setOrderId(order.getOrderId());
+                        orderCoupon.setCouponId(coupon.getCouponId());
+                        orderCoupon.setAppliedAmount(discountAmount);
+                        orderCouponDAO.insert(orderCoupon);
+                    }
+                }
+                
                 response.sendRedirect(request.getContextPath() + "/orders");
             } else {
                 request.setAttribute("error", "Lỗi tạo đơn hàng!");

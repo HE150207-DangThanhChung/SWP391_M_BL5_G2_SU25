@@ -245,72 +245,83 @@ public class OrderDAO {
         return details;
     }
 
-    // Tạo mới đơn hàng
-    public boolean createOrder(Order order) {
-        String sqlOrder = "INSERT INTO [Order] (OrderDate, Status, CustomerId, CreatedBy, SaleBy, StoreId) VALUES (?, ?, ?, ?, ?, ?)";
-        String sqlDetail = "INSERT INTO OrderDetail (OrderId, ProductVariantId, ProductName, Price, Quantity, Discount, TaxRate, TotalAmount, Status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        Connection con = null;
-        PreparedStatement psOrder = null;
-        PreparedStatement psDetail = null;
-        ResultSet rs = null;
-        try {
-            con = DBContext.getConnection();
-            con.setAutoCommit(false);
-            psOrder = con.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
-            psOrder.setDate(1, order.getOrderDate());
-            psOrder.setString(2, order.getStatus());
-            psOrder.setInt(3, order.getCustomer().getCustomerId());
-            psOrder.setInt(4, order.getCreatedBy().getEmployeeId());
-            psOrder.setInt(5, order.getSaleBy().getEmployeeId());
-            psOrder.setInt(6, order.getStore().getStoreId());
-            int affectedRows = psOrder.executeUpdate();
-            if (affectedRows == 0) {
-                throw new SQLException("Creating order failed, no rows affected.");
-            }
-            rs = psOrder.getGeneratedKeys();
-            int newOrderId = -1;
-            if (rs.next()) {
-                newOrderId = rs.getInt(1);
-            }
-            // Thêm chi tiết đơn hàng
-            psDetail = con.prepareStatement(sqlDetail);
-            for (OrderDetail detail : order.getOrderDetails()) {
-                psDetail.setInt(1, newOrderId);
-                psDetail.setInt(2, detail.getProductVariantId());
-                psDetail.setString(3, detail.getProductName());
-                psDetail.setDouble(4, detail.getPrice());
-                psDetail.setInt(5, detail.getQuantity());
-                if (detail.getDiscount() != null) {
-                    psDetail.setDouble(6, detail.getDiscount());
-                } else {
-                    psDetail.setNull(6, Types.FLOAT);
-                }
-                if (detail.getTaxRate() != null) {
-                    psDetail.setDouble(7, detail.getTaxRate());
-                } else {
-                    psDetail.setNull(7, Types.FLOAT);
-                }
-                psDetail.setDouble(8, detail.getTotalAmount());
-                psDetail.setString(9, detail.getStatus());
-                psDetail.addBatch();
-            }
-            psDetail.executeBatch();
-            con.commit();
-            return true;
-        } catch (Exception e) {
-            if (con != null) try {
-                con.rollback();
-            } catch (SQLException ex) {
-                ex.printStackTrace();
-            }
-            throw new RuntimeException("createOrder() failed", e);
-        } finally {
-            DBContext.closeConnection(rs);
-            DBContext.closeConnection(psOrder);
-            DBContext.closeConnection(psDetail);
-            DBContext.closeConnection(con);
+   // Tạo mới đơn hàng
+public boolean createOrder(Order order) {
+    String sqlOrder = "INSERT INTO [Order] (OrderDate, Status, CustomerId, CreatedBy, SaleBy, StoreId) VALUES (?, ?, ?, ?, ?, ?)";
+    String sqlDetail = "INSERT INTO OrderDetail (OrderId, ProductVariantId, ProductName, Price, Quantity, Discount, TaxRate, TotalAmount, Status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    Connection con = null;
+    PreparedStatement psOrder = null;
+    PreparedStatement psDetail = null;
+    ResultSet rs = null;
+    try {
+        con = DBContext.getConnection();
+        con.setAutoCommit(false);
+
+        // Insert Order
+        psOrder = con.prepareStatement(sqlOrder, Statement.RETURN_GENERATED_KEYS);
+        psOrder.setDate(1, order.getOrderDate());
+        psOrder.setString(2, order.getStatus());
+        psOrder.setInt(3, order.getCustomer().getCustomerId());
+        psOrder.setInt(4, order.getCreatedBy().getEmployeeId());
+        psOrder.setInt(5, order.getSaleBy().getEmployeeId());
+        psOrder.setInt(6, order.getStore().getStoreId());
+
+        int affectedRows = psOrder.executeUpdate();
+        if (affectedRows == 0) {
+            throw new SQLException("Creating order failed, no rows affected.");
         }
+
+        rs = psOrder.getGeneratedKeys();
+        int newOrderId = -1;
+        if (rs.next()) {
+            newOrderId = rs.getInt(1);
+            order.setOrderId(newOrderId); // ✅ rất quan trọng
+        }
+
+        // Insert OrderDetail
+        psDetail = con.prepareStatement(sqlDetail);
+        for (OrderDetail detail : order.getOrderDetails()) {
+            psDetail.setInt(1, newOrderId);
+            psDetail.setInt(2, detail.getProductVariantId());
+            psDetail.setString(3, detail.getProductName());
+            psDetail.setDouble(4, detail.getPrice());
+            psDetail.setInt(5, detail.getQuantity());
+
+            if (detail.getDiscount() != null) {
+                psDetail.setDouble(6, detail.getDiscount());
+            } else {
+                psDetail.setNull(6, Types.FLOAT);
+            }
+
+            if (detail.getTaxRate() != null) {
+                psDetail.setDouble(7, detail.getTaxRate());
+            } else {
+                psDetail.setNull(7, Types.FLOAT);
+            }
+
+            psDetail.setDouble(8, detail.getTotalAmount());
+            psDetail.setString(9, detail.getStatus());
+            psDetail.addBatch();
+        }
+        psDetail.executeBatch();
+
+        con.commit();
+        return true;
+    } catch (Exception e) {
+        if (con != null) try {
+            con.rollback();
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+        throw new RuntimeException("createOrder() failed", e);
+    } finally {
+        DBContext.closeConnection(rs);
+        DBContext.closeConnection(psOrder);
+        DBContext.closeConnection(psDetail);
+        DBContext.closeConnection(con);
     }
+}
+
 
     // Cập nhật đơn hàng (chỉ cho phép khi trạng thái là pending)
     public boolean updateOrder(Order order) {

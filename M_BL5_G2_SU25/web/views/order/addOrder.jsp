@@ -218,11 +218,136 @@
             </div>
         </div>
 
+        <!-- Phần áp dụng mã giảm giá -->
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title">
+                    <i class="bi bi-tag me-2"></i>Mã giảm giá
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="input-group">
+                            <input type="text" id="couponCode" class="form-control" placeholder="Nhập mã giảm giá">
+                            <button type="button" class="btn btn-primary" onclick="applyCoupon()">
+                                <i class="bi bi-check2"></i> Áp dụng
+                            </button>
+                        </div>
+                        <div id="couponMessage" class="form-text mt-2"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-end">
+                            <div class="text-end">
+                                <div class="mb-2">
+                                    <span class="text-muted">Tạm tính:</span>
+                                    <span id="subtotal" class="ms-2 fw-medium">0₫</span>
+                                </div>
+                                <div class="mb-2">
+                                    <span class="text-muted">Giảm giá:</span>
+                                    <span id="discount" class="ms-2 text-danger fw-medium">0₫</span>
+                                </div>
+                                <div>
+                                    <span class="text-muted">Tổng cộng:</span>
+                                    <span id="total" class="ms-2 fw-bold fs-5">0₫</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="d-flex gap-2 justify-content-end mt-4">
+            <input type="hidden" name="discountAmount" id="discountAmount" value="0">
+            <input type="hidden" name="finalTotal" id="finalTotal" value="0">
+            <input type="hidden" name="couponCode" id="appliedCouponCode" value="">
             <button type="submit" class="btn btn-primary btn-icon">
                 <i class="bi bi-check-lg"></i> Tạo đơn hàng
             </button>
         </div>
+
+        <script>
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        function updateTotals() {
+            let subtotal = 0;
+            document.querySelectorAll('input[name="totalAmount"]').forEach(input => {
+                subtotal += parseFloat(input.value || 0);
+            });
+            
+            let discountAmount = parseFloat(document.getElementById('discountAmount').value || 0);
+            let finalTotal = subtotal - discountAmount;
+
+            document.getElementById('subtotal').textContent = formatCurrency(subtotal);
+            document.getElementById('discount').textContent = formatCurrency(discountAmount);
+            document.getElementById('total').textContent = formatCurrency(finalTotal);
+            document.getElementById('finalTotal').value = finalTotal;
+        }
+
+        function applyCoupon() {
+            const code = document.getElementById('couponCode').value.trim();
+            if (!code) {
+                showCouponMessage('Vui lòng nhập mã giảm giá', 'text-danger');
+                return;
+            }
+
+            let subtotal = 0;
+            let productCount = 0;
+            document.querySelectorAll('input[name="totalAmount"]').forEach(input => {
+                if (parseFloat(input.value || 0) > 0) {
+                    subtotal += parseFloat(input.value);
+                    productCount++;
+                }
+            });
+
+            fetch('${pageContext.request.contextPath}/apply-coupon', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `couponCode=\${encodeURIComponent(code)}&orderTotal=\${subtotal}&productCount=\${productCount}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('discountAmount').value = data.discountAmount;
+                    document.getElementById('appliedCouponCode').value = code;
+                    showCouponMessage(
+                        `Đã áp dụng mã giảm giá: giảm \${data.discountPercent}% (tối đa \${formatCurrency(data.maxDiscount)})`,
+                        'text-success'
+                    );
+                    updateTotals();
+                } else {
+                    showCouponMessage(data.message, 'text-danger');
+                }
+            })
+            .catch(error => {
+                showCouponMessage('Có lỗi xảy ra khi áp dụng mã giảm giá', 'text-danger');
+                console.error('Error:', error);
+            });
+        }
+
+        function showCouponMessage(message, className) {
+            const messageEl = document.getElementById('couponMessage');
+            messageEl.textContent = message;
+            messageEl.className = 'form-text mt-2 ' + className;
+        }
+
+        // Cập nhật tổng tiền khi trang load và khi có thay đổi
+        document.addEventListener('DOMContentLoaded', updateTotals);
+        document.querySelectorAll('input[name="quantity"], input[name="discount"], input[name="taxRate"]')
+            .forEach(input => {
+                input.addEventListener('input', updateTotals);
+            });
+        </script>
     </form>
 </div>
 

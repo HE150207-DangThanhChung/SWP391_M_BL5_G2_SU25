@@ -279,6 +279,19 @@ public class CouponDAO {
 
     
     // ---------- CONVENIENCE ----------
+    // Giảm số lần áp dụng còn lại của coupon
+    public boolean decrementApplyLimit(int couponId) {
+        String sql = "UPDATE dbo.Coupon SET ApplyLimit = ApplyLimit - 1 WHERE CouponId = ? AND ApplyLimit > 0";
+        try (Connection cn = db.getConnection();
+             PreparedStatement ps = cn.prepareStatement(sql)) {
+            ps.setInt(1, couponId);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     // Hàm tìm kiếm tùy theo yêu cầu
     // Hàm tìm kiếm các coupon còn hoạt động
     public List<Coupon> getAllActive() {
@@ -299,4 +312,30 @@ public class CouponDAO {
         }
         return list;
     }
+    public static void main(String[] args) {
+    CouponDAO dao = new CouponDAO();
+
+    // Mã coupon cần test (đảm bảo có trong DB)
+    String testCode = "BACK2SCHOOL"; // ví dụ
+
+    Coupon coupon = dao.getByCode(testCode);
+
+    if (coupon != null) {
+        System.out.println("✅ Tìm thấy coupon:");
+        System.out.println("ID: " + coupon.getCouponId());
+        System.out.println("Code: " + coupon.getCouponCode());
+        System.out.println("Discount Percent: " + coupon.getDiscountPercent());
+        System.out.println("Max Discount: " + coupon.getMaxDiscount());
+        System.out.println("Requirement: " + coupon.getRequirement());
+        System.out.println("Min Total: " + coupon.getMinTotal());
+        System.out.println("Min Product: " + coupon.getMinProduct());
+        System.out.println("Apply Limit: " + coupon.getApplyLimit());
+        System.out.println("From Date: " + coupon.getFromDate());
+        System.out.println("To Date: " + coupon.getToDate());
+        System.out.println("Status: " + coupon.getStatus());
+    } else {
+        System.out.println("❌ Không tìm thấy coupon với code: " + testCode);
+    }
+}
+
 }
