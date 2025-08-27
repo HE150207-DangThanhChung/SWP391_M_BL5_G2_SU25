@@ -3,6 +3,7 @@ package controller;
 import dal.OrderDAO;
 import dal.PaymentsDAO;
 import dal.StoreStockDAO;
+import dal.OrderCouponDAO;
 import java.io.IOException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -30,18 +31,21 @@ import java.nio.charset.StandardCharsets;
 import java.util.Calendar;
 import java.util.Locale;
 import java.util.TimeZone;
+import model.OrderCoupon;
 
 @WebServlet(name = "CheckoutInfo", urlPatterns = {"/checkoutInfo"})
 public class CheckoutInfo extends HttpServlet {
     private OrderDAO orderDAO;
     private PaymentsDAO paymentsDAO;
     private StoreStockDAO storeStockDAO;
+    private OrderCouponDAO orderCouponDAO;
 
     @Override
     public void init() throws ServletException {
         orderDAO = new OrderDAO();
         paymentsDAO = new PaymentsDAO();
         storeStockDAO = new StoreStockDAO();
+        orderCouponDAO = new OrderCouponDAO();
     }
 
     @Override
@@ -73,8 +77,22 @@ public class CheckoutInfo extends HttpServlet {
             for (OrderDetail detail : order.getOrderDetails()) {
                 totalAmount += detail.getTotalAmount();
             }
+            
+            // Tính toán giảm giá từ các coupon đã áp dụng
+            List<OrderCoupon> appliedCoupons = orderCouponDAO.getByOrderId(orderId);
+            double discountAmount = 0;
+            for (OrderCoupon coupon : appliedCoupons) {
+                discountAmount += coupon.getAppliedAmount();
+            }
+            
+            // Trừ số tiền giảm giá từ tổng tiền
+            double originalAmount = totalAmount;
+            totalAmount = Math.max(0, totalAmount - discountAmount);
 
             request.setAttribute("order", order);
+            request.setAttribute("discountAmount", formatCurrencyVND(discountAmount));
+            request.setAttribute("originalAmount", formatCurrencyVND(originalAmount));
+            request.setAttribute("appliedCoupons", appliedCoupons);
             request.setAttribute("rawAmount", totalAmount);
             request.setAttribute("totalAmount", formatCurrencyVND(totalAmount));
             request.getRequestDispatcher("/views/payment/checkout.jsp").forward(request, response);
@@ -115,6 +133,16 @@ public class CheckoutInfo extends HttpServlet {
             for (OrderDetail detail : order.getOrderDetails()) {
                 totalAmount += detail.getTotalAmount();
             }
+            
+            // Tính toán giảm giá từ các coupon đã áp dụng
+            List<OrderCoupon> appliedCoupons = orderCouponDAO.getByOrderId(orderId);
+            double discountAmount = 0;
+            for (OrderCoupon coupon : appliedCoupons) {
+                discountAmount += coupon.getAppliedAmount();
+            }
+            
+            // Trừ số tiền giảm giá từ tổng tiền
+            totalAmount = Math.max(0, totalAmount - discountAmount);
             long paymentPrice = Math.round(totalAmount);
             
             Payments payment = new Payments();

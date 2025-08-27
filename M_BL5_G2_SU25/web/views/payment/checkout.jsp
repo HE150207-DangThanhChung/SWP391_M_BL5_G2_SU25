@@ -48,7 +48,22 @@
                                     <p><strong>Chi nhánh:</strong> ${order.store.storeName}</p>
                                 </div>
                                 <div class="col-md-6">
-                                    <p><strong>Tổng tiền:</strong> ${totalAmount} VNĐ</p>
+                                    <p><strong>Tổng tiền gốc:</strong> ${originalAmount} VNĐ</p>
+                                    <c:if test="${not empty appliedCoupons}">
+                                        <p class="text-success"><strong>Giảm giá:</strong> -${discountAmount} VNĐ</p>
+                                        <div class="small mb-2">
+                                            <strong>Mã giảm giá đã áp dụng:</strong>
+                                            <ul class="list-unstyled">
+                                                <c:forEach items="${appliedCoupons}" var="coupon">
+                                                    <li class="text-success">
+                                                        <i class="bi bi-ticket-perforated"></i>
+                                                        Mã ${coupon.coupon.couponCode}: -${coupon.appliedAmount} VNĐ
+                                                    </li>
+                                                </c:forEach>
+                                            </ul>
+                                        </div>
+                                    </c:if>
+                                    <p class="fw-bold text-primary"><strong>Thành tiền:</strong> ${totalAmount} VNĐ</p>
                                     <p><strong>Trạng thái:</strong> ${order.status}</p>
                                 </div>
                             </div>
