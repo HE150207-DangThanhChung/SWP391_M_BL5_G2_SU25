@@ -190,28 +190,82 @@
                         </tfoot>
                     </table>
                 </div>
-                  <div class="section-title">Mã giảm giá áp dụng</div>
-        <table>
-            <tr>
-                <th>Mã Coupon</th>
-                <th>Số tiền giảm</th>
-                <th>Ngày áp dụng</th>
-            </tr>
-            <c:set var="hasCoupon" value="false"/>
-            <c:forEach var="oc" items="${orderCoupons}">
-                <c:if test="${oc.orderId == order.orderId}">
-                    <c:set var="hasCoupon" value="true"/>
-                    <tr>
-                        <td>${oc.coupon != null ? oc.coupon.couponCode : oc.couponId}</td>
-                        <td><fmt:formatNumber value="${oc.appliedAmount}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
-                        <td><fmt:formatDate value="${oc.appliedAt}" pattern="dd/MM/yyyy HH:mm"/></td>
-                    </tr>
-                </c:if>
-            </c:forEach>
-            <c:if test="${!hasCoupon}">
-                <tr><td colspan="3" style="text-align:center;color:#888;">Không có mã giảm giá nào được áp dụng</td></tr>
-            </c:if>
-        </table>              
+                  <div class="card mt-4">
+                    <div class="card-header">
+                        <h5 class="card-title">
+                            <i class="bi bi-ticket-perforated me-2"></i>Mã giảm giá áp dụng
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-hover align-middle">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>Mã Coupon</th>
+                                        <th>Phần trăm giảm</th>
+                                        <th>Số tiền giảm</th>
+                                        <th>Ngày áp dụng</th>
+                                        <th>Yêu cầu tối thiểu</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <c:set var="hasCoupon" value="false"/>
+                                    <c:forEach var="oc" items="${orderCoupons}">
+                                        <c:if test="${oc.orderId == order.orderId}">
+                                            <c:set var="hasCoupon" value="true"/>
+                                            <tr>
+                                                <td>${oc.coupon != null ? oc.coupon.couponCode : oc.couponId}</td>
+                                                <td>
+                                                    <c:if test="${oc.coupon != null}">
+                                                        <span class="badge bg-info">
+                                                            <fmt:formatNumber value="${oc.coupon.discountPercent}" type="number" maxFractionDigits="1"/>%
+                                                        </span>
+                                                        <c:if test="${oc.coupon.maxDiscount > 0}">
+                                                            <br>
+                                                            <small class="text-muted">
+                                                                Tối đa: <fmt:formatNumber value="${oc.coupon.maxDiscount}" type="currency" currencySymbol="₫" maxFractionDigits="0"/>
+                                                            </small>
+                                                        </c:if>
+                                                    </c:if>
+                                                </td>
+                                                <td class="text-end">
+                                                    <span class="fw-medium text-success">
+                                                        -<fmt:formatNumber value="${oc.appliedAmount}" type="number" pattern="#,##0"/>₫
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <fmt:formatDate value="${oc.appliedAt}" pattern="dd/MM/yyyy HH:mm"/>
+                                                </td>
+                                                <td>
+                                                    <c:if test="${oc.coupon != null}">
+                                                        <c:if test="${oc.coupon.minTotal > 0}">
+                                                            <small class="d-block">
+                                                                <i class="bi bi-cash me-1"></i>Đơn tối thiểu: 
+                                                                <fmt:formatNumber value="${oc.coupon.minTotal}" type="number" pattern="#,##0"/>₫
+                                                            </small>
+                                                        </c:if>
+                                                        <c:if test="${oc.coupon.minProduct > 0}">
+                                                            <small class="d-block">
+                                                                <i class="bi bi-box me-1"></i>Số sản phẩm tối thiểu: ${oc.coupon.minProduct}
+                                                            </small>
+                                                        </c:if>
+                                                    </c:if>
+                                                </td>
+                                            </tr>
+                                        </c:if>
+                                    </c:forEach>
+                                    <c:if test="${!hasCoupon}">
+                                        <tr>
+                                            <td colspan="5" class="text-center text-muted">
+                                                <i class="bi bi-info-circle me-2"></i>Không có mã giảm giá nào được áp dụng
+                                            </td>
+                                        </tr>
+                                    </c:if>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>              
             </div>
                                 
         </div>
