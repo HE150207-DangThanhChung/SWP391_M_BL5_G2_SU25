@@ -158,27 +158,7 @@
                         icon: 'success',
                         confirmButtonColor: '#3b82f6'
                     }).then(() => {
-                        // Xóa thông tin "đã xem" để admin sẽ thấy thông báo mới
-                        localStorage.removeItem('lastSeenNotificationTime');
-                        localStorage.removeItem('headerLastSeenNotificationTime');
-                        
-                        // Load lại thông báo header nếu function tồn tại (cho admin)
-                        if (typeof loadHeaderNotifications === 'function') {
-                            loadHeaderNotifications();
-                        }
-                        
-                        // Trigger event để header biết có yêu cầu mới
-                        $(document).trigger('newFormRequestCreated');
-                        
-                        // Gọi function toàn cục để trigger notification ngay lập tức
-                        if (typeof window.triggerNewRequestNotification === 'function') {
-                            window.triggerNewRequestNotification();
-                        }
-                        
-                        // Chờ một chút để thông báo được cập nhật, rồi chuyển trang
-                        setTimeout(function() {
-                            window.location.href = '${pageContext.request.contextPath}/management/form-requests';
-                        }, 500); // Delay 500ms
+                        window.location.href = '${pageContext.request.contextPath}/management/form-requests';
                     });
                 },
                 error: function (xhr) {

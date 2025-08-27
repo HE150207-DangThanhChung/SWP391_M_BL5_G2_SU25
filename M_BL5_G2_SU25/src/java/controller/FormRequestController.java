@@ -169,9 +169,7 @@ public class FormRequestController extends HttpServlet {
             FormRequest fr = new FormRequest(0, description, status, createdAt, employeeId, employeeName);
             dao.add(fr);
             
-            // Cập nhật thông báo trong session để admin có thể thấy
-            request.getSession().setAttribute("hasNewFormRequest", true);
-            request.getSession().setAttribute("lastNotificationUpdate", System.currentTimeMillis());
+            // Đã xóa phần xử lý thông báo
             
             // Trả về thành công kèm theo thông tin người tạo từ session
             response.getWriter().write("{\"success\":true,\"message\":\"Thêm yêu cầu thành công\",\"employeeId\":" + employeeId + ",\"employeeName\":\"" + employeeName + "\"}");
