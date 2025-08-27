@@ -55,21 +55,9 @@
                                     <input type="hidden" name="existingOptionId[]" value="${option.attributeOptionId}">
                                     <input type="text" class="form-control" name="existingOptionValue[]" value="${option.value}" required>
                                 </div>
-                                <div class="col-sm-2 text-end">
-                                    <button type="button" class="btn btn-danger btn-sm" onclick="removeOption(this)">Xóa</button>
-                                </div>
                             </div>
                         </c:forEach>
                     </div>
-
-                    <h3 class="mt-4">Thêm giá trị mới</h3>
-                    <div id="new-options">
-                        <div class="form-group">
-                            <input type="text" class="form-control" name="newOptionValue[]" placeholder="Nhập giá trị mới">
-                        </div>
-                    </div>
-                    <button type="button" class="btn btn-secondary" onclick="addNewOptionField()">Thêm giá trị khác</button>
-                    
                     <hr>
                     <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
                     <a href="${pageContext.request.contextPath}/attribute/list" class="btn btn-light">Hủy</a>
