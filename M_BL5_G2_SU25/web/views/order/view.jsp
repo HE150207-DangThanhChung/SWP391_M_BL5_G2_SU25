@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <html>
 <head>
     <title>Chi tiết đơn hàng</title>
@@ -123,12 +124,17 @@
                 <tr>
                     <td>${detail.productVariantId}</td>
                     <td>${detail.productName}</td>
-                    <td>${detail.price}</td>
+                    <td><fmt:formatNumber value="${detail.price}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
                     <td>${detail.quantity}</td>
-                    <td>${detail.discount}</td>
-                    <td>${detail.taxRate}</td>
-                    <td>${detail.totalAmount}</td>
-                    <td>${detail.status}</td>
+                    <td><fmt:formatNumber value="${detail.discount}" type="number" maxFractionDigits="2"/>%</td>
+                    <td><fmt:formatNumber value="${detail.taxRate}" type="number" maxFractionDigits="2"/>%</td>
+                    <td><fmt:formatNumber value="${detail.totalAmount}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
+                    <td>
+                        <c:choose>
+                            <c:when test="${detail.status eq 'Completed'}">Đã hoàn thành</c:when>
+                            <c:otherwise>${detail.status}</c:otherwise>
+                        </c:choose>
+                    </td>
                 </tr>
             </c:forEach>
         </table>

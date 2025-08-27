@@ -197,11 +197,24 @@
 
                     <tbody>
                         <c:if test="${not empty listP}">
+                            
+                            <jsp:useBean id="latestPayments" class="java.util.HashMap"/>
+                            
+                           
                             <c:forEach items="${listP}" var="payment">
+                                <c:set var="currentOrderId" value="${payment.getOrderID()}"/>
+                                <c:set var="currentPaymentDate" value="${payment.getPaymentDate().getTime()}"/>
+                                
+                                <c:if test="${empty latestPayments[currentOrderId] || 
+                                            latestPayments[currentOrderId].getPaymentDate().getTime() < currentPaymentDate}">
+                                    <c:set target="${latestPayments}" property="${currentOrderId}" value="${payment}"/>
+                                </c:if>
+                            </c:forEach>
+                            
+                         
+                            <c:forEach items="${latestPayments.values()}" var="payment">
                                 <tr>
-
                                     <td>${payment.getOrderID()}</td>
-
                                     <td>${payment.getFirstName()} ${payment.getMiddleName()} ${payment.getLastName()}</td>
                                     <td>${payment.getPaymentMethod()}</td>
                                     <td>

@@ -1,6 +1,7 @@
 
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -193,12 +194,18 @@
                     </select>
                 </td>
                 <td><input type="text" class="form-control form-control-sm" name="productName" required readonly /></td>
-                <td><input type="number" class="form-control form-control-sm" step="0.01" name="price" required readonly /></td>
+                <td>
+                    <input type="hidden" name="price" />
+                    <input type="text" class="form-control form-control-sm" readonly />
+                </td>
                 <td><input type="number" class="form-control form-control-sm" name="quantity" required /></td>
                 <td><input type="number" class="form-control form-control-sm" step="0.01" name="discount" /></td>
                 <td><input type="number" class="form-control form-control-sm" step="0.01" name="taxRate" /></td>
                 <td><input type="number" class="form-control form-control-sm" step="0.01" name="totalAmount" required readonly /></td>
-                <td><input type="text" class="form-control form-control-sm" name="detailStatus" readonly /></td>
+                <td>
+                    <input type="hidden" name="detailStatus" value="Completed" />
+                    <input type="text" class="form-control form-control-sm" readonly />
+                </td>
                 <td>
                     <button type="button" class="btn btn-outline-danger btn-sm" onclick="removeRow(this)">
                         <i class="bi bi-trash"></i>
@@ -240,20 +247,33 @@
             }
         }
 
-        function fillProductDetails(select) {
+            function formatCurrency(amount) {
+                return new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                }).format(amount);
+            }
+
+            function fillProductDetails(select) {
             var row = select.closest('tr');
             var option = select.options[select.selectedIndex];
             
             // Điền thông tin sản phẩm
             row.querySelector('input[name="productName"]').value = option.dataset.name || '';
-            row.querySelector('input[name="price"]').value = option.dataset.price || '';
-            
-            // Reset các trường còn lại
+            var price = option.dataset.price || 0;
+            row.querySelector('input[name="price"]').value = price;
+            row.querySelector('input[name="price"]').nextElementSibling.value = formatCurrency(price);            // Reset các trường còn lại
             row.querySelector('input[name="quantity"]').value = '';
             row.querySelector('input[name="discount"]').value = '';
             row.querySelector('input[name="taxRate"]').value = '';
             row.querySelector('input[name="totalAmount"]').value = '';
-            row.querySelector('input[name="detailStatus"]').value = 'Completed';
+            // Cập nhật trạng thái
+            var hiddenStatus = row.querySelector('input[name="detailStatus"]');
+            var displayStatus = hiddenStatus.nextElementSibling;
+            hiddenStatus.value = 'Completed';
+            displayStatus.value = 'Đã hoàn thành';
             
             // Thêm sự kiện tính tổng tiền khi thay đổi số lượng hoặc giảm giá
             var quantityInput = row.querySelector('input[name="quantity"]');
