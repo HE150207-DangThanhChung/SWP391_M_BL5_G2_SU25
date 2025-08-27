@@ -128,15 +128,15 @@
                     </select>
                     <select class="form-select form-select-sm" id="statusFilter">
                         <option value="">Tất cả trạng thái</option>
-                        <option value="Active">Active</option>
-                        <option value="Inactive">Inactive</option>
+                        <option value="Active">Hoạt động</option>
+                        <option value="Inactive">Không hoạt động</option>
                     </select>
                     <div class="position-relative">
-                        <input type="number" step="0.01" class="form-control form-control-sm" id="minPrice" placeholder="Giá min">
+                        <input type="number" step="0.01" class="form-control form-control-sm" id="minPrice" placeholder="Giá thấp nhất">
                         <div class="error-message">Giá tối thiểu phải lớn hơn hoặc bằng 0</div>
                     </div>
                     <div class="position-relative">
-                        <input type="number" step="0.01" class="form-control form-control-sm" id="maxPrice" placeholder="Giá max">
+                        <input type="number" step="0.01" class="form-control form-control-sm" id="maxPrice" placeholder="Giá cao nhất">
                         <div class="error-message">Giá tối đa phải lớn hơn hoặc bằng 0</div>
                     </div>
                     <select class="form-select form-select-sm" id="sortBy">

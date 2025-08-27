@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <!DOCTYPE html>
 <html>
     <head>
@@ -90,7 +90,7 @@
                                             <div class="card-body">
                                                 <h6>Biến thể ${loop.count}</h6>
                                                 <p><strong>Mã sản phẩm:</strong> ${variant.productCode}</p>
-                                                <p><strong>Giá:</strong> ${variant.price}</p>
+                                                <p><strong>Giá:</strong> <fmt:formatNumber value="${variant.price}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></p>
                                                 <p><strong>Bảo hành:</strong> ${variant.warrantyDurationMonth} tháng</p>
                                                 <p><strong>Hình ảnh:</strong></p>
                                                 <div class="d-flex flex-wrap">

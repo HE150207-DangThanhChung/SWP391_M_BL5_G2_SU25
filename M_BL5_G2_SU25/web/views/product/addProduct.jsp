@@ -141,7 +141,7 @@
                                         <c:forEach var="attribute" items="${allAttributes}">
                                             <div class="form-group">
                                                 <label>${attribute.attributeName}</label>
-                                                <select class="form-control" name="attributeOptionId[0][]" required>
+                                                <select class="form-control" name="attributeOptionId[0][]">
                                                     <option value="">Chọn ${attribute.attributeName}</option>
                                                     <c:forEach var="option" items="${attributeOptions[attribute.attributeId]}">
                                                         <option value="${option.attributeOptionId}">${option.value}</option>
@@ -196,22 +196,12 @@
     let variantIndexCounter = 1; // Start with 1 as index 0 is already on the page
 
     // Pre-render store options to avoid JSTL in JavaScript
-    const storeOptionsHtml = `
-        <option value="">Chọn cửa hàng</option>
-        <c:forEach var="store" items="${stores}">
-            <option value="\${store.storeId}">\${fn:escapeXml(store.storeName)}</option>
-        </c:forEach>
-    `;
+    const storeOptionsHtml = `<option value="">Chọn cửa hàng</option><c:forEach var="store" items="\${stores}"><option value="\${store.storeId}">\${fn:escapeXml(store.storeName)}</option></c:forEach>`;
 
     // Pre-render attribute options to avoid JSTL in JavaScript
     const attributeOptionsHtml = {};
     <c:forEach var="attribute" items="${allAttributes}">
-        attributeOptionsHtml[${attribute.attributeId}] = `
-            <option value="">Chọn \${attribute.attributeName}</option>
-            <c:forEach var="option" items="${attributeOptions[attribute.attributeId]}">
-                <option value="\${option.attributeOptionId}">\${fn:escapeXml(option.value)}</option>
-            </c:forEach>
-        `;
+        attributeOptionsHtml[${attribute.attributeId}] = `<option value="">Chọn \${attribute.attributeName}</option><c:forEach var="option" items="${attributeOptions[attribute.attributeId]}"><option value="\${option.attributeOptionId}">\${fn:escapeXml(option.value)}</option></c:forEach>`;
     </c:forEach>
 
     document.addEventListener("DOMContentLoaded", function () {
@@ -239,7 +229,7 @@
             attributesHtml += `
                 <div class="form-group">
                     <label>\${attribute.attributeName}</label>
-                    <select class="form-control" name="attributeOptionId[\${newVariantIndex}][]" required>
+                    <select class="form-control" name="attributeOptionId[\${newVariantIndex}][]">
                         \${attributeOptionsHtml[\${attribute.attributeId}]}
                     </select>
                     <div class="error-message">Vui lòng chọn \${attribute.attributeName.toLowerCase()}</div>
@@ -358,7 +348,9 @@
     function validateForm(event) {
         event.preventDefault();
         const form = event.target;
-        const allFields = form.querySelectorAll("input[required], select[required]");
+        const allFields = form.querySelectorAll(
+            "input[required], select[required]"
+        );
         let firstInvalid = null;
         let valid = true;
 
@@ -398,24 +390,6 @@
                 }
                 if (!firstInvalid) firstInvalid = field;
             }
-        });
-
-        // Validate unique attribute options per variant
-        document.querySelectorAll('.variant-card').forEach(variant => {
-            const selects = variant.querySelectorAll('select[name^="attributeOptionId"]');
-            const selectedOptions = new Set();
-            selects.forEach(select => {
-                if (select.value && selectedOptions.has(select.value)) {
-                    valid = false;
-                    select.classList.add('error-border');
-                    const errorMessage = select.nextElementSibling;
-                    errorMessage.textContent = 'Không thể chọn cùng giá trị cho nhiều thông số';
-                    errorMessage.style.display = 'block';
-                    if (!firstInvalid) firstInvalid = select;
-                } else if (select.value) {
-                    selectedOptions.add(select.value);
-                }
-            });
         });
 
         // Validate at least one image per variant
