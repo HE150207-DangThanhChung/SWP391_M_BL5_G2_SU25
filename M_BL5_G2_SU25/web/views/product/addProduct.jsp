@@ -109,8 +109,8 @@
                         <label class="form-label">Trạng thái</label>
                         <select class="form-select" name="status" required>
                             <option value="">Chọn trạng thái</option>
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
+                            <option value="Active">Hoạt động</option>
+                            <option value="Inactive">Không hoạt động</option>
                         </select>
                         <div class="error-message">Vui lòng chọn trạng thái</div>
                     </div>

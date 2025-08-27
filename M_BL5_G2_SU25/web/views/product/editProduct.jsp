@@ -92,8 +92,8 @@
                             <div class="mb-3">
                                 <label class="form-label">Trạng thái</label>
                                 <select class="form-select" name="status" required>
-                                    <option value="Active" ${product.status == 'Active' ? 'selected' : ''}>Active</option>
-                                    <option value="Inactive" ${product.status == 'Inactive' ? 'selected' : ''}>Inactive</option>
+                                    <option value="Active" ${product.status == 'Active' ? 'selected' : ''}>Hoạt động</option>
+                                    <option value="Inactive" ${product.status == 'Inactive' ? 'selected' : ''}>Không hoạt động</option>
                                 </select>
                             </div>
                         </c:if>
