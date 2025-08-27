@@ -75,7 +75,16 @@ public class LoginController extends HttpServlet {
         session.setAttribute("employeeName", employeeName);
 
         // Redirect to dashboard only after all session work is done
-        response.sendRedirect(request.getContextPath() + "/views/dashboard/ownerDashboard.jsp");
+        if (profile.getRoleId() == 1) {
+            response.sendRedirect(request.getContextPath() + "/management/employees");
+
+        } else if (profile.getRoleId() == 1) {
+            response.sendRedirect(request.getContextPath() + "/orders");
+
+        } else if (profile.getRoleId() == 2) {
+            response.sendRedirect(request.getContextPath() + "/product");
+
+        }
         
 //        Will change to this after complete dashboard
 //        response.sendRedirect(request.getContextPath() + "/owner/dashboard");
