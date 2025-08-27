@@ -434,7 +434,7 @@
                         <td>\${product.productId != undefined ? product.productId : 'N/A'}</td>
                         <td>
                             <img src="\${imageSrc}" alt="\${product.productName || 'No Name'}" class="product-img" \${imageSrc ? '' : 'style="display:none;"'}>
-                            <span class="text-muted" \${imageSrc ? 'style="display:none;"' : ''}>No image</span>
+                            <span class="text-muted" \${imageSrc ? 'style="display:none;"' : ''}>Không có ảnh</span>
                         </td>
                         <td><a href="${pageContext.request.contextPath}/product/detail?productId=\${product.productId != undefined ? product.productId : ''}">\${product.productName || 'No Name'}</a></td>
                         <td>\${product.brandName != undefined ? product.brandName : 'N/A'}</td>
