@@ -165,10 +165,97 @@ public class OrderCouponDAO {
             return 0;
         }
     }
-    
-    public static void main(String[] args) {
-    OrderCouponDAO dao = new OrderCouponDAO();
 
+public List<OrderCoupon> getAll() {
+    String sql = """
+        SELECT OrderId, CouponId, AppliedAt, AppliedAmount
+        FROM dbo.OrderCoupon
+        """;
+    List<OrderCoupon> list = new ArrayList<>();
+    try (Connection cn = db.getConnection();
+         PreparedStatement ps = cn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+        while (rs.next()) {
+            list.add(mapRow(rs));
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return list;
+}
+public List<OrderCoupon> getAllWithCoupon() {
+    String sql = """
+        SELECT oc.OrderId, oc.CouponId, oc.AppliedAt, oc.AppliedAmount,
+               c.CouponId AS cId, c.CouponCode, c.DiscountPercent, c.MaxDiscount,
+               c.Requirement, c.MinTotal, c.MinProduct, c.ApplyLimit,
+               c.FromDate, c.ToDate, c.Status
+        FROM dbo.OrderCoupon oc
+        JOIN dbo.Coupon c ON oc.CouponId = c.CouponId
+        """;
+
+    List<OrderCoupon> list = new ArrayList<>();
+    try (Connection cn = db.getConnection();
+         PreparedStatement ps = cn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+
+        while (rs.next()) {
+            // map OrderCoupon
+            OrderCoupon oc = new OrderCoupon();
+            oc.setOrderId(rs.getInt("OrderId"));
+            oc.setCouponId(rs.getInt("CouponId"));
+            oc.setAppliedAt(rs.getTimestamp("AppliedAt"));
+            oc.setAppliedAmount(rs.getDouble("AppliedAmount"));
+
+            // map Coupon
+            Coupon c = new Coupon();
+            c.setCouponId(rs.getInt("cId"));
+            c.setCouponCode(rs.getString("CouponCode"));
+            c.setDiscountPercent(rs.getDouble("DiscountPercent"));
+            c.setMaxDiscount(rs.getDouble("MaxDiscount"));
+            c.setRequirement(rs.getString("Requirement"));
+            c.setMinTotal(rs.getDouble("MinTotal"));
+            c.setMinProduct(rs.getInt("MinProduct"));
+            c.setApplyLimit(rs.getInt("ApplyLimit"));
+            c.setFromDate(rs.getDate("FromDate"));
+            c.setToDate(rs.getDate("ToDate"));
+            c.setStatus(rs.getString("Status"));
+
+            // gắn coupon vào orderCoupon
+            oc.setCoupon(c);
+
+            list.add(oc);
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return list;
+}
+
+   public static void main(String[] args) {
+    OrderCouponDAO dao = new OrderCouponDAO();
+    List<OrderCoupon> list = dao.getAllWithCoupon();
+
+    if (list.isEmpty()) {
+        System.out.println("Không có dữ liệu trong OrderCoupon!");
+    } else {
+        System.out.println("Danh sách OrderCoupon:");
+        for (OrderCoupon oc : list) {
+            Coupon c = oc.getCoupon(); // lấy Coupon gắn vào OrderCoupon
+            System.out.println(
+                "OrderId: " + oc.getOrderId()
+                + ", CouponId: " + oc.getCouponId()
+                + ", AppliedAt: " + oc.getAppliedAt()
+                + ", AppliedAmount: " + oc.getAppliedAmount()
+                + (c != null ? 
+                    " | CouponCode: " + c.getCouponCode()
+                    + ", Discount: " + c.getDiscountPercent() + "%"
+                    + ", Status: " + c.getStatus()
+                    : " | (Không có Coupon)")
+            );
+        }
+    }
+}
+
+
 
 }

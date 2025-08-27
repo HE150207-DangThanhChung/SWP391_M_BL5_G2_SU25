@@ -190,7 +190,30 @@
                         </tfoot>
                     </table>
                 </div>
+                  <div class="section-title">Mã giảm giá áp dụng</div>
+        <table>
+            <tr>
+                <th>Mã Coupon</th>
+                <th>Số tiền giảm</th>
+                <th>Ngày áp dụng</th>
+            </tr>
+            <c:set var="hasCoupon" value="false"/>
+            <c:forEach var="oc" items="${orderCoupons}">
+                <c:if test="${oc.orderId == order.orderId}">
+                    <c:set var="hasCoupon" value="true"/>
+                    <tr>
+                        <td>${oc.coupon != null ? oc.coupon.couponCode : oc.couponId}</td>
+                        <td><fmt:formatNumber value="${oc.appliedAmount}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
+                        <td><fmt:formatDate value="${oc.appliedAt}" pattern="dd/MM/yyyy HH:mm"/></td>
+                    </tr>
+                </c:if>
+            </c:forEach>
+            <c:if test="${!hasCoupon}">
+                <tr><td colspan="3" style="text-align:center;color:#888;">Không có mã giảm giá nào được áp dụng</td></tr>
+            </c:if>
+        </table>              
             </div>
+                                
         </div>
         <div class="d-flex gap-2 justify-content-end mt-4">
             <button type="submit" class="btn btn-primary btn-icon">

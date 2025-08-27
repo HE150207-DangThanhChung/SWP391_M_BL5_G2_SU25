@@ -84,22 +84,29 @@ public class OrderController extends HttpServlet {
         }
          StoreDAO storeDAO = new StoreDAO();
         List<Store> stores = storeDAO.getAllStores();
+        
+         List<OrderCoupon> orderCoupons = orderCouponDAO.getAllWithCoupon();
         request.setAttribute("stores", stores);
         request.setAttribute("orders", orders);
+          request.setAttribute("orderCoupons", orderCoupons);
         request.getRequestDispatcher("/views/order/listOrder.jsp").forward(request, response);
     }
 
     private void viewOrder(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int orderId = Integer.parseInt(request.getParameter("id"));
         Order order = orderDAO.getOrderById(orderId);
+         List<OrderCoupon> orderCoupons = orderCouponDAO.getAllWithCoupon();
         request.setAttribute("order", order);
+          request.setAttribute("orderCoupons", orderCoupons);
         request.getRequestDispatcher("/views/order/view.jsp").forward(request, response);
     }
 
     private void showEditForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int orderId = Integer.parseInt(request.getParameter("id"));
         Order order = orderDAO.getOrderById(orderId);
+          List<OrderCoupon> orderCoupons = orderCouponDAO.getAllWithCoupon();
         request.setAttribute("order", order);
+          request.setAttribute("orderCoupons", orderCoupons);
         request.getRequestDispatcher("/views/order/editOrder.jsp").forward(request, response);
     }
 

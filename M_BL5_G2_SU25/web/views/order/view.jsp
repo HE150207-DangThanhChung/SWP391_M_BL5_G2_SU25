@@ -97,10 +97,11 @@
     </c:if>
 
     <c:if test="${not empty order}">
+        <!-- Thông tin chung -->
         <div class="section-title">Thông tin chung</div>
         <table class="info-table">
             <tr><th>Mã đơn hàng</th><td>${order.orderId}</td></tr>
-            <tr><th>Ngày đặt</th><td>${order.orderDate}</td></tr>
+            <tr><th>Ngày đặt</th><td><fmt:formatDate value="${order.orderDate}" pattern="dd/MM/yyyy HH:mm"/></td></tr>
             <tr><th>Trạng thái</th><td>${order.status}</td></tr>
             <tr><th>Khách hàng</th><td>${order.customer != null ? order.customer.fullName : order.customerId}</td></tr>
             <tr><th>Người tạo</th><td>${order.createdBy != null ? order.createdBy.fullName : order.createdById}</td></tr>
@@ -108,6 +109,7 @@
             <tr><th>Cửa hàng</th><td>${order.store != null ? order.store.storeName : order.storeId}</td></tr>
         </table>
 
+        <!-- Danh sách sản phẩm -->
         <div class="section-title">Danh sách sản phẩm</div>
         <table>
             <tr>
@@ -137,6 +139,30 @@
                     </td>
                 </tr>
             </c:forEach>
+        </table>
+
+        <!-- Danh sách Coupon áp dụng -->
+        <div class="section-title">Mã giảm giá áp dụng</div>
+        <table>
+            <tr>
+                <th>Mã Coupon</th>
+                <th>Số tiền giảm</th>
+                <th>Ngày áp dụng</th>
+            </tr>
+            <c:set var="hasCoupon" value="false"/>
+            <c:forEach var="oc" items="${orderCoupons}">
+                <c:if test="${oc.orderId == order.orderId}">
+                    <c:set var="hasCoupon" value="true"/>
+                    <tr>
+                        <td>${oc.coupon != null ? oc.coupon.couponCode : oc.couponId}</td>
+                        <td><fmt:formatNumber value="${oc.appliedAmount}" type="currency" currencySymbol="₫" maxFractionDigits="0"/></td>
+                        <td><fmt:formatDate value="${oc.appliedAt}" pattern="dd/MM/yyyy HH:mm"/></td>
+                    </tr>
+                </c:if>
+            </c:forEach>
+            <c:if test="${!hasCoupon}">
+                <tr><td colspan="3" style="text-align:center;color:#888;">Không có mã giảm giá nào được áp dụng</td></tr>
+            </c:if>
         </table>
     </c:if>
 

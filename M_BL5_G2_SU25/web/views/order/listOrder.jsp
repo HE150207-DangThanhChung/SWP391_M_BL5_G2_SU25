@@ -306,14 +306,30 @@
                                                 <c:out value="${order.orderDetails != null ? order.orderDetails.size() : 0}" />
                                             </td>
                                             <td class="text-end">
-                                                                                <c:set var="total" value="0" />
-                                                                                <c:forEach var="detail" items="${order.orderDetails}">
-                                                                                    <c:set var="total" value="${total + detail.totalAmount}" />
-                                                                                </c:forEach>
-                                                                                <span class="fw-medium">
-                                                                                    <fmt:formatNumber value="${total}" type="number" pattern="#,##0"/>₫
-                                                                                </span>
-                                                                            </td>                                            <td class="text-center">
+    <c:set var="total" value="0" />
+    <c:forEach var="detail" items="${order.orderDetails}">
+        <c:set var="total" value="${total + detail.totalAmount}" />
+    </c:forEach>
+
+    <c:set var="discount" value="0" />
+    <c:forEach var="oc" items="${orderCoupons}">
+        <c:if test="${oc.orderId == order.orderId}">
+            <c:set var="discount" value="${discount + oc.appliedAmount}" />
+        </c:if>
+    </c:forEach>
+
+    <span class="fw-medium">
+        <fmt:formatNumber value="${total - discount}" type="number" pattern="#,##0"/>₫
+    </span>
+
+    <c:if test="${discount > 0}">
+        <br/>
+        <small class="text-success">- Giảm giá:
+            <fmt:formatNumber value="${discount}" type="number" pattern="#,##0"/>₫
+        </small>
+    </c:if>
+</td>
+                                          <td class="text-center">
                                                 <div class="btn-group btn-group-sm">
                                                     <button class="btn btn-outline-primary"
                                                             onclick="window.location.href = '${pageContext.request.contextPath}/order/view?id=${order.orderId}'">
