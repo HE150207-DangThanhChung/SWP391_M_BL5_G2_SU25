@@ -119,10 +119,7 @@
                     <i class="fas fa-tags"></i> 
                     Quản lí khách hàng
                 </a>
-                <a href="">
-                    <i class="fas fa-tags"></i> 
-                    Quản lí nhập kho
-                </a>
+                
                 <a href="${pageContext.request.contextPath}/management/category">
                     <i class="fas fa-tags"></i> 
                     Quản lí danh mục
