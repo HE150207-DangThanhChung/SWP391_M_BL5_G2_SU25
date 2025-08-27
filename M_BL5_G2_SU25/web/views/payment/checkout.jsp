@@ -64,7 +64,22 @@
                                         </div>
                                     </c:if>
                                     <p class="fw-bold text-primary"><strong>Thành tiền:</strong> ${totalAmount} VNĐ</p>
-                                    <p><strong>Trạng thái:</strong> ${order.status}</p>
+                                    <p><strong>Trạng thái:</strong> 
+                                        <c:choose>
+                                            <c:when test="${order.status eq 'Pending'}">
+                                                <span class="badge bg-warning">Chờ thanh toán</span>
+                                            </c:when>
+                                            <c:when test="${order.status eq 'Completed'}">
+                                                <span class="badge bg-success">Đã thanh toán</span>
+                                            </c:when>
+                                            <c:when test="${order.status eq 'Cancelled'}">
+                                                <span class="badge bg-danger">Đã hủy</span>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <span class="badge bg-secondary">${order.status}</span>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </p>
                                 </div>
                             </div>
                         </div>
