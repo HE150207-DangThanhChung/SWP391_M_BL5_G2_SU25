@@ -188,10 +188,10 @@
                                         class="btn-primary px-4 py-2 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-200 text-sm">
                                     ✏️ Chỉnh sửa thông tin
                                 </button>
-                                <button onclick="history.back()"
+<!--                                <button onclick="history.back()"
                                         class="btn-secondary px-4 py-2 text-white rounded-lg font-medium shadow-md hover:shadow-lg transition-all duration-200 text-sm">
                                     ← Quay lại
-                                </button>
+                                </button>-->
                             </div>
                         </div>
                     </div>

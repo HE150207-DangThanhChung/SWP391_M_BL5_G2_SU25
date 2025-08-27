@@ -176,7 +176,7 @@ public class ReceiptController extends HttpServlet {
             int odId = Integer.parseInt(odIdStr);
 
             Order o = oDao.getOrderById(odId);
-            List<OrderDetail> odDetail = oDao.getOrderDetails(odId);
+            List<OrderDetail> odDetail = oDao.getOrderDetails(o.getOrderId());
 
             jsonMap.put("success", true);
             jsonMap.put("order", o);

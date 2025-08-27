@@ -20,7 +20,7 @@ public class OrderDAO {
 
     public static void main(String[] args) {
         OrderDAO oDao = new OrderDAO();
-        System.out.println(oDao.getCompletedOrders("", 100, 0).size());
+        System.out.println(oDao.getOrderDetails(1));
     }
     
     // Lấy danh sách đơn hàng

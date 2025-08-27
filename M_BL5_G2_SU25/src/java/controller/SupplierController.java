@@ -23,7 +23,7 @@ import java.util.List;
 public class SupplierController extends HttpServlet {
 
     private static final Gson gson = new GsonBuilder().setPrettyPrinting().create();
-    private final int ITEMS_PER_PAGE = 2;
+    private final int ITEMS_PER_PAGE = 3;
     private final String BASE_PATH = "/management/suppliers";
 
     @Override
