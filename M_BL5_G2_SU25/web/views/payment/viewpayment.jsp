@@ -13,7 +13,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Chi tiết hoá đơn</title>
+        <title>Danh sách thanh toán</title>
         <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
